@@ -1,7 +1,11 @@
-<h1>Admin Dashboard</h1>
-<p>Ini laman admin</p>
+@extends('layouts.admin')
 
-<form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button type="submit">Logout</button>
-</form>
+@section('title', 'Dashboard Admin')
+@section('topbar_title', 'Dashboard Admin')
+
+@section('content')
+    <div class="card">
+        <h3>Selamat Datang, {{ auth()->user()->name }}!</h3>
+        <p>Anda login sebagai Admin.</p>
+    </div>
+@endsection

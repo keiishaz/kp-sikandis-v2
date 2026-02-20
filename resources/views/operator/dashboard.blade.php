@@ -1,7 +1,11 @@
-<h1>Operator Dashboard</h1>
-<p>Ini laman operator</p>
+@extends('layouts.admin')
 
-<form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button type="submit">Logout</button>
-</form>
+@section('title', 'Dashboard Operator')
+@section('topbar_title', 'Dashboard Operator')
+
+@section('content')
+    <div class="card">
+        <h3>Selamat Datang, {{ auth()->user()->name }}!</h3>
+        <p>Anda login sebagai Operator.</p>
+    </div>
+@endsection
