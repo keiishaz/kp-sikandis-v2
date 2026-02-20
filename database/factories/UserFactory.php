@@ -25,8 +25,8 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'nip' => fake()->unique()->numerify('##################'), // 18 digits
+            'role_id' => 1, // Default to a valid role if possible, or use factory states
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
