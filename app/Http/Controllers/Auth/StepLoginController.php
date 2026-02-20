@@ -76,8 +76,15 @@ class StepLoginController extends Controller
             Auth::login($user);
             $r->session()->regenerate();
             session()->forget('login_nip');
+
+            // Redirect based on role
+            if ($user->role && $user->role->nama_role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->role && $user->role->nama_role === 'operator') {
+                return redirect()->intended(route('operator.dashboard'));
+            }
             
-            return redirect('/dashboard');
+            return redirect()->intended(route('dashboard'));
         }
 
         // FAILURE

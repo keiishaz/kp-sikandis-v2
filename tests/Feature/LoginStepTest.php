@@ -24,27 +24,47 @@ class LoginStepTest extends TestCase
         }
     }
 
-    public function test_login_flow_success()
+    public function test_login_admin_redirects_to_admin_dashboard()
     {
+        $adminRole = \App\Models\Role::where('nama_role', 'admin')->first();
         $user = User::factory()->create([
             'nip' => '123456789',
             'password' => Hash::make('password'),
-            'role_id' => 1
+            'role_id' => $adminRole->id
         ]);
 
         // Step 1: Check NIP
-        $response = $this->post('/login-nip', ['nip' => '123456789']);
-        $response->assertRedirect('/login-password');
-        $response->assertSessionHas('login_nip', '123456789');
+        $this->post('/login-nip', ['nip' => '123456789'])
+             ->assertRedirect('/login-password')
+             ->assertSessionHas('login_nip', '123456789');
 
         // Step 2: Submit Password
-        $response = $this->post('/login-password', ['password' => 'password']);
-        $response->assertRedirect('/dashboard');
+        $this->post('/login-password', ['password' => 'password'])
+             ->assertRedirect(route('admin.dashboard'));
+             
         $this->assertAuthenticatedAs($user);
         
         // Check Log
         $log = File::get(storage_path('logs/login.txt'));
         $this->assertStringContainsString('LOGIN SUCCESS', $log);
+    }
+
+    public function test_login_operator_redirects_to_operator_dashboard()
+    {
+        $operatorRole = \App\Models\Role::where('nama_role', 'operator')->first();
+        $user = User::factory()->create([
+            'nip' => '987654321',
+            'password' => Hash::make('password'),
+            'role_id' => $operatorRole->id
+        ]);
+
+        session(['login_nip' => $user->nip]);
+
+        // Step 2: Submit Password
+        $this->post('/login-password', ['password' => 'password'])
+             ->assertRedirect(route('operator.dashboard'));
+             
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_login_lockout_logic()
@@ -80,5 +100,45 @@ class LoginStepTest extends TestCase
         // Check Log Blocked
         $log = File::get(storage_path('logs/login.txt'));
         $this->assertStringContainsString('LOGIN BLOCKED', $log);
+    }
+
+    public function test_authenticated_user_cannot_access_login_page()
+    {
+        $user = User::factory()->create(['role_id' => 1]);
+        $this->actingAs($user);
+
+        $this->get('/login')->assertRedirect(route('dashboard'));
+        $this->get('/login-password')->assertRedirect(route('dashboard'));
+    }
+
+    public function test_admin_cannot_access_operator_dashboard()
+    {
+        $adminRole = \App\Models\Role::where('nama_role', 'admin')->first();
+        $user = User::factory()->create(['nip' => '111111', 'role_id' => $adminRole->id]);
+        $this->actingAs($user);
+
+        // Should redirect to admin dashboard
+        $this->get(route('operator.dashboard'))->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_operator_cannot_access_admin_dashboard()
+    {
+        $operatorRole = \App\Models\Role::where('nama_role', 'operator')->first();
+        $user = User::factory()->create(['nip' => '222222', 'role_id' => $operatorRole->id]);
+        $this->actingAs($user);
+
+        // Should redirect to operator dashboard
+        $this->get(route('admin.dashboard'))->assertRedirect(route('operator.dashboard'));
+    }
+
+    public function test_logout_functionality()
+    {
+        $user = User::factory()->create(['role_id' => 1]);
+        $this->actingAs($user);
+
+        $this->post(route('logout'))
+             ->assertRedirect('/');
+
+        $this->assertGuest();
     }
 }
