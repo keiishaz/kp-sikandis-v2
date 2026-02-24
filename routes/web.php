@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\StepLoginController;
 use App\Http\Controllers\Admin\KelolaOperatorController;
+use App\Http\Controllers\Admin\UnitController;
+use App\Http\Controllers\Admin\SubUnitController;
 
 Route::redirect('/', '/login');
 Route::middleware('guest')->group(function () {
@@ -18,9 +20,16 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
+
         Route::resource('kelola-operator', KelolaOperatorController::class)
              ->only(['index', 'store', 'edit', 'update', 'destroy'])
              ->names('kelola-operator');
+
+        Route::resource('units', UnitController::class)
+             ->only(['index', 'store', 'edit', 'update', 'destroy']);
+
+        Route::resource('units.sub-units', SubUnitController::class)
+             ->only(['index', 'store', 'edit', 'update', 'destroy']);
     });
 
     Route::prefix('operator')->name('operator.')->middleware('role:operator')->group(function () {

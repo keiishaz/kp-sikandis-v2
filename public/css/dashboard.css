@@ -925,6 +925,18 @@ body {
     }
 }
 
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 .modal-header {
     display: flex;
     align-items: center;
@@ -1348,4 +1360,36 @@ body {
     font-size: 0.85rem;
     padding-left: 2.5rem;
     /* Indent sub items */
+}
+
+/* ========================================
+   TOAST NOTIFICATION
+   ======================================== */
+
+.toast-notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    max-width: 360px;
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+    animation: slideInRight 0.3s ease;
+}
+
+.toast-success {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    color: #15803d;
+}
+
+.toast-error {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
 }
