@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pemegangs', function (Blueprint $table) {
+        Schema::create('kendaraan_pemegangs', function (Blueprint $table) {
             $table->id();
-            $table->string('nama', 150);
-            $table->char('nip', 18)->unique();
-            $table->string('jabatan', 100);
-            $table->foreignId('unit_id')->constrained('units');
-            $table->foreignId('sub_unit_id')->constrained('sub_units');
             $table->timestamps();
         });
     }
@@ -27,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pemegangs');
+        Schema::dropIfExists('kendaraan_pemegangs');
     }
 };

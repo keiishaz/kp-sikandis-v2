@@ -18,6 +18,11 @@ class SubUnitController extends Controller
         return view('admin.units.sub-units.index', compact('unit', 'subUnits'));
     }
 
+    public function create(Unit $unit)
+    {
+        return view('admin.units.sub-units.create', compact('unit'));
+    }
+
     public function store(StoreSubUnitRequest $request, Unit $unit)
     {
         $subUnit = $unit->subUnits()->create($request->validated());

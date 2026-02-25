@@ -13,4 +13,9 @@ class Unit extends Model
     {
         return $this->hasMany(SubUnit::class);
     }
+
+    public function pegawais(): HasMany
+    {
+        return $this->hasMany(Pegawai::class);
+    }
 }

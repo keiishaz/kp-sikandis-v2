@@ -44,12 +44,11 @@
                     <div class="nav-group-header">Kendaraan</div>
                     <div class="nav-group-items">
                         <div class="nav-item">
-                            <!-- Placeholder for Pemegang -->
                             <a href="#" class="nav-link">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
                                 </svg>
-                                <span>Kelola Data Pemegang</span>
+                                <span>Kelola Pemegang Kendaraan</span>
                             </a>
                         </div>
                         <div class="nav-item">
@@ -85,17 +84,20 @@
                             </a>
                         </div>
                         <div class="nav-item">
-                            <!-- Placeholder for Pegawai -->
-                            <a href="#" class="nav-link">
-                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                            <!-- Nav Item: Kelola Pegawai -->
+                            <a href="{{ route('admin.pegawai.index') }}" class="nav-link {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                                 <span>Kelola Pegawai</span>
                             </a>
                         </div>
                         <div class="nav-item">
-                            <!-- Placeholder for Kategori -->
-                            <a href="#" class="nav-link">
+                            <!-- Nav Item: Kelola Kategori -->
+                            <a href="{{ route('admin.kategori.index') }}" class="nav-link {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
                                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H12L10 4Z" fill="currentColor"/>
                                 </svg>

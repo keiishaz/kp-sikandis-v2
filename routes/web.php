@@ -6,6 +6,9 @@ use App\Http\Controllers\Auth\StepLoginController;
 use App\Http\Controllers\Admin\KelolaOperatorController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\SubUnitController;
+use App\Http\Controllers\Admin\PegawaiController;
+use App\Http\Controllers\Admin\KategoriController;
+use App\Models\Unit;
 
 Route::redirect('/', '/login');
 Route::middleware('guest')->group(function () {
@@ -22,14 +25,29 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
         Route::resource('kelola-operator', KelolaOperatorController::class)
-             ->only(['index', 'store', 'edit', 'update', 'destroy'])
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
              ->names('kelola-operator');
 
         Route::resource('units', UnitController::class)
-             ->only(['index', 'store', 'edit', 'update', 'destroy']);
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
         Route::resource('units.sub-units', SubUnitController::class)
-             ->only(['index', 'store', 'edit', 'update', 'destroy']);
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // URL: admin/pegawai
+        Route::resource('pegawai', PegawaiController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // URL: admin/kategori
+        Route::resource('kategori', KategoriController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // Endpoint dependent dropdown sub-unit berdasarkan unit
+        Route::get('/api/units/{unit}/sub-units', function (Unit $unit) {
+            return response()->json(
+                $unit->subUnits()->orderBy('nama_sub_unit')->get(['id', 'nama_sub_unit'])
+            );
+        })->name('api.units.sub-units');
     });
 
     Route::prefix('operator')->name('operator.')->middleware('role:operator')->group(function () {

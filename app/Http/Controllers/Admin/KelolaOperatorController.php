@@ -33,6 +33,11 @@ class KelolaOperatorController extends Controller
         return view('admin.kelola-operator.index', compact('operators'));
     }
 
+    public function create()
+    {
+        return view('admin.kelola-operator.create');
+    }
+
     public function store(Request $request)
     {
         $operatorRole = Role::where('nama_role', 'operator')->firstOrFail();

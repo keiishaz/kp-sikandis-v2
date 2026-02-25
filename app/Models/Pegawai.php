@@ -4,19 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class SubUnit extends Model
+class Pegawai extends Model
 {
-    protected $fillable = ['unit_id', 'nama_sub_unit'];
+    protected $table = 'pegawais';
+
+    protected $fillable = ['nama', 'nip', 'jabatan', 'unit_id', 'sub_unit_id'];
 
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
     }
 
-    public function pegawais(): HasMany
+    public function subUnit(): BelongsTo
     {
-        return $this->hasMany(Pegawai::class);
+        return $this->belongsTo(SubUnit::class);
     }
 }

@@ -30,10 +30,10 @@
         <div class="table-header">
             <h3 class="table-title">Daftar Sub Unit</h3>
             <div class="table-header-actions">
-                <button type="button" class="btn btn-primary" data-modal-open="modal-sub-unit-create">
+                <a href="{{ route('admin.units.sub-units.create', $unit) }}" class="btn btn-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Tambah Sub Unit</span>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -64,8 +64,7 @@
                                           method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-action btn-delete" title="Hapus"
-                                                onclick="return confirm('Yakin ingin menghapus sub unit ini?')">
+                                        <button type="submit" class="btn-action btn-delete" title="Hapus">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
                                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -95,28 +94,4 @@
 
         <div class="pagination-wrapper">{{ $subUnits->links() }}</div>
     </section>
-
-    {{-- Modal: Tambah Sub Unit --}}
-    <div class="modal-overlay {{ $errors->any() ? 'active' : '' }}" id="modal-sub-unit-create">
-        <div class="modal" role="dialog" aria-modal="true">
-            <div class="modal-header">
-                <h3 class="modal-title">Tambah Sub Unit</h3>
-                <button type="button" class="modal-close" data-modal-close="modal-sub-unit-create">✕</button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{{ route('admin.units.sub-units.store', $unit) }}">
-                    @csrf
-                    <div class="form-field">
-                        <label for="nama_sub_unit">Nama Sub Unit</label>
-                        <input id="nama_sub_unit" name="nama_sub_unit" value="{{ old('nama_sub_unit') }}" required autofocus>
-                        @error('nama_sub_unit')<div class="error-text">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-modal-close="modal-sub-unit-create">Batal</button>
-                        <button class="btn btn-primary" type="submit">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection

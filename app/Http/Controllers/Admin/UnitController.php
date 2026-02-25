@@ -24,6 +24,11 @@ class UnitController extends Controller
         return view('admin.units.index', compact('units'));
     }
 
+    public function create()
+    {
+        return view('admin.units.create');
+    }
+
     public function store(StoreUnitRequest $request)
     {
         $unit = Unit::create($request->validated());

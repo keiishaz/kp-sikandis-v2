@@ -9,10 +9,10 @@
         <div class="table-header">
             <h3 class="table-title">Kelola Operator</h3>
             <div class="table-header-actions">
-                <button type="button" class="btn btn-primary" data-modal-open="modal-admin-operator-create">
+                <a href="{{ route('admin.kelola-operator.create') }}" class="btn btn-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Tambah Operator</span>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -122,46 +122,4 @@
             {{ $operators->links() }}
         </div>
     </section>
-
-    <!-- Modal: Tambah Operator -->
-    <div class="modal-overlay {{ $errors->any() ? 'active' : '' }}" id="modal-admin-operator-create">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-admin-operator-create-title">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modal-admin-operator-create-title">Tambah Operator</h3>
-                <button type="button" class="modal-close" data-modal-close="modal-admin-operator-create">✕</button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{{ route('admin.kelola-operator.store') }}">
-                    @csrf
-
-                    <div class="form-grid">
-                        <div class="form-field">
-                            <label for="op_name">Nama</label>
-                            <input id="op_name" name="name" value="{{ old('name') }}" required>
-                            @error('name')<div class="error-text">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="form-field">
-                            <label for="op_nip">NIP</label>
-                            <input id="op_nip" name="nip" type="text" value="{{ old('nip') }}" required>
-                            @error('nip')<div class="error-text">{{ $message }}</div>@enderror
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-field">
-                            <label for="op_password">Password</label>
-                            <input id="op_password" name="password" type="password" required>
-                            @error('password')<div class="error-text">{{ $message }}</div>@enderror
-                        </div>
-                        <div></div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-modal-close="modal-admin-operator-create">Batal</button>
-                        <button class="btn btn-primary" type="submit">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
