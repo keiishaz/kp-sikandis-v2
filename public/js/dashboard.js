@@ -22,8 +22,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // New Initializers
     initTableSearch();
     initColumnResize();
+    initAccordionMenu();
 
 });
+
+/**
+ * Sidebar Accordion Menu
+ */
+function initAccordionMenu() {
+    const toggles = document.querySelectorAll('.nav-group-toggle');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const group = this.closest('.nav-group');
+            // Toggle expanded class
+            group.classList.toggle('expanded');
+        });
+    });
+}
 
 /**
  * Real-time Table Search & Filtering (Debounced)

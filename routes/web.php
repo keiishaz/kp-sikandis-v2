@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
+        // Modul Logs
+        Route::get('/log/aktivitas', [App\Http\Controllers\Admin\LogViewerController::class, 'aktivitas'])->name('log.aktivitas');
+        Route::get('/log/login', [App\Http\Controllers\Admin\LogViewerController::class, 'login'])->name('log.login');
+
         Route::resource('kelola-operator', KelolaOperatorController::class)
              ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
              ->names('kelola-operator');

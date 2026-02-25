@@ -97,7 +97,28 @@ body {
     padding: var(--spacing-xl) 0;
     z-index: 1000;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-gutter: stable;
     box-shadow: var(--shadow-lg);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-header {
@@ -173,6 +194,78 @@ body {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+}
+
+.nav-group {
+    margin-bottom: var(--spacing-xs);
+}
+
+.nav-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%;
+}
+
+.nav-group-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+}
+
+.nav-group-toggle.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+    font-weight: 600;
+}
+
+.nav-link-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.nav-group-toggle .chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-base);
+}
+
+.nav-group.expanded .chevron {
+    transform: rotate(180deg);
+}
+
+.nav-group-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
+    margin-top: 4px;
+}
+
+.nav-group.expanded .nav-group-content {
+    max-height: 500px;
+}
+
+.nav-group-content .nav-item {
+    margin-bottom: 2px;
+}
+
+.nav-group-content .nav-link {
+    padding-left: 3.2rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    font-size: 0.825rem;
 }
 
 /* ========================================
