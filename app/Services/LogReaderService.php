@@ -84,6 +84,14 @@ class LogReaderService
                         } else {
                             $keteranganHtml = "Menghapus data <strong>{$entitas}</strong>.";
                         }
+                    } elseif (str_contains($aksi, 'AKTIVASI') || str_contains($aksi, 'DEAKTIVASI')) {
+                        // Custom Override untuk AKTIVASI dan DEAKTIVASI seperti instruksi: "Melakukan AKTIVASI Kendaraan pada Toyota"
+                        $detailParts = array_slice($parts, 4);
+                        if (!empty($detailParts)) {
+                            $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>" . htmlspecialchars(implode(' | ', $detailParts), ENT_QUOTES) . "</strong>.";
+                        } else {
+                            $keteranganHtml = "Melakukan <strong>{$aksi}</strong>.";
+                        }
                     } else {
                         // Fallback aksi lainnya
                         $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>{$entitas}</strong>. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);

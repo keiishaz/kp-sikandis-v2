@@ -14,18 +14,21 @@ return new class extends Migration
         Schema::create('kendaraans', function (Blueprint $table) {
             $table->id();
             $table->string('nama_kendaraan', 100);
-            $table->string('no_polisi', 15)->unique();
-            $table->smallInteger('tahun');
-            $table->string('no_rangka', 50)->unique();
-            $table->string('no_mesin', 50)->unique();
+            $table->char('no_polisi', 15)->unique();
+            $table->year('tahun');
+            $table->char('no_rangka', 17)->unique();
+            $table->char('no_mesin', 30)->unique();
             $table->date('pajak');
             $table->enum('jenis_penggunaan', ['jabatan', 'operasional']);
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-
+            $table->string('lokasi_operasional', 100)->nullable();
+                
             $table->foreignId('kategori_id')
                 ->constrained('kategoris')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
+
+            $table->enum('status', ['aktif','nonaktif'])
+                ->default('aktif');
 
             $table->timestamps();
             $table->softDeletes();

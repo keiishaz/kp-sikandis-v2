@@ -90,7 +90,7 @@
                                     <circle cx="5.5" cy="18.5" r="2.5"></circle>
                                     <circle cx="18.5" cy="18.5" r="2.5"></circle>
                                 </svg>
-                                <span style="font-family:inherit;">Manajemen Kendaraan</span>
+                                <span style="font-family:inherit;">Kendaraan</span>
                             </div>
                             <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -103,7 +103,7 @@
                                 </a>
                             </div>
                             <div class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ route('admin.kendaraan.index') }}" class="nav-link {{ request()->routeIs('admin.kendaraan.*') ? 'active' : '' }}">
                                     <span>Data Kendaraan</span>
                                 </a>
                             </div>

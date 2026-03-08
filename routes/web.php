@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\SubUnitController;
 use App\Http\Controllers\Admin\PegawaiController;
 use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\KendaraanController;
 use App\Models\Unit;
 
 Route::redirect('/', '/login');
@@ -45,6 +46,9 @@ Route::middleware('auth')->group(function () {
         // URL: admin/kategori
         Route::resource('kategori', KategoriController::class)
              ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // URL: admin/kendaraan
+        Route::resource('kendaraan', KendaraanController::class);
 
         // Endpoint dependent dropdown sub-unit berdasarkan unit
         Route::get('/api/units/{unit}/sub-units', function (Unit $unit) {
