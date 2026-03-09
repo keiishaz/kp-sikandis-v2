@@ -72,6 +72,14 @@
     box-sizing: border-box;
 }
 
+svg {
+    max-width: 100%;
+}
+
+polyline {
+    fill: none;
+}
+
 body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
@@ -1137,6 +1145,14 @@ body {
     flex-direction: column;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-lg);
+}
+
+.pagination-wrapper svg,
+.pagination svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .pagination-inner {

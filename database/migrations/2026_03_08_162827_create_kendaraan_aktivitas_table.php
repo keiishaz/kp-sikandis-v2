@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kendaraan_pemegangs', function (Blueprint $table) {
+        Schema::create('kendaraan_aktivitas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kendaraan_id')
               ->constrained('kendaraans')
               ->cascadeOnDelete();
 
-            $table->foreignId('pegawai_id')
-              ->constrained('pegawais')
-              ->cascadeOnDelete();
-            
-            $table->string('nomor_sk');
-            $table->date('tanggal_sk');
-            $table->boolean('is_active')->default(true);
- 
+            $table->string('judul_aktivitas', 150);
+            $table->text('deskripsi')->nullable();
+            $table->date('tanggal_aktivitas');
+
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kendaraan_pemegangs');
+        Schema::dropIfExists('kendaraan_aktivitas');
     }
 };

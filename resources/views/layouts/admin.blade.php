@@ -98,18 +98,20 @@
                         </button>
                         <div class="nav-group-content">
                             <div class="nav-item">
-                                <a href="{{ route('admin.kategori.index') }}" class="nav-link {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
-                                    <span>Kategori Kendaraan</span>
-                                </a>
-                            </div>
-                            <div class="nav-item">
                                 <a href="{{ route('admin.kendaraan.index') }}" class="nav-link {{ request()->routeIs('admin.kendaraan.*') ? 'active' : '' }}">
                                     <span>Data Kendaraan</span>
                                 </a>
                             </div>
+                            
                             <div class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <span>Pemegang Kendaraan</span>
+                                <a href="{{ route('admin.kategori.index') }}" class="nav-link {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
+                                    <span>Kategori Kendaraan</span>
+                                </a>
+                            </div>
+                            
+                            <div class="nav-item">
+                                <a href="{{ route('admin.qr-kendaraan.index') }}" class="nav-link {{ request()->routeIs('admin.qr-kendaraan.*') ? 'active' : '' }}">
+                                    <span>QR Kendaraan</span>
                                 </a>
                             </div>
                         </div>
@@ -180,18 +182,31 @@
 
             <h2 class="topbar-title">@yield('topbar_title', 'Dashboard')</h2>
 
-            <div class="topbar-user">
+            <div class="topbar-user" style="position: relative;">
                 @auth
                     @php
                         $user = auth()->user();
                         $roleText = $user->role->nama_role === 'admin' ? 'Admin' : 'Operator';
                         $initials = strtoupper(substr($user->name ?? 'U', 0, 2));
                     @endphp
-                    <div class="user-info">
-                        <div class="user-name">{{ $user->name }}</div>
-                        <div class="user-role">{{ $roleText }}</div>
+                    <button class="user-menu-btn" onclick="toggleUserDropdown()" style="display:flex; align-items:center; gap:12px; background:none; border:none; cursor:pointer; text-align:left; padding:4px 8px; border-radius:8px;">
+                        <div class="user-info">
+                            <div class="user-name">{{ $user->name }}</div>
+                            <div class="user-role">{{ $roleText }}</div>
+                        </div>
+                        <div class="user-avatar">{{ $initials }}</div>
+                    </button>
+
+                    <!-- User Dropdown Menu -->
+                    <div id="userDropdown" class="user-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 5px); right: 0; background: #fff; width: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; z-index: 1000; overflow: hidden;">
+                        <a href="{{ route('profile.edit') }}" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; text-decoration: none; color: #1e293b; font-size: 13px; border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Edit Profil
+                        </a>
                     </div>
-                    <div class="user-avatar">{{ $initials }}</div>
                 @endauth
             </div>
         </header>
@@ -223,5 +238,23 @@
     </div>
 
     <script src="{{ asset('js/dashboard.js') }}"></script>
+    <script>
+        // Dropdown Logic
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const btn = document.querySelector('.user-menu-btn');
+            const dropdown = document.getElementById('userDropdown');
+            if (btn && dropdown && !btn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+    
+    @stack('scripts')
 </body>
 </html>

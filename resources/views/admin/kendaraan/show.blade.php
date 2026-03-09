@@ -133,25 +133,127 @@
                 </div>
             </div>
 
-            <!-- Tab 2: Riwayat Pemegang (Placeholder) -->
+            <!-- Tab 2: Riwayat Pemegang -->
             <div id="tab-pemegang" class="tab-content" style="display: none;">
-                <div style="background: #fff; padding: 40px; border-radius: 8px; border: 1px dashed var(--gray-300); text-align: center;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray-400); margin-bottom:16px;">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <h4 style="margin:0 0 8px; color:var(--gray-700); font-size:16px;">Modul Riwayat Pemegang Belum Diaktifkan</h4>
-                    <p style="margin:0; color:var(--gray-500); font-size:13px;">Data penugasan dan serah terima pemegang akan tampil di sini.</p>
+
+                @if(session('success') && request()->has('tab') && request()->tab === 'pemegang')
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 16px;border-radius:8px;color:#16a34a;font-size:13px;margin-bottom:16px;" id="pemegang-flash">
+                        ✓ {{ session('success') }}
+                    </div>
+                @endif
+
+                <!-- Header: Tombol Ganti Pemegang -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div>
+                        <h4 style="margin:0; font-size:15px; font-weight:600; color:#0f172a;">Histori Pemegang Kendaraan</h4>
+                        <p style="margin:4px 0 0; font-size:12px; color:#64748b;">Seluruh riwayat penugasan kendaraan ini, diurutkan terbaru.</p>
+                    </div>
+                    <button type="button" id="btn-ganti-pemegang"
+                        style="display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
+                        onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                        Ganti Pemegang
+                    </button>
+                </div>
+
+                <!-- Tabel Histori Pemegang -->
+                <div style="background:#fff; border-radius:10px; border:1px solid #e2e8f0; overflow:hidden;">
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:#f1f5f9; border-bottom:2px solid #e2e8f0;">
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Nama Pegawai</th>
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">NIP</th>
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Nomor SK</th>
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Tanggal Mulai</th>
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Tanggal Selesai</th>
+                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($kendaraan->pemegangs as $p)
+                            <tr style="border-bottom:1px solid #f1f5f9; transition:background 0.1s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                                <td style="padding:12px 16px; font-weight:500; color:#0f172a;">{{ $p->pegawai->nama ?? '-' }}</td>
+                                <td style="padding:12px 16px; color:#475569; font-family:monospace;">{{ $p->pegawai->nip ?? '-' }}</td>
+                                <td style="padding:12px 16px; color:#475569;">{{ $p->nomor_sk }}</td>
+                                <td style="padding:12px 16px; color:#475569;">{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
+                                <td style="padding:12px 16px; color:#475569;">{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
+                                <td style="padding:12px 16px;">
+                                    @if($p->is_active)
+                                        <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">Aktif</span>
+                                    @else
+                                        <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;">Nonaktif</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" style="padding:40px;text-align:center;color:#94a3b8;font-size:13px;">
+                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;color:#cbd5e1;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                    <p style="margin:0;">Belum ada pemegang yang tercatat untuk kendaraan ini.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Tab 3: Riwayat Aktivitas Kendaraan (Placeholder) -->
+            <!-- Tab 3: Riwayat Aktivitas Kendaraan -->
             <div id="tab-aktivitas" class="tab-content" style="display: none;">
-                <div style="background: #fff; padding: 40px; border-radius: 8px; border: 1px dashed var(--gray-300); text-align: center;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gray-400); margin-bottom:16px;">
-                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <h4 style="margin:0 0 8px; color:var(--gray-700); font-size:16px;">Riwayat Servis / BBM Belum Tersedia</h4>
-                    <p style="margin:0; color:var(--gray-500); font-size:13px;">Jejak rekam aktivitas perawatan kendaraan akan dilacak melalui tab ini.</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h4 style="margin:0; font-size:16px; font-weight:600; color:#1e293b;">Daftar Aktivitas Kendaraan</h4>
+                    <button type="button" onclick="openAktivitasModal()" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; font-size:13px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Tambah Aktivitas
+                    </button>
+                </div>
+
+                <div class="table-container" style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+                    <table class="data-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Tanggal</th>
+                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Judul Aktivitas</th>
+                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Deskripsi</th>
+                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Pembuat</th>
+                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Waktu Sistem</th>
+                                <th style="padding:12px 16px; text-align:center; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; width:100px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($kendaraan->aktivitas as $akt)
+                            <tr style="border-bottom:1px solid #f1f5f9;">
+                                <td style="padding:12px 16px; font-size:13px; color:#1e293b; font-weight:500;">{{ $akt->tanggal_aktivitas->translatedFormat('d M Y') }}</td>
+                                <td style="padding:12px 16px; font-size:13px; color:#1e293b; font-weight:600;">{{ $akt->judul_aktivitas }}</td>
+                                <td style="padding:12px 16px; font-size:13px; color:#64748b; line-height:1.4;">{{ $akt->deskripsi ?? '-' }}</td>
+                                <td style="padding:12px 16px; font-size:13px; color:#1e293b;">{{ $akt->creator->name ?? 'System' }}</td>
+                                <td style="padding:12px 16px; font-size:12px; color:#94a3b8;">{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</td>
+                                <td style="padding:12px 16px; text-align:center;">
+                                    <div style="display:flex; justify-content:center; gap:8px;">
+                                        <button type="button" onclick='editAktivitas(@json($akt))' class="btn-action" title="Edit" style="background:#eff6ff; color:#3b82f6; border-radius:4px; padding:4px; border:none; cursor:pointer;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        </button>
+                                        <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display:inline;">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn-action" title="Hapus" style="background:#fef2f2; color:#ef4444; border-radius:4px; padding:4px; border:none; cursor:pointer;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" style="padding:40px; text-align:center;">
+                                    <div style="color:#94a3b8;">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.5;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <p style="margin:0; font-size:14px;">Belum ada riwayat aktivitas kendaraan.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -159,32 +261,289 @@
     </div>
 </section>
 
+<!-- =========== MODAL: Ganti Pemegang =========== -->
+<div id="modal-ganti-pemegang" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; width:100%; max-width:540px; margin:20px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+        <!-- Modal Header -->
+        <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h3 style="margin:0; font-size:16px; font-weight:600; color:#0f172a;">Ganti Pemegang Kendaraan</h3>
+                <p style="margin:4px 0 0; font-size:12px; color:#64748b;">{{ $kendaraan->nama_kendaraan }} — {{ $kendaraan->no_polisi }}</p>
+            </div>
+            <button id="btn-close-modal" type="button"
+                style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;"
+                onmouseover="this.style.color='#475569'" onmouseout="this.style.color='#94a3b8'">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="form-ganti-pemegang" action="{{ route('admin.kendaraan.pemegang.store', $kendaraan->id) }}" method="POST">
+            @csrf
+            <input type="hidden" name="force_replace" id="input-force-replace" value="0">
+
+            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
+
+                <!-- Pilih Pegawai -->
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Pilih Pegawai <span style="color:#ef4444;">*</span></label>
+                    <select name="pegawai_id" id="select-pegawai" required
+                        style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; background:#fff; outline:none; cursor:pointer;"
+                        onchange="previewPegawai(this.value)">
+                        <option value="">— Pilih Pegawai —</option>
+                        @foreach($pegawais as $peg)
+                            <option value="{{ $peg->id }}">{{ $peg->nama }} — {{ $peg->nip }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Preview Pegawai -->
+                <div id="preview-pegawai" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
+                    <p style="margin:0 0 8px; font-size:11px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Info Pegawai Terpilih</p>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <div><p style="margin:0; font-size:11px; color:#64748b;">Nama</p><p id="prev-nama" style="margin:0; font-size:13px; font-weight:600; color:#0f172a;">—</p></div>
+                        <div><p style="margin:0; font-size:11px; color:#64748b;">NIP</p><p id="prev-nip" style="margin:0; font-size:13px; font-family:monospace; color:#0f172a;">—</p></div>
+                        <div><p style="margin:0; font-size:11px; color:#64748b;">Jabatan</p><p id="prev-jabatan" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
+                        <div><p style="margin:0; font-size:11px; color:#64748b;">Unit</p><p id="prev-unit" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
+                        <div><p style="margin:0; font-size:11px; color:#64748b;">Sub Unit</p><p id="prev-subunit" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
+                    </div>
+                </div>
+
+                <!-- Nomor SK -->
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Nomor SK <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="nomor_sk" required placeholder="Contoh: SK/001/2026"
+                        style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                </div>
+
+                <!-- Tanggal SK & Tanggal Mulai -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal SK <span style="color:#ef4444;">*</span></label>
+                        <input type="date" name="tanggal_sk" required
+                            style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal Mulai <span style="color:#ef4444;">*</span></label>
+                        <input type="date" name="tanggal_mulai" required
+                            style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" id="btn-cancel-modal"
+                    style="padding:9px 18px; border:1px solid #d1d5db; background:#fff; color:#374151; border-radius:8px; font-size:13px; cursor:pointer;">
+                    Batal
+                </button>
+                <button type="submit" id="btn-submit-pemegang"
+                    style="padding:9px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; transition:background 0.2s;"
+                    onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                    Simpan Pemegang
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- =========== MODAL: Aktivitas Kendaraan =========== -->
+<div id="modal-aktivitas" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; width:100%; max-width:500px; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="modal-aktivitas-title" style="margin:0; font-size:16px; font-weight:600; color:#0f172a;">Tambah Aktivitas Kendaraan</h3>
+            <button onclick="closeAktivitasModal()" type="button" style="background:none;border:none;cursor:pointer;color:#94a3b8;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+        <form id="form-aktivitas" method="POST">
+            @csrf
+            <input type="hidden" name="_method" id="aktivitas-method" value="POST">
+            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal Aktivitas <span style="color:#ef4444;">*</span></label>
+                    <input type="date" name="tanggal_aktivitas" id="akt-tanggal" required style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Judul Aktivitas <span style="color:#ef4444;">*</span></label>
+                    <input type="text" name="judul_aktivitas" id="akt-judul" required placeholder="Misal: Servis Rutin, Ganti Ban, dll" style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Deskripsi</label>
+                    <textarea name="deskripsi" id="akt-deskripsi" rows="3" placeholder="Tambahkan rincian aktivitas jika ada..." style="width:100%; padding: 9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; font-family:inherit;"></textarea>
+                </div>
+            </div>
+            <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" onclick="closeAktivitasModal()" style="padding:9px 18px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-size:13px; cursor:pointer;">Batal</button>
+                <button type="submit" style="padding:9px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer;">Simpan Aktivitas</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
+document.addEventListener('DOMContentLoaded', () => {
 
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active classes
-                tabBtns.forEach(b => {
-                    b.classList.remove('active');
-                    b.style.color = 'var(--gray-500)';
-                    b.style.borderBottomColor = 'transparent';
-                });
-                tabContents.forEach(c => {
-                    c.style.display = 'none';
-                });
+    // ---- Tab Switching ----
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-                // Add active to clicked
-                btn.classList.add('active');
-                btn.style.color = 'var(--primary-color)';
-                btn.style.borderBottomColor = 'var(--primary-color)';
-
-                const targetId = btn.getAttribute('data-target');
-                document.getElementById(targetId).style.display = 'block';
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => {
+                b.classList.remove('active');
+                b.style.color = 'var(--gray-500)';
+                b.style.borderBottomColor = 'transparent';
             });
+            tabContents.forEach(c => { c.style.display = 'none'; });
+
+            btn.classList.add('active');
+            btn.style.color = 'var(--primary-color)';
+            btn.style.borderBottomColor = 'var(--primary-color)';
+
+            document.getElementById(btn.getAttribute('data-target')).style.display = 'block';
         });
     });
+
+    // ---- Modal Open/Close ----
+    const modal = document.getElementById('modal-ganti-pemegang');
+
+    document.getElementById('btn-ganti-pemegang').addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    function closeModal() {
+        modal.style.display = 'none';
+        document.getElementById('input-force-replace').value = '0';
+    }
+
+    // ---- AJAX Preview Pegawai ----
+    window.previewPegawai = function(pegawaiId) {
+        const box = document.getElementById('preview-pegawai');
+        if (!pegawaiId) { box.style.display = 'none'; return; }
+
+        fetch(`/admin/api/pegawai/${pegawaiId}`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('prev-nama').textContent    = data.nama     || '—';
+                document.getElementById('prev-nip').textContent     = data.nip      || '—';
+                document.getElementById('prev-jabatan').textContent = data.jabatan  || '—';
+                document.getElementById('prev-unit').textContent    = data.unit     || '—';
+                document.getElementById('prev-subunit').textContent = data.sub_unit || '—';
+                box.style.display = 'block';
+            })
+            .catch(() => { box.style.display = 'none'; });
+    };
+
+    // ---- Form Submit: cek needs_confirm ----
+    document.getElementById('form-ganti-pemegang').addEventListener('submit', async function(e) {
+        const forceReplace = document.getElementById('input-force-replace').value;
+        if (forceReplace === '1') return; // sudah dikonfirmasi, lanjut submit biasa
+
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        formData.set('force_replace', '0');
+
+        try {
+            const res = await fetch(this.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error('Server error');
+            const data = await res.json();
+
+            if (data.needs_confirm) {
+                // Tampilkan SIKANDIS confirm dialog
+                const nama = data.pemegang_lama?.nama || 'Pemegang saat ini';
+                const confirmed = await SIKANDIS.confirm({
+                    title: 'Konfirmasi Serah Terima',
+                    message: `Kendaraan ini saat ini dipegang oleh <strong>${nama}</strong>. Pemegang lama akan dinonaktifkan dan digantikan dengan pemegang baru. Lanjutkan?`,
+                    confirmText: 'Ya, Ganti Pemegang',
+                    cancelText: 'Batal',
+                    type: 'warning',
+                });
+
+                if (confirmed) {
+                    document.getElementById('input-force-replace').value = '1';
+                    this.submit();
+                }
+            } else {
+                // Tidak ada pemegang aktif, redirect dari server response
+                window.location.href = "{{ route('admin.kendaraan.show', $kendaraan->id) }}?tab=pemegang";
+            }
+        } catch (err) {
+            // Fallback: submit normal
+            document.getElementById('input-force-replace').value = '1';
+            this.submit();
+        }
+    });
+
+    // ---- Aktivitas Modal ----
+    const modalAkt = document.getElementById('modal-aktivitas');
+    const formAkt  = document.getElementById('form-aktivitas');
+
+    window.openAktivitasModal = function() {
+        document.getElementById('modal-aktivitas-title').textContent = 'Tambah Aktivitas Kendaraan';
+        formAkt.action = "{{ route('admin.kendaraan.aktivitas.store', $kendaraan->id) }}";
+        formAkt.reset();
+        document.getElementById('aktivitas-method').value = 'POST';
+        document.getElementById('akt-tanggal').value = new Date().toISOString().split('T')[0];
+        modalAkt.style.display = 'flex';
+    };
+
+    window.closeAktivitasModal = function() {
+        modalAkt.style.display = 'none';
+    };
+
+    window.editAktivitas = function(akt) {
+        document.getElementById('modal-aktivitas-title').textContent = 'Edit Aktivitas Kendaraan';
+        formAkt.action = `/admin/kendaraan-aktivitas/${akt.id}`;
+        document.getElementById('aktivitas-method').value = 'PUT';
+        document.getElementById('akt-tanggal').value = akt.tanggal_aktivitas.split('T')[0];
+        document.getElementById('akt-judul').value = akt.judul_aktivitas;
+        document.getElementById('akt-deskripsi').value = akt.deskripsi || '';
+        modalAkt.style.display = 'flex';
+    };
+
+    window.deleteAktivitas = async function(e, id) {
+        e.preventDefault();
+        const confirmed = await SIKANDIS.confirm({
+            title: 'Hapus Aktivitas',
+            message: 'Apakah Anda yakin ingin menghapus data aktivitas ini? Tindakan ini tidak dapat dibatalkan.',
+            confirmText: 'Ya, Hapus',
+            type: 'danger'
+        });
+
+        if (confirmed) {
+            const res = await fetch(`/admin/kendaraan-aktivitas/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            });
+            if (res.ok) window.location.href = "{{ route('admin.kendaraan.show', $kendaraan->id) }}?tab=aktivitas";
+        }
+    };
+
+    // ---- Auto-open tab jika dari redirect ----
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'pemegang') {
+        const btn = document.querySelector('[data-target="tab-pemegang"]');
+        if (btn) btn.click();
+    } else if (urlParams.get('tab') === 'aktivitas') {
+        const btn = document.querySelector('[data-target="tab-aktivitas"]');
+        if (btn) btn.click();
+    }
+
+    // Flash message auto-hide
+    const flash = document.getElementById('pemegang-flash');
+    if (flash) setTimeout(() => { flash.style.opacity = '0'; flash.style.transition = 'opacity 0.5s'; setTimeout(() => flash.remove(), 500); }, 4000);
+
+});
 </script>
 @endsection
+

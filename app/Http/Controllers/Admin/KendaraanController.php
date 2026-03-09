@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Kendaraan;
 use App\Models\Kategori;
+use App\Models\Pegawai;
 use App\Models\QrKendaraan;
 use App\Http\Requests\Admin\StoreKendaraanRequest;
 use App\Http\Requests\Admin\UpdateKendaraanRequest;
@@ -106,6 +107,15 @@ class KendaraanController extends Controller
             "Nama Kendaraan: {$kendaraan->nama_kendaraan}"
         );
 
+        // 4. Catat ke Riwayat Aktivitas Kendaraan
+        \App\Models\KendaraanAktivitas::create([
+            'kendaraan_id'      => $kendaraan->id,
+            'judul_aktivitas'   => 'Registrasi Kendaraan Baru',
+            'deskripsi'         => "Kendaraan {$kendaraan->nama_kendaraan} ({$kendaraan->no_polisi}) telah didaftarkan ke sistem.",
+            'tanggal_aktivitas' => now()->toDateString(),
+            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
+        ]);
+
         return redirect()->route('admin.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil ditambahkan beserta Token QR.');
     }
@@ -115,8 +125,19 @@ class KendaraanController extends Controller
      */
     public function show(Kendaraan $kendaraan)
     {
-        $kendaraan->load(['kategori', 'qrKendaraan']);
-        return view('admin.kendaraan.show', compact('kendaraan'));
+        $kendaraan->load([
+            'kategori',
+            'qrKendaraan',
+            'pemegangs' => fn($q) => $q->orderBy('tanggal_mulai', 'desc'),
+            'pemegangs.pegawai.unit',
+            'pemegangs.pegawai.subUnit',
+            'aktivitas' => fn($q) => $q->orderBy('tanggal_aktivitas', 'desc')->orderBy('created_at', 'desc'),
+            'aktivitas.creator',
+        ]);
+
+        $pegawais = Pegawai::with(['unit', 'subUnit'])->orderBy('nama')->get();
+
+        return view('admin.kendaraan.show', compact('kendaraan', 'pegawais'));
     }
 
     /**
@@ -151,6 +172,15 @@ class KendaraanController extends Controller
             "Dari: {$oldNama} → {$validated['nama_kendaraan']}"
         );
 
+        // Catat ke Riwayat Aktivitas Kendaraan
+        \App\Models\KendaraanAktivitas::create([
+            'kendaraan_id'      => $kendaraan->id,
+            'judul_aktivitas'   => 'Perubahan Data Kendaraan',
+            'deskripsi'         => "Data kendaraan telah diperbarui. Nama sebelumnya: {$oldNama}.",
+            'tanggal_aktivitas' => now()->toDateString(),
+            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
+        ]);
+
         return redirect()->route('admin.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil diperbarui.');
     }
@@ -174,6 +204,15 @@ class KendaraanController extends Controller
             $kendaraan->id,
             "{$kendaraan->nama_kendaraan}"
         );
+
+        // Catat ke Riwayat Aktivitas Kendaraan
+        \App\Models\KendaraanAktivitas::create([
+            'kendaraan_id'      => $kendaraan->id,
+            'judul_aktivitas'   => "Status Kendaraan diubah ke {$newStatus}",
+            'deskripsi'         => "Kendaraan {$kendaraan->nama_kendaraan} telah {$msg}.",
+            'tanggal_aktivitas' => now()->toDateString(),
+            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
+        ]);
 
         return redirect()->route('admin.kendaraan.index')
                          ->with('success', "Status kendaraan berhasil {$msg}.");

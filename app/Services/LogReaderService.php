@@ -55,7 +55,12 @@ class LogReaderService
                 
                 $keteranganRaw = '';
                 if (count($parts) > 3) {
-                    $keteranganRaw = implode(' | ', array_slice($parts, 3));
+                    $keteranganRaw = implode(' — ', array_slice($parts, 3));
+                    // Bersihkan ID: N dari keterangan agar tidak tampil dua kali atau redundant
+                    $keteranganRaw = preg_replace('/ID:\s*\d+\s*(—\s*)?/', '', $keteranganRaw);
+                    // Ganti pemisah internal | menjadi koma yang lebih natural
+                    $keteranganRaw = str_replace([' | ', '|'], ', ', $keteranganRaw);
+                    $keteranganRaw = trim($keteranganRaw, ' ,');
                 }
 
                 $keteranganHtml = '';
@@ -92,9 +97,16 @@ class LogReaderService
                         } else {
                             $keteranganHtml = "Melakukan <strong>{$aksi}</strong>.";
                         }
+                    } elseif (str_contains($aksi, 'SERAH TERIMA PEMEGANG')) {
+                        $keteranganHtml = "Proses <strong>serah terima pemegang</strong> dilakukan. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
+                    } elseif (str_contains($aksi, 'NONAKTIF PEMEGANG')) {
+                        $keteranganHtml = "Melepas <strong>pemegang kendaraan</strong>. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
+                    } elseif (str_contains($aksi, 'TAMBAH PEMEGANG')) {
+                        $keteranganHtml = "Menambahkan <strong>pemegang kendaraan</strong> baru. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
                     } else {
                         // Fallback aksi lainnya
-                        $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>{$entitas}</strong>. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
+                        $rawClean = preg_replace('/ID:\s*\d+\s*(—\s*)?/', '', $keteranganRaw);
+                        $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>{$entitas}</strong>. Rincian: " . htmlspecialchars($rawClean, ENT_QUOTES);
                     }
                 }
 
