@@ -19,8 +19,9 @@ class LoginStepTest extends TestCase
         $this->seed(\Database\Seeders\RoleSeeder::class);
 
         // Clear log file
-        if(File::exists(storage_path('logs/login.txt'))){
-            File::put(storage_path('logs/login.txt'), '');
+        $logFile = 'logs/login_' . now()->format('Y_m') . '.txt';
+        if(File::exists(storage_path($logFile))){
+            File::put(storage_path($logFile), '');
         }
     }
 
@@ -45,7 +46,8 @@ class LoginStepTest extends TestCase
         $this->assertAuthenticatedAs($user);
         
         // Check Log
-        $log = File::get(storage_path('logs/login.txt'));
+        $logFile = 'logs/login_' . now()->format('Y_m') . '.txt';
+        $log = File::get(storage_path($logFile));
         $this->assertStringContainsString('LOGIN SUCCESS', $log);
     }
 
@@ -90,7 +92,8 @@ class LoginStepTest extends TestCase
         $this->assertNotNull($user->locked_until);
         
         // Check Log
-        $log = File::get(storage_path('logs/login.txt'));
+        $logFile = 'logs/login_' . now()->format('Y_m') . '.txt';
+        $log = File::get(storage_path($logFile));
         $this->assertStringContainsString('LOGIN LOCKED 1 MIN', $log);
 
         // Attempt 4 (Blocked)
@@ -98,7 +101,7 @@ class LoginStepTest extends TestCase
         $response->assertSessionHasErrors('password');
         
         // Check Log Blocked
-        $log = File::get(storage_path('logs/login.txt'));
+        $log = File::get(storage_path($logFile));
         $this->assertStringContainsString('LOGIN BLOCKED', $log);
     }
 

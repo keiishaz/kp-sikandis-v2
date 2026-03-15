@@ -59,6 +59,11 @@ class KelolaOperatorController extends Controller
                          ->with('success', 'Operator berhasil ditambahkan.');
     }
 
+    public function show(User $kelola_operator)
+    {
+        return view('admin.kelola-operator.show', ['operator' => $kelola_operator]);
+    }
+
     public function edit(User $kelola_operator)
     {
         return view('admin.kelola-operator.edit', ['operator' => $kelola_operator]);

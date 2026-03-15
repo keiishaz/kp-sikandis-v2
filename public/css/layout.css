@@ -120,6 +120,18 @@
   background: var(--surface-page);
 }
 
+@media (min-width: 1280px) {
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-content > * {
+    width: 100%;
+    max-width: 1440px;
+  }
+}
+
 /* === TOPBAR === */
 .topbar {
   height: 58px;

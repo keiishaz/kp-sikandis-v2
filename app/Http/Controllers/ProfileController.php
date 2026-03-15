@@ -34,6 +34,7 @@ class ProfileController extends Controller
 
         if (!empty($validatedData['password'])) {
             $user->password = Hash::make($validatedData['password']);
+            $user->password_changed_at = now();
         }
 
         // Simpan langsung ke database secara quiet

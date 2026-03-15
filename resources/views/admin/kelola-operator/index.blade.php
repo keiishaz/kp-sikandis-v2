@@ -6,21 +6,7 @@
 @section('content')
 <div class="dashboard">
 
-    {{-- Toast Notification --}}
-    @if(session('success') || session('error'))
-        <div id="toast-notification" class="toast-notification {{ session('success') ? 'toast-success' : 'toast-error' }}">
-            @if(session('success'))
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="toast-icon" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            @else
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="toast-icon" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            @endif
-            <span>{{ session('success') ?? session('error') }}</span>
-            <button onclick="document.getElementById('toast-notification').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:.6;padding:0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        <script>setTimeout(()=>{const t=document.getElementById('toast-notification');if(t)t.style.opacity='0'; setTimeout(()=>t&&t.remove(),300);},4000);</script>
-    @endif
+
 
     {{-- PHP Logic --}}
     @php
@@ -77,6 +63,7 @@
                                 NIP <span style="font-size: 10px; margin-left: 4px; color: var(--n-400);">{{ $sortIndicator('nip') }}</span>
                             </a>
                         </th>
+                        <th>Terakhir Login</th>
                         <th class="action-cell">Aksi</th>
                     </tr>
                 </thead>
@@ -84,8 +71,18 @@
                     @forelse($operators as $op)
                         <tr>
                             <td><div class="cell-primary">{{ $op->name }}</div></td>
-                            <td><span style="font-family: monospace; font-size: 13px; color: var(--n-600); letter-spacing: .5px;">{{ $op->nip }}</span></td>
+                            <td><span class="plat-badge" style="background:transparent;border:none;padding:0;color:var(--n-600);">{{ $op->nip }}</span></td>
+                            <td>
+                                @if(isset($op->last_login_at))
+                                    <div style="font-size: 13px; color: var(--n-700);">{{ \Carbon\Carbon::parse($op->last_login_at)->translatedFormat('d M Y, H:i') }}</div>
+                                @else
+                                    <span class="badge badge-neutral">Belum pernah login</span>
+                                @endif
+                            </td>
                             <td class="action-cell">
+                                <a href="{{ route('admin.kelola-operator.show', $op) }}" class="btn btn-icon" style="background:var(--n-100); color:var(--n-600);" title="Detail">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 12 12 12 8"></polyline><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </a>
                                 <a href="{{ route('admin.kelola-operator.edit', $op) }}" class="btn btn-icon btn-secondary" title="Edit">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                 </a>

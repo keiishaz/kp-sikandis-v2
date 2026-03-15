@@ -383,6 +383,7 @@
                     @csrf
                     
                     <div class="form-group">
+                        <input type="hidden" name="nip" value="{{ session('login_nip') }}">
                         <label for="nip" class="form-label">NIP</label>
                         <input type="text" id="nip" class="form-input input-readonly" value="{{ session('login_nip') }}" readonly tabindex="-1">
                     </div>

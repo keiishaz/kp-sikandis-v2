@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/log/login', [LogViewerController::class, 'login'])->name('log.login');
 
         Route::resource('kelola-operator', KelolaOperatorController::class)
-             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
+             ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
              ->names('kelola-operator');
 
         Route::resource('units', UnitController::class)

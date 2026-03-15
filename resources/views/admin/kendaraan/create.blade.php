@@ -24,7 +24,7 @@
     </div>
 
     {{-- FORM CARD --}}
-    <div class="card" style="max-width: 820px;">
+    <div class="card form-page">
         <form action="{{ route('admin.kendaraan.store') }}" method="POST" novalidate>
             @csrf
             

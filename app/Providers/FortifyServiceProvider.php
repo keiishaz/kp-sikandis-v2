@@ -17,7 +17,10 @@ class FortifyServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\LoginResponse::class,
+            \App\Http\Responses\LoginResponse::class
+        );
     }
 
     public function boot(): void
@@ -33,20 +36,27 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request) {
             $nip = $request->nip ?? session('login_nip');
             
-            // Log attempt context if needed or just NIP
-            // $ip = $request->ip();
+            // Simpan metadata device/IP dari Request untuk pencatatan detail login sukses
+            $ip = $request->ip();
+            $userAgent = $request->userAgent();
 
             $user = User::where('nip', $nip)->first();
 
             if (!$user) {
                 \App\Services\LoginLogger::log('LOGIN FAIL', "NIP tidak ditemukan: {$nip}");
-                return null;
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'password' => "NIP tidak ditemukan"
+                ]);
             }
 
             // Check if user is blocked
             if ($user->locked_until && now()->lt($user->locked_until)) {
-                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nip);
-                return null;
+                $sec = now()->diffInSeconds($user->locked_until);
+                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nip . " (Sisa {$sec} detik)");
+                session()->flash('locked_until', $user->locked_until);
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'password' => "Akun dikunci. Tunggu {$sec} detik sebelum mencoba lagi."
+                ]);
             }
 
             if (Hash::check($request->password, $user->password)) {
@@ -54,9 +64,15 @@ class FortifyServiceProvider extends ServiceProvider
                     'failed_login_attempts' => 0,
                     'locked_until' => null,
                     'last_login_at' => now(),
+                    'last_login_ip' => $ip,
+                    'last_login_user_agent' => $userAgent,
                 ])->save();
 
-                \App\Services\LoginLogger::log('LOGIN SUCCESS', $user->nip);
+                \App\Services\LoginLogger::log('LOGIN SUCCESS', $user->nip, [
+                    'ip' => $ip,
+                    'user_agent' => $userAgent
+                ]);
+                session()->forget('login_nip');
 
                 return $user;
             }
@@ -71,7 +87,19 @@ class FortifyServiceProvider extends ServiceProvider
                 \App\Services\LoginLogger::log('LOGIN FAIL PASSWORD', $user->nip);
             }
 
-            return null;
+            $remain = max(0, 3 - $user->failed_login_attempts);
+            $sec = $user->locked_until ? now()->diffInSeconds($user->locked_until) : 0;
+            
+            if ($user->locked_until) {
+                session()->flash('locked_until', $user->locked_until);
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'password' => "Akun dikunci. Tunggu {$sec} detik sebelum mencoba lagi."
+                ]);
+            }
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'password' => "Password salah. Sisa {$remain} percobaan."
+            ]);
         });
 
     }

@@ -29,7 +29,7 @@
     </div>
 
     {{-- FORM CARD --}}
-    <div class="card" style="max-width: 600px;">
+    <div class="card form-page">
         <form method="POST" action="{{ route('admin.units.sub-units.update', [$unit, $sub_unit]) }}" novalidate>
             @csrf
             @method('PUT')

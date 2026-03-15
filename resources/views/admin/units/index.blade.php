@@ -5,21 +5,7 @@
 
 @section('content')
 <div class="dashboard">
-    {{-- Toast Notification --}}
-    @if(session('success') || session('error'))
-        <div id="toast-notification" class="toast-notification {{ session('success') ? 'toast-success' : 'toast-error' }}">
-            @if(session('success'))
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="toast-icon" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            @else
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="toast-icon" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            @endif
-            <span>{{ session('success') ?? session('error') }}</span>
-            <button onclick="document.getElementById('toast-notification').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:.6;padding:0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        <script>setTimeout(()=>{const t=document.getElementById('toast-notification');if(t)t.style.opacity='0'; setTimeout(()=>t&&t.remove(),300);},4000);</script>
-    @endif
+
 
     {{-- PAGE HEADER --}}
     <div class="page-intro" style="display: flex; justify-content: space-between; align-items: center;">

@@ -13,7 +13,8 @@ class LogReaderService
      */
     public function readAktivitasLog($search = null, $date = null, $perPage = 15, $page = 1)
     {
-        $path = storage_path('logs/aktivitas.txt');
+        $month = now()->format('Y_m');
+        $path = storage_path("logs/aktivitas_{$month}.txt");
         if (!File::exists($path)) {
             return new LengthAwarePaginator([], 0, $perPage, $page, ['path' => request()->url(), 'query' => request()->query()]);
         }
@@ -23,92 +24,44 @@ class LogReaderService
 
         $data = [];
         foreach ($lines as $line) {
-            // Contoh baris: [2026-02-24 00:03:36] TAMBAH UNIT — User: Keisha Azzahra — Entitas: Unit — ID: 1 — Nama: Dinas Kominfo
-            // Kita parse waktu aslinya, lalu render. Asumsi aslinya sudah WIB atau UTC sesuai format saat log ditulis.
-            // Memaksa parsing Carbon ke format WIB:
             if (preg_match('/^\[(.*?)\] (.*)/', $line, $matches)) {
                 $timeString = $matches[1];
                 $messageStr = $matches[2];
                 
                 try {
-                    // Karena diminta konversi WIB jika asalnya beda, namun kita akan anggap string text ini sebagai input Carbon.
                     $carbonDate = Carbon::parse($timeString)->timezone('Asia/Jakarta');
                 } catch (\Exception $e) {
                     $carbonDate = null;
                 }
 
-                // Filter Date
                 if ($date && $carbonDate && $carbonDate->format('Y-m-d') !== $date) {
                     continue;
                 }
 
-                // Filter Search
                 if ($search && stripos($line, $search) === false) {
                     continue;
                 }
 
-                // Parsing rincian berdasarkan pemisah ' ' atau ' — '
                 $parts = explode(' — ', $messageStr);
                 $aksi = $parts[0] ?? '-';
                 $user = isset($parts[1]) ? str_replace('User: ', '', $parts[1]) : '-';
                 $entitas = isset($parts[2]) ? str_replace('Entitas: ', '', $parts[2]) : '-';
                 
-                $keteranganRaw = '';
+                // Pada format baru, $parts[3] adalah kalimat natural (keterangan HTML bisa dioverride dari format text langsung)
+                // Jika data lama ditemukan dengan format ID: N, diabaikan dan pakai $parts[4] dll if necessary
+                $keteranganHtml = '';
                 if (count($parts) > 3) {
                     $keteranganRaw = implode(' — ', array_slice($parts, 3));
-                    // Bersihkan ID: N dari keterangan agar tidak tampil dua kali atau redundant
-                    $keteranganRaw = preg_replace('/ID:\s*\d+\s*(—\s*)?/', '', $keteranganRaw);
-                    // Ganti pemisah internal | menjadi koma yang lebih natural
-                    $keteranganRaw = str_replace([' | ', '|'], ', ', $keteranganRaw);
-                    $keteranganRaw = trim($keteranganRaw, ' ,');
-                }
-
-                $keteranganHtml = '';
-                if ($keteranganRaw) {
-                    $idDoc = '';
-                    if (preg_match('/ID: (\d+)/', $keteranganRaw, $mId)) {
-                        $idDoc = $mId[1];
-                    }
-
-                    if (str_contains($aksi, 'EDIT') && preg_match('/Dari:\s*(.*?)\s*→\s*(.*)$/', $keteranganRaw, $mEdit)) {
-                        $htmlFrom = htmlspecialchars($mEdit[1], ENT_QUOTES);
-                        $htmlTo = htmlspecialchars($mEdit[2], ENT_QUOTES);
-                        $keteranganHtml = "Mengubah data <strong>{$entitas}</strong> dari <strong>{$htmlFrom}</strong> menjadi <strong>{$htmlTo}</strong>.";
-                    } elseif (str_contains($aksi, 'TAMBAH')) {
-                        // Ambil detail di sebelah kanan ID (misal Nama: ABC | NIP: 123)
-                        $detailParts = array_slice($parts, 4);
-                        if (!empty($detailParts)) {
-                            $keteranganHtml = "Menambahkan data <strong>{$entitas}</strong> baru dengan rincian: <strong>" . htmlspecialchars(implode(' | ', $detailParts), ENT_QUOTES) . "</strong>.";
-                        } else {
-                            $keteranganHtml = "Menambahkan data <strong>{$entitas}</strong> baru.";
-                        }
-                    } elseif (str_contains($aksi, 'HAPUS')) {
-                        $detailParts = array_slice($parts, 4);
-                        if (!empty($detailParts)) {
-                            $keteranganHtml = "Menghapus data <strong>{$entitas}</strong>, rincian: <strong>" . htmlspecialchars(implode(' | ', $detailParts), ENT_QUOTES) . "</strong>.";
-                        } else {
-                            $keteranganHtml = "Menghapus data <strong>{$entitas}</strong>.";
-                        }
-                    } elseif (str_contains($aksi, 'AKTIVASI') || str_contains($aksi, 'DEAKTIVASI')) {
-                        // Custom Override untuk AKTIVASI dan DEAKTIVASI seperti instruksi: "Melakukan AKTIVASI Kendaraan pada Toyota"
-                        $detailParts = array_slice($parts, 4);
-                        if (!empty($detailParts)) {
-                            $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>" . htmlspecialchars(implode(' | ', $detailParts), ENT_QUOTES) . "</strong>.";
-                        } else {
-                            $keteranganHtml = "Melakukan <strong>{$aksi}</strong>.";
-                        }
-                    } elseif (str_contains($aksi, 'SERAH TERIMA PEMEGANG')) {
-                        $keteranganHtml = "Proses <strong>serah terima pemegang</strong> dilakukan. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
-                    } elseif (str_contains($aksi, 'NONAKTIF PEMEGANG')) {
-                        $keteranganHtml = "Melepas <strong>pemegang kendaraan</strong>. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
-                    } elseif (str_contains($aksi, 'TAMBAH PEMEGANG')) {
-                        $keteranganHtml = "Menambahkan <strong>pemegang kendaraan</strong> baru. Rincian: " . htmlspecialchars($keteranganRaw, ENT_QUOTES);
+                    // Apabila data lama (karena transisi file):
+                    if (str_starts_with($keteranganRaw, 'ID:')) {
+                       $keteranganHtml = preg_replace('/ID:\s*\d+\s*(—\s*)?/', '', $keteranganRaw);
+                       $keteranganHtml = str_replace([' | ', '|'], ', ', $keteranganHtml);
                     } else {
-                        // Fallback aksi lainnya
-                        $rawClean = preg_replace('/ID:\s*\d+\s*(—\s*)?/', '', $keteranganRaw);
-                        $keteranganHtml = "Melakukan <strong>{$aksi}</strong> pada <strong>{$entitas}</strong>. Rincian: " . htmlspecialchars($rawClean, ENT_QUOTES);
+                       $keteranganHtml = $keteranganRaw; 
                     }
                 }
+
+                $keteranganHtml = htmlspecialchars($keteranganHtml, ENT_QUOTES);
 
                 $data[] = [
                     'waktu'      => $carbonDate ? $carbonDate->translatedFormat('d F Y, H:i:s') : $timeString,
@@ -137,7 +90,8 @@ class LogReaderService
      */
     public function readLoginLog($search = null, $date = null, $perPage = 15, $page = 1)
     {
-        $path = storage_path('logs/login.txt');
+        $month = now()->format('Y_m');
+        $path = storage_path("logs/login_{$month}.txt");
         if (!File::exists($path)) {
             return new LengthAwarePaginator([], 0, $perPage, $page, ['path' => request()->url(), 'query' => request()->query()]);
         }

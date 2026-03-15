@@ -51,6 +51,20 @@ class AdminDashboardController extends Controller
                             ->limit(5)
                             ->get();
 
+        // Grafik Tren Scan QR per bulan tahun ini
+        $qrTrendRecords = QrKendaraan::whereYear('updated_at', date('Y'))
+            ->get()
+            ->groupBy(function($val) {
+                return Carbon::parse($val->updated_at)->format('n');
+            });
+            
+        $qrChartBulan = [];
+        $qrChartData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $qrChartBulan[] = Carbon::create()->month($i)->translatedFormat('M');
+            $qrChartData[] = isset($qrTrendRecords[$i]) ? $qrTrendRecords[$i]->sum('scan_count') : 0;
+        }
+
         // ─── Statistik Master Data ────────────────────────────────────────
         $totalPegawai   = Pegawai::count();
         $totalUnit      = Unit::count();
@@ -76,7 +90,7 @@ class AdminDashboardController extends Controller
                             ->get();
 
         // ─── Log Aktivitas Terbaru (dari file log) ────────────────────────
-        $recentLogs = collect($logService->readAktivitasLog(null, null, 8, 1)->items());
+        $recentLogs = collect($logService->readAktivitasLog(null, Carbon::today()->format('Y-m-d'), 8, 1)->items());
 
         return view('admin.dashboard', compact(
             'totalKendaraan',
@@ -93,6 +107,8 @@ class AdminDashboardController extends Controller
             'totalQr',
             'totalScan',
             'topQr',
+            'qrChartBulan',
+            'qrChartData',
             'totalPegawai',
             'totalUnit',
             'totalKategori',

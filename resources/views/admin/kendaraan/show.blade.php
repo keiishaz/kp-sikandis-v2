@@ -129,12 +129,7 @@
 
         {{-- TAB 2: RIWAYAT PEMEGANG --}}
         <div id="tab-pemegang" class="tab-content" style="display: none;">
-            @if(session('success') && request()->has('tab') && request()->tab === 'pemegang')
-                <div class="toast-notification toast-success" id="pemegang-flash" style="margin-bottom: 16px; position: static; max-width: 100%;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
+
 
             <div class="card">
                 <div class="card-header">
@@ -211,34 +206,30 @@
                                     <div style="font-size: 11px; color: var(--n-500);">{{ $akt->tanggal_aktivitas->translatedFormat('Y') }}</div>
                                 </div>
                                 <div class="timeline-dot"></div>
-                                <div class="timeline-content card" style="border: 1px solid var(--n-200); box-shadow: none;">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                                            <h4 class="timeline-title" style="display: flex; align-items: center; gap: 10px; margin: 0;">
-                                                {{ $akt->judul_aktivitas }}
-                                                @if($akt->biaya_terpakai)
-                                                    <span class="badge" style="background: var(--brand-50); color: var(--brand-700); border: 1px solid var(--brand-200); font-weight: 600; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 11px;">
-                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                                        Rp {{ number_format($akt->biaya_terpakai, 0, ',', '.') }}
-                                                    </span>
-                                                @endif
-                                            </h4>
-                                        </div>
-                                        <div style="display: flex; gap: 4px;">
-                                            <button type="button" onclick='editAktivitas(@json($akt))' class="btn btn-secondary btn-icon" style="width: 24px; height: 24px;">
+                                <div class="timeline-content" style="border: 1px solid var(--n-200); box-shadow: none;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                        <h4 class="timeline-title" style="margin: 0; padding-top: 2px;">{{ $akt->judul_aktivitas }}</h4>
+                                        <div style="display: flex; gap: 6px; align-items: center;">
+                                            @if($akt->biaya_terpakai)
+                                                <span class="badge" style="background: var(--brand-50); color: var(--brand-700); border: 1px solid var(--brand-200); font-weight: 600; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 11px;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                                    Rp {{ number_format($akt->biaya_terpakai, 0, ',', '.') }}
+                                                </span>
+                                            @endif
+                                            <button type="button" onclick='editAktivitas(@json($akt))' class="btn btn-secondary btn-icon" style="width: 24px; height: 24px; padding: 0; min-height: 24px;">
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                             </button>
-                                            <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display: inline;">
+                                            <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display: inline; margin: 0;">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-secondary btn-icon" style="width: 24px; height: 24px;">
+                                                <button type="submit" class="btn btn-secondary btn-icon" style="width: 24px; height: 24px; padding: 0; min-height: 24px;">
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                                                 </button>
                                             </form>
                                         </div>
                                     </div>
-                                    <p class="timeline-desc">{{ $akt->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
-                                    <div class="timeline-meta" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--n-200); font-size: 12px; color: var(--n-500); display: flex; justify-content: space-between;">
-                                        <span>Dibuat oleh: {{ $akt->creator->name ?? 'System' }}</span>
+                                    <p class="timeline-desc" style="margin: 0; font-size: 13px;">{{ $akt->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
+                                    <div class="timeline-meta" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--n-200); font-size: 11.5px; display: flex; justify-content: space-between;">
+                                        <span>Oleh: {{ $akt->creator->name ?? 'System' }}</span>
                                         <span>{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
                                 </div>

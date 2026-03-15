@@ -4,19 +4,7 @@
 @section('topbar_title', 'Data Kendaraan')
 
 @section('content')
-    {{-- Toast Notification --}}
-    @if(session('success') || session('error'))
-        <div id="toast-notification" class="toast-notification {{ session('success') ? 'toast-success' : 'toast-error' }}">
-            @if(session('success'))
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            @else
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            @endif
-            <span style="font-size:14px;font-weight:500">{{ session('success') ?? session('error') }}</span>
-            <button onclick="document.getElementById('toast-notification').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:.6;padding:0;">✕</button>
-        </div>
-        <script>setTimeout(()=>{const t=document.getElementById('toast-notification');if(t)t.remove();},4000);</script>
-    @endif
+
 
     {{-- PAGE HEADER --}}
     <div class="page-intro">

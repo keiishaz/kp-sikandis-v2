@@ -23,7 +23,7 @@
     </div>
 
     {{-- FORM CARD --}}
-    <div class="card" style="max-width: 600px;">
+    <div class="card form-page">
         <form method="POST" action="{{ route('admin.kelola-operator.update', $operator) }}" novalidate>
             @csrf
             @method('PUT')

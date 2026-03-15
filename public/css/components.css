@@ -523,6 +523,10 @@
   border-color: var(--brand-600);
 }
 .page-item.disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Fix SVG bawaan pagination Laravel */
+.page-item svg, nav[role="navigation"] svg { width: 16px !important; height: 16px !important; }
+
 @media (max-width: 640px) {
   .pagination { flex-direction: column; gap: 12px; }
 }

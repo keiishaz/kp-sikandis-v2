@@ -23,7 +23,7 @@
     </div>
 
     {{-- FORM CARD --}}
-    <div class="card" style="max-width: 800px;">
+    <div class="card form-page">
         <form method="POST" action="{{ route('admin.pegawai.update', $pegawai) }}" novalidate>
             @csrf
             @method('PUT')

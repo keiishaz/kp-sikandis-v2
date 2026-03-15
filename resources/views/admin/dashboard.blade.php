@@ -246,6 +246,16 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Tren Scan QR --}}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Tren Scan QR (Tahun Ini)</h3>
+                </div>
+                <div class="card-body">
+                    <div id="qrScanChart" style="min-height: 300px;"></div>
+                </div>
+            </div>
         </div>
 
         <div class="dashboard-col-side">
@@ -256,7 +266,7 @@
                     <a href="{{ route('admin.log.aktivitas') }}" class="btn btn-sm btn-ghost">Semua</a>
                 </div>
                 <div class="card-body" style="padding: 12px 0;">
-                    <div class="activity-feed">
+                    <div class="activity-feed" style="max-height: 420px; overflow-y: auto; padding: 0 12px;">
                         @forelse($recentLogs as $log)
                             @php
                                 $aksi = strtoupper($log['aksi'] ?? '');
@@ -356,3 +366,51 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.querySelector("#qrScanChart")) {
+            var options = {
+                series: [{
+                    name: 'Scan QR',
+                    data: {!! json_encode($qrChartData ?? []) !!}
+                }],
+                chart: {
+                    height: 300,
+                    type: 'area',
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, sans-serif'
+                },
+                colors: ['#7C3AED'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.05,
+                        stops: [0, 100]
+                    }
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: {
+                    categories: {!! json_encode($qrChartBulan ?? []) !!},
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: { formatter: function (val) { return Math.floor(val); } }
+                },
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 4,
+                }
+            };
+            var chart = new ApexCharts(document.querySelector("#qrScanChart"), options);
+            chart.render();
+        }
+    });
+</script>
+@endpush
