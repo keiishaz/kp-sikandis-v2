@@ -9,7 +9,7 @@ class LoginLogger
     public static function log($status, $nip, $context = [])
     {
         $month = now()->format('Y_m');
-        $logFile = "logs/login_{$month}.txt";
+        $logFile = "logs/login/login_{$month}.txt";
 
         $timestamp = now()->format('Y-m-d H:i:s');
         $message = "[{$timestamp}] {$status} — {$nip}";

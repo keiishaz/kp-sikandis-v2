@@ -14,7 +14,7 @@ class LogReaderService
     public function readAktivitasLog($search = null, $date = null, $perPage = 15, $page = 1)
     {
         $month = now()->format('Y_m');
-        $path = storage_path("logs/aktivitas_{$month}.txt");
+        $path = storage_path("logs/aktivitas/aktivitas_{$month}.txt");
         if (!File::exists($path)) {
             return new LengthAwarePaginator([], 0, $perPage, $page, ['path' => request()->url(), 'query' => request()->query()]);
         }
@@ -91,7 +91,7 @@ class LogReaderService
     public function readLoginLog($search = null, $date = null, $perPage = 15, $page = 1)
     {
         $month = now()->format('Y_m');
-        $path = storage_path("logs/login_{$month}.txt");
+        $path = storage_path("logs/login/login_{$month}.txt");
         if (!File::exists($path)) {
             return new LengthAwarePaginator([], 0, $perPage, $page, ['path' => request()->url(), 'query' => request()->query()]);
         }

@@ -41,7 +41,14 @@ class ActivityLogger
 
         $line = "[{$timestamp}] {$aksi} — User: {$userName} — Entitas: {$entitas} — {$kalimat}";
 
-        $path = storage_path("logs/aktivitas_{$month}.txt");
+        $path = storage_path("logs/aktivitas/aktivitas_{$month}.txt");
+        
+        // Ensure directory exists
+        $directory = dirname($path);
+        if (!\Illuminate\Support\Facades\File::exists($directory)) {
+            \Illuminate\Support\Facades\File::makeDirectory($directory, 0755, true);
+        }
+
         file_put_contents($path, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
