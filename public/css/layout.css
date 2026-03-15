@@ -1,0 +1,267 @@
+/* =============================================
+   SIKANDIS - Layout System
+   ============================================= */
+
+/* === APP WRAPPER === */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface-page);
+  position: relative;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: linear-gradient(180deg, var(--brand-900) 0%, var(--brand-950) 100%);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  transition: width 0.25s ease, transform 0.25s ease;
+  overflow: hidden;
+}
+
+/* Sidebar Collapsed State (Desktop) */
+.app-layout.sidebar-collapsed .sidebar {
+  width: 60px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .brand-sub,
+.app-layout.sidebar-collapsed .sidebar .brand-name,
+.app-layout.sidebar-collapsed .sidebar .nav-section-label,
+.app-layout.sidebar-collapsed .sidebar .nav-item span,
+.app-layout.sidebar-collapsed .sidebar .nav-group-header span,
+.app-layout.sidebar-collapsed .sidebar .nav-chevron,
+.app-layout.sidebar-collapsed .sidebar .user-name,
+.app-layout.sidebar-collapsed .sidebar .user-role,
+.app-layout.sidebar-collapsed .sidebar .logout-btn {
+  display: none;
+}
+
+.app-layout.sidebar-collapsed .sidebar .nav-item,
+.app-layout.sidebar-collapsed .sidebar .nav-group-header {
+  justify-content: center;
+  padding: 10px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .nav-item.active::before {
+  left: 0; width: 3px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .nav-icon {
+  width: 20px; height: 20px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .nav-group-body {
+  max-height: 0 !important;
+}
+
+.app-layout.sidebar-collapsed .sidebar .sidebar-brand {
+  justify-content: center;
+  padding: 16px 10px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .sidebar-footer {
+  justify-content: center;
+  padding: 12px 6px;
+}
+
+.app-layout.sidebar-collapsed .sidebar .user-avatar-sm {
+  margin: 0;
+}
+
+/* Tooltip on icon when collapsed */
+.app-layout.sidebar-collapsed .sidebar .nav-item,
+.app-layout.sidebar-collapsed .sidebar .nav-group-header {
+  position: relative;
+}
+.app-layout.sidebar-collapsed .sidebar .nav-item[title]:hover::after,
+.app-layout.sidebar-collapsed .sidebar .nav-group-header[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--n-900);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: var(--r-md);
+  white-space: nowrap;
+  z-index: 300;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+
+/* === MAIN AREA === */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: 240px;
+  min-height: 100vh;
+  transition: margin-left 0.25s ease;
+}
+
+.app-layout.sidebar-collapsed .main-wrapper {
+  margin-left: 60px;
+}
+
+.page-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--surface-page);
+}
+
+/* === TOPBAR === */
+.topbar {
+  height: 58px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--n-200);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* Sidebar Toggle Button (desktop) */
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  color: var(--n-500);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.sidebar-toggle-btn:hover {
+  background: var(--n-100);
+  color: var(--n-700);
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: none;
+  border: none;
+  color: var(--n-600);
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.mobile-menu-btn:hover { background: var(--n-100); }
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.4);
+  backdrop-filter: blur(2px);
+  z-index: 199;
+  display: none;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Page background when sidebar collapsed - subtle warm tint so not plain white */
+.app-layout.sidebar-collapsed .page-content {
+  background: var(--surface-page);
+}
+
+/* Subtle gradient overlay on page-content for depth */
+.page-content::before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0; right: 0;
+  width: 300px; height: 300px;
+  background: radial-gradient(ellipse at top right, rgba(37,99,235,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* === RESPONSIVE RULES === */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .main-wrapper { margin-left: 0; }
+  .app-layout.sidebar-collapsed .main-wrapper { margin-left: 0; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+    width: 240px !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Hide desktop toggle, show mobile toggle */
+  .sidebar-toggle-btn { display: none; }
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  /* Always show text labels on mobile (drawer mode) */
+  .app-layout.sidebar-collapsed .sidebar .brand-sub,
+  .app-layout.sidebar-collapsed .sidebar .brand-name,
+  .app-layout.sidebar-collapsed .sidebar .nav-section-label,
+  .app-layout.sidebar-collapsed .sidebar .nav-item span,
+  .app-layout.sidebar-collapsed .sidebar .nav-group-header span,
+  .app-layout.sidebar-collapsed .sidebar .nav-chevron,
+  .app-layout.sidebar-collapsed .sidebar .user-name,
+  .app-layout.sidebar-collapsed .sidebar .user-role,
+  .app-layout.sidebar-collapsed .sidebar .logout-btn {
+    display: block;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar .nav-chevron {
+    display: block;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar .nav-item,
+  .app-layout.sidebar-collapsed .sidebar .nav-group-header {
+    justify-content: flex-start;
+    padding: 9px 10px;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar .sidebar-brand {
+    justify-content: flex-start;
+    padding: 20px 18px 16px;
+  }
+
+  .app-layout.sidebar-collapsed .sidebar .sidebar-footer {
+    justify-content: flex-start;
+    padding: 12px 14px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .page-content { padding: 16px 12px; }
+  .topbar { padding: 0 14px; }
+}

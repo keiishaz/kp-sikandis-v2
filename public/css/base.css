@@ -1,0 +1,72 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Helvetica, sans-serif;
+  font-size: 14px; line-height: 1.6;
+  color: var(--n-700); background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+img { max-width: 100%; }
+svg { display: block; flex-shrink: 0; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--n-300); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--n-400); }
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection */
+::selection { background: var(--brand-100); color: var(--brand-900); }
+
+/* Typography */
+/* Scale */
+.text-xs   { font-size: 11px; line-height: 1.5; }
+.text-sm   { font-size: 13px; line-height: 1.5; }
+.text-base { font-size: 14px; line-height: 1.6; }
+.text-md   { font-size: 15px; line-height: 1.5; }
+.text-lg   { font-size: 17px; line-height: 1.4; }
+.text-xl   { font-size: 20px; line-height: 1.3; }
+.text-2xl  { font-size: 24px; line-height: 1.2; }
+.text-3xl  { font-size: 30px; line-height: 1.1; }
+
+/* Weight */
+.font-regular  { font-weight: 400; }
+.font-medium   { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold     { font-weight: 700; }
+
+/* Color */
+.text-primary   { color: var(--n-900); }
+.text-secondary { color: var(--n-600); }
+.text-muted     { color: var(--n-400); }
+.text-brand     { color: var(--brand-600); }
+
+/* Utility */
+.capitalize { text-transform: capitalize; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }

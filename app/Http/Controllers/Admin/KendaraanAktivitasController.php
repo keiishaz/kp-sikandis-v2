@@ -17,6 +17,7 @@ class KendaraanAktivitasController extends Controller
             'tanggal_aktivitas' => 'required|date',
             'judul_aktivitas'   => 'required|string|max:150',
             'deskripsi'         => 'nullable|string',
+            'biaya_terpakai'    => 'nullable|numeric|min:0',
         ]);
 
         $aktivitas = KendaraanAktivitas::create([
@@ -24,6 +25,7 @@ class KendaraanAktivitasController extends Controller
             'judul_aktivitas'   => $request->judul_aktivitas,
             'deskripsi'         => $request->deskripsi,
             'tanggal_aktivitas' => $request->tanggal_aktivitas,
+            'biaya_terpakai'    => $request->biaya_terpakai,
             'created_by'        => Auth::id(),
         ]);
 
@@ -38,7 +40,7 @@ class KendaraanAktivitasController extends Controller
             return response()->json(['success' => true, 'message' => 'Aktivitas berhasil ditambahkan']);
         }
 
-        return redirect()->back()->with('success', 'Aktivitas berhasil ditambahkan');
+        return redirect()->route('admin.kendaraan.show', ['kendaraan' => $kendaraan->id, 'tab' => 'aktivitas'])->with('success', 'Aktivitas berhasil ditambahkan');
     }
 
     public function update(Request $request, KendaraanAktivitas $aktivitas)
@@ -47,6 +49,7 @@ class KendaraanAktivitasController extends Controller
             'tanggal_aktivitas' => 'required|date',
             'judul_aktivitas'   => 'required|string|max:150',
             'deskripsi'         => 'nullable|string',
+            'biaya_terpakai'    => 'nullable|numeric|min:0',
         ]);
 
         $oldJudul = $aktivitas->judul_aktivitas;
@@ -55,6 +58,7 @@ class KendaraanAktivitasController extends Controller
             'judul_aktivitas'   => $request->judul_aktivitas,
             'deskripsi'         => $request->deskripsi,
             'tanggal_aktivitas' => $request->tanggal_aktivitas,
+            'biaya_terpakai'    => $request->biaya_terpakai,
         ]);
 
         ActivityLogger::log(
@@ -68,7 +72,7 @@ class KendaraanAktivitasController extends Controller
             return response()->json(['success' => true, 'message' => 'Aktivitas berhasil diperbarui']);
         }
 
-        return redirect()->back()->with('success', 'Aktivitas berhasil diperbarui');
+        return redirect()->route('admin.kendaraan.show', ['kendaraan' => $aktivitas->kendaraan_id, 'tab' => 'aktivitas'])->with('success', 'Aktivitas berhasil diperbarui');
     }
 
     public function destroy(KendaraanAktivitas $aktivitas)

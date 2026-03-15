@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('judul_aktivitas', 150);
             $table->text('deskripsi')->nullable();
             $table->date('tanggal_aktivitas');
-
+            $table->integer('biaya_terpakai')->nullable();
             $table->foreignId('created_by')
                 ->nullable()
                 ->constrained('users')

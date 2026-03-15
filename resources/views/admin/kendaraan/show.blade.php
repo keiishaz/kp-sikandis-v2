@@ -4,160 +4,147 @@
 @section('topbar_title', 'Kendaraan')
 
 @section('content')
-<section class="form-container">
-    <div class="card" style="padding: 0;">
-        <div style="padding: var(--spacing-lg);">
-            <nav style="font-size:13px;color:#94a3b8;margin-bottom:20px;display:flex;align-items:center;gap:6px;">
-                <a href="{{ route('admin.kendaraan.index') }}" style="color:#3b82f6;text-decoration:none;font-weight:500;">Kendaraan</a>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                <span style="color:#334155;">Detail Kendaraan</span>
-            </nav>
+<div class="dashboard">
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h3 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#0f172a;">{{ $kendaraan->nama_kendaraan }}</h3>
-                    <div style="display: flex; gap: 12px; align-items: center; font-size: 13px; color: var(--gray-500);">
-                        <span style="display:inline-flex;align-items:center;background:var(--gray-100);padding:4px 8px;border-radius:4px;font-weight:600;color:var(--gray-700);letter-spacing:1px;">{{ $kendaraan->no_polisi }}</span>
-                        <span>•</span>
-                        <span>{{ $kendaraan->kategori->nama_kategori ?? '-' }}</span>
-                        <span>•</span>
-                        <span>Tahun {{ $kendaraan->tahun }}</span>
-                    </div>
-                </div>
-                <div style="display: flex; gap:12px; align-items: center;">
-                    @php
-                        // Kalkulasi manual pajak untuk Show view tanpa query ulang di controller untuk kemudahan refactor logic lokal
-                        $now = \Carbon\Carbon::now();
-                        $statusPajak = 'Belum Diatur';
-                        $colorPajakBadgeLine = '#e2e8f0';
-                        $colorPajakBadgeText = '#64748b';
-                        $colorPajakBadgeBg = '#f8fafc';
-                        
-                        if ($kendaraan->pajak) {
-                            $pDate = \Carbon\Carbon::parse($kendaraan->pajak);
-                            if ($pDate->isPast()) {
-                                $statusPajak = 'Telah Jatuh Tempo';
-                                $colorPajakBadgeLine = '#fecaca'; $colorPajakBadgeText = '#ef4444'; $colorPajakBadgeBg = '#fef2f2';
-                            } else {
-                                if ($now->diffInMonths($pDate, false) <= 6) {
-                                    $statusPajak = 'Hampir Jatuh Tempo';
-                                    $colorPajakBadgeLine = '#fef08a'; $colorPajakBadgeText = '#ca8a04'; $colorPajakBadgeBg = '#fefce8';
-                                } else {
-                                    $statusPajak = 'Pajak Aktif';
-                                    $colorPajakBadgeLine = '#bbf7d0'; $colorPajakBadgeText = '#16a34a'; $colorPajakBadgeBg = '#f0fdf4';
-                                }
-                            }
-                        }
-                    @endphp
-                    <span style="display:inline-flex;align-items:center;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;background-color:{{ $colorPajakBadgeBg }};color:{{ $colorPajakBadgeText }}; border:1px solid {{ $colorPajakBadgeLine }}; gap:6px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        Pajak: {{ $statusPajak }}
-                    </span>
-                    
-                    @if($kendaraan->status === 'aktif')
-                        <span style="display:inline-block;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;background-color:#16a34a15;color:#16a34a;">Status Kendaraan: Aktif</span>
-                    @else
-                        <span style="display:inline-block;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;background-color:#ef444415;color:#ef4444;">Status Kendaraan: Nonaktif</span>
-                    @endif
-                    
-                    <a href="{{ route('admin.kendaraan.index') }}" class="btn btn-outline" style="padding:6px 16px; display:inline-flex; align-items:center; font-size:13px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                        Kembali
-                    </a>
-                </div>
+    {{-- PAGE HEADER --}}
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+        <div>
+            <nav aria-label="breadcrumb" style="margin-bottom: 12px; font-size: 13.5px;">
+                <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <li>
+                        <a href="{{ route('admin.kendaraan.index') }}" style="color: var(--n-500); text-decoration: none; font-weight: 500;">Kendaraan</a>
+                    </li>
+                    <li style="color: var(--n-400);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </li>
+                    <li style="color: var(--n-900); font-weight: 600;" aria-current="page">Detail</li>
+                </ol>
+            </nav>
+            <h2 class="page-heading" style="margin-bottom: 8px;">{{ $kendaraan->nama_kendaraan }}</h2>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <span class="plat-badge">{{ $kendaraan->no_polisi }}</span>
+                <span class="badge badge-neutral">{{ $kendaraan->kategori->nama_kategori ?? '-' }}</span>
+                <span class="badge badge-neutral">Tahun {{ $kendaraan->tahun }}</span>
             </div>
         </div>
-
-        <!-- Custom Tabs Navigation -->
-        <div style="display: flex; gap: 24px; border-bottom: 1px solid var(--gray-200); padding: 0 var(--spacing-lg);">
-            <button class="tab-btn active" data-target="tab-info" style="background:none; border:none; padding: 12px 4px; font-size: 14px; font-weight: 500; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); cursor:pointer;">
-                Informasi Kendaraan
-            </button>
-            <button class="tab-btn" data-target="tab-pemegang" style="background:none; border:none; padding: 12px 4px; font-size: 14px; font-weight: 500; color: var(--gray-500); border-bottom: 2px solid transparent; cursor:pointer;">
-                Riwayat Pemegang
-            </button>
-            <button class="tab-btn" data-target="tab-aktivitas" style="background:none; border:none; padding: 12px 4px; font-size: 14px; font-weight: 500; color: var(--gray-500); border-bottom: 2px solid transparent; cursor:pointer;">
-                Riwayat Aktivitas Kendaraan
-            </button>
+        
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <span class="badge {{ $kendaraan->status === 'aktif' ? 'badge-success' : 'badge-danger' }}" style="padding: 8px 16px;">
+                {{ $kendaraan->status === 'aktif' ? 'Status: Aktif' : 'Status: Nonaktif' }}
+            </span>
+            @php
+                $pajakBadgeClass = match($kendaraan->color_pajak) {
+                    'green' => 'badge-success',
+                    'yellow' => 'badge-warning',
+                    'red' => 'badge-danger',
+                    default => 'badge-neutral'
+                };
+            @endphp
+            <span class="badge {{ $pajakBadgeClass }}" style="padding: 8px 16px;">
+                Pajak: {{ $kendaraan->status_pajak }}
+            </span>
+            <a href="{{ route('admin.kendaraan.edit', $kendaraan->id) }}" class="btn btn-primary btn-sm">Edit Kendaraan</a>
+            <a href="{{ route('admin.kendaraan.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
         </div>
+    </div>
 
-        <!-- Tab Contents -->
-        <div style="padding: var(--spacing-md); background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-            
-            <!-- Tab 1: Info -->
-            <div id="tab-info" class="tab-content" style="display: block;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                    <!-- Spesifikasi Block -->
-                    <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
-                        <h4 style="margin:0 0 16px; font-size:14px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--gray-100); padding-bottom:8px;">Spesifikasi & Pajak</h4>
-                        
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px;">
-                                <span style="font-size:13px; color:var(--gray-500);">Nomor Rangka</span>
-                                <span style="font-size:13px; font-weight:500; color:var(--gray-800);">{{ $kendaraan->no_rangka ?? '-' }}</span>
+    {{-- CUSTOM TAB NAVIGATION --}}
+    <div style="display: flex; gap: 32px; border-bottom: 2px solid var(--n-100); margin-bottom: 24px;">
+        <button class="tab-btn active" data-target="tab-info" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 600; color: var(--brand-600); border-bottom: 2px solid var(--brand-600); cursor:pointer; margin-bottom: -2px;">
+            Informasi Kendaraan
+        </button>
+        <button class="tab-btn" data-target="tab-pemegang" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 500; color: var(--n-500); border-bottom: 2px solid transparent; cursor:pointer; margin-bottom: -2px;">
+            Riwayat Pemegang
+        </button>
+        <button class="tab-btn" data-target="tab-aktivitas" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 500; color: var(--n-500); border-bottom: 2px solid transparent; cursor:pointer; margin-bottom: -2px;">
+            Riwayat Aktivitas
+        </button>
+    </div>
+
+    {{-- TAB CONTENTS --}}
+    <div class="tab-contents">
+        
+        {{-- TAB 1: INFORMASI KENDARAAN --}}
+        <div id="tab-info" class="tab-content" style="display: block;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                
+                {{-- Spesifikasi & Pajak --}}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="info-icon" stroke="var(--brand-600)" stroke-width="2" style="margin-right:8px; vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Spesifikasi & Pajak
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">No. Rangka</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->no_rangka ?? '-' }}</span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px;">
-                                <span style="font-size:13px; color:var(--gray-500);">Nomor Mesin</span>
-                                <span style="font-size:13px; font-weight:500; color:var(--gray-800);">{{ $kendaraan->no_mesin ?? '-' }}</span>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">No. Mesin</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->no_mesin ?? '-' }}</span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px;">
-                                <span style="font-size:13px; color:var(--gray-500);">Tanggal Aktif Pajak</span>
-                                <span style="font-size:13px; font-weight:500; color:var(--gray-800);">{{ $kendaraan->pajak ? \Carbon\Carbon::parse($kendaraan->pajak)->translatedFormat('d F Y') : '-' }}</span>
+                            <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
+                                <span class="text-muted">Tanggal Pajak</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->pajak ? \Carbon\Carbon::parse($kendaraan->pajak)->translatedFormat('d F Y') : '-' }}</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Penggunaan Block -->
-                    <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
-                        <h4 style="margin:0 0 16px; font-size:14px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--gray-100); padding-bottom:8px;">Informasi Penggunaan</h4>
-                        
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px;">
-                                <span style="font-size:13px; color:var(--gray-500);">Jenis Penggunaan</span>
-                                <span style="font-size:13px; font-weight:600; color:var(--gray-800); text-transform:capitalize;">{{ $kendaraan->jenis_penggunaan }}</span>
+                {{-- Penggunaan --}}
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="info-icon" stroke="var(--brand-600)" stroke-width="2" style="margin-right:8px; vertical-align:middle;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 12 12 12 8"></polyline><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            Penggunaan
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">Jenis Penggunaan</span>
+                                <span style="font-weight: 500; color: var(--n-900); text-transform: capitalize;">{{ $kendaraan->jenis_penggunaan }}</span>
                             </div>
                             @if($kendaraan->jenis_penggunaan === 'operasional')
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px;">
-                                <span style="font-size:13px; color:var(--gray-500);">Lokasi Operasional</span>
-                                <span style="font-size:13px; font-weight:500; color:var(--gray-800);">{{ $kendaraan->lokasi_operasional ?? '-' }}</span>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">Lokasi Operasional</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->lokasi_operasional ?? '-' }}</span>
                             </div>
                             @endif
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--gray-100); padding-bottom:8px; align-items:center;">
-                                <span style="font-size:13px; color:var(--gray-500);">Token QR Validasi Publik</span>
-                                <span style="font-size:15px; font-weight:700; color:var(--primary-color); letter-spacing:1.5px; background:var(--primary-light); padding:4px 8px; border-radius:4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px;">
+                                <span class="text-muted">Token QR Sistem</span>
+                                <span class="badge" style="background: var(--brand-100); color: var(--brand-700); font-family: monospace; letter-spacing: 1px;">
                                     {{ $kendaraan->qrKendaraan->token ?? '-' }}
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
+        </div>
 
-            <!-- Tab 2: Riwayat Pemegang -->
-            <div id="tab-pemegang" class="tab-content" style="display: none;">
+        {{-- TAB 2: RIWAYAT PEMEGANG --}}
+        <div id="tab-pemegang" class="tab-content" style="display: none;">
+            @if(session('success') && request()->has('tab') && request()->tab === 'pemegang')
+                <div class="toast-notification toast-success" id="pemegang-flash" style="margin-bottom: 16px; position: static; max-width: 100%;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
 
-                @if(session('success') && request()->has('tab') && request()->tab === 'pemegang')
-                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 16px;border-radius:8px;color:#16a34a;font-size:13px;margin-bottom:16px;" id="pemegang-flash">
-                        ✓ {{ session('success') }}
-                    </div>
-                @endif
-
-                <!-- Header: Tombol Ganti Pemegang -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                    <div>
-                        <h4 style="margin:0; font-size:15px; font-weight:600; color:#0f172a;">Histori Pemegang Kendaraan</h4>
-                        <p style="margin:4px 0 0; font-size:12px; color:#64748b;">Seluruh riwayat penugasan kendaraan ini, diurutkan terbaru.</p>
-                    </div>
-                    <button type="button" id="btn-ganti-pemegang"
-                        style="display:inline-flex;align-items:center;gap:8px;background:#2563eb;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:background 0.2s;"
-                        onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Daftar Histori Pemegang Kendaraan</h3>
+                    <button type="button" id="btn-ganti-pemegang" class="btn btn-primary btn-sm">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
                         Ganti Pemegang
                     </button>
                 </div>
-
-                <!-- Tabel Histori Pemegang -->
-                <div class="table-responsive" style="border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">
+                <div class="card-body-flush table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -171,128 +158,132 @@
                         </thead>
                         <tbody>
                             @forelse($kendaraan->pemegangs as $p)
-                            <tr>
-                                <td style="font-weight:500;">{{ $p->pegawai->nama ?? '-' }}</td>
-                                <td style="font-family:monospace;font-size:12.5px;">{{ $p->pegawai->nip ?? '-' }}</td>
-                                <td>{{ $p->nomor_sk }}</td>
-                                <td>{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
-                                <td>{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
-                                <td>
-                                    @if($p->is_active)
-                                        <span class="status-badge active">Aktif</span>
-                                    @else
-                                        <span class="status-badge inactive">Nonaktif</span>
-                                    @endif
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        <div class="cell-primary">{{ $p->pegawai->nama ?? '-' }}</div>
+                                    </td>
+                                    <td><span style="font-family: monospace; font-size: 13px; color: var(--n-600);">{{ $p->pegawai->nip ?? '-' }}</span></td>
+                                    <td>{{ $p->nomor_sk }}</td>
+                                    <td>{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
+                                    <td>{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
+                                    <td>
+                                        @if($p->is_active)
+                                            <span class="badge badge-success">Aktif</span>
+                                        @else
+                                            <span class="badge badge-neutral">Selesai</span>
+                                        @endif
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="6" class="empty-state">
-                                    <div class="empty-content">
-                                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                        <p>Belum ada pemegang yang tercatat.</p>
-                                    </div>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-state-icon">
+                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                            </div>
+                                            <div class="empty-state-title">Belum ada pemegang</div>
+                                        </div>
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Tab 3: Riwayat Aktivitas Kendaraan -->
-            <div id="tab-aktivitas" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h4 style="margin:0; font-size:16px; font-weight:600; color:#1e293b;">Daftar Aktivitas Kendaraan</h4>
-                    <button type="button" onclick="openAktivitasModal()" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; font-size:13px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        {{-- TAB 3: RIWAYAT AKTIVITAS --}}
+        <div id="tab-aktivitas" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Histori Servis & Aktivitas</h3>
+                    <button type="button" onclick="openAktivitasModal()" class="btn btn-primary btn-sm">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         Tambah Aktivitas
                     </button>
                 </div>
-
-                <div class="table-responsive" style="border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Judul Aktivitas</th>
-                                <th>Deskripsi</th>
-                                <th>Pembuat</th>
-                                <th>Waktu Sistem</th>
-                                <th class="col-actions">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($kendaraan->aktivitas as $akt)
-                            <tr>
-                                <td style="font-weight:500;">{{ $akt->tanggal_aktivitas->translatedFormat('d M Y') }}</td>
-                                <td style="font-weight:600;">{{ $akt->judul_aktivitas }}</td>
-                                <td style="color:#64748b;line-height:1.4;">{{ $akt->deskripsi ?? '-' }}</td>
-                                <td>{{ $akt->creator->name ?? 'System' }}</td>
-                                <td style="font-size:12px;color:#94a3b8;">{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</td>
-                                <td class="col-actions">
-                                    <div class="action-buttons">
-                                        <button type="button" onclick='editAktivitas(@json($akt))' class="btn-action btn-edit" title="Edit">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                        </button>
-                                        <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display:inline;">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-action btn-delete" title="Hapus">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                <div class="card-body">
+                    <div class="timeline">
+                        @forelse($kendaraan->aktivitas as $akt)
+                            <div class="timeline-item">
+                                <div class="timeline-date">
+                                    <div style="font-weight: 600; color: var(--n-900);">{{ $akt->tanggal_aktivitas->translatedFormat('d M') }}</div>
+                                    <div style="font-size: 11px; color: var(--n-500);">{{ $akt->tanggal_aktivitas->translatedFormat('Y') }}</div>
+                                </div>
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content card" style="border: 1px solid var(--n-200); box-shadow: none;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            <h4 class="timeline-title" style="display: flex; align-items: center; gap: 10px; margin: 0;">
+                                                {{ $akt->judul_aktivitas }}
+                                                @if($akt->biaya_terpakai)
+                                                    <span class="badge" style="background: var(--brand-50); color: var(--brand-700); border: 1px solid var(--brand-200); font-weight: 600; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; font-size: 11px;">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                                        Rp {{ number_format($akt->biaya_terpakai, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </h4>
+                                        </div>
+                                        <div style="display: flex; gap: 4px;">
+                                            <button type="button" onclick='editAktivitas(@json($akt))' class="btn btn-secondary btn-icon" style="width: 24px; height: 24px;">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                             </button>
-                                        </form>
+                                            <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display: inline;">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-secondary btn-icon" style="width: 24px; height: 24px;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="empty-state">
-                                    <div class="empty-content">
-                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                        <p>Belum ada riwayat aktivitas kendaraan.</p>
+                                    <p class="timeline-desc">{{ $akt->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
+                                    <div class="timeline-meta" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--n-200); font-size: 12px; color: var(--n-500); display: flex; justify-content: space-between;">
+                                        <span>Dibuat oleh: {{ $akt->creator->name ?? 'System' }}</span>
+                                        <span>{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</span>
                                     </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="empty-state" style="padding: 40px; margin: 0 auto; width: 100%;">
+                                <div class="empty-state-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </div>
+                                <div class="empty-state-title">Belum ada riwayat aktivitas</div>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
-
         </div>
+
     </div>
-</section>
+</div>
+
+{{-- MODALS SECTION --}}
 
 <!-- =========== MODAL: Ganti Pemegang =========== -->
-<div id="modal-ganti-pemegang" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:12px; width:100%; max-width:540px; margin:20px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+<div id="modal-ganti-pemegang" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
+    <div class="modal-dialog" style="background:#fff; border-radius: var(--r-xl); width:100%; max-width:540px; box-shadow: var(--shadow-lg);">
 
-        <!-- Modal Header -->
-        <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--n-200); display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h3 style="margin:0; font-size:16px; font-weight:600; color:#0f172a;">Ganti Pemegang Kendaraan</h3>
-                <p style="margin:4px 0 0; font-size:12px; color:#64748b;">{{ $kendaraan->nama_kendaraan }} — {{ $kendaraan->no_polisi }}</p>
+                <h3 style="margin:0; font-size:18px; font-weight:600; color:var(--n-900);">Ganti Pemegang Kendaraan</h3>
+                <p style="margin:4px 0 0; font-size:13px; color:var(--n-500);">{{ $kendaraan->nama_kendaraan }} — {{ $kendaraan->no_polisi }}</p>
             </div>
-            <button id="btn-close-modal" type="button"
-                style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;"
-                onmouseover="this.style.color='#475569'" onmouseout="this.style.color='#94a3b8'">
+            <button id="btn-close-modal" type="button" class="btn btn-icon btn-secondary" style="border: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
-        <!-- Form -->
         <form id="form-ganti-pemegang" action="{{ route('admin.kendaraan.pemegang.store', $kendaraan->id) }}" method="POST">
             @csrf
             <input type="hidden" name="force_replace" id="input-force-replace" value="0">
 
-            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
+            <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
 
-                <!-- Pilih Pegawai -->
-                <div>
-                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Pilih Pegawai <span style="color:#ef4444;">*</span></label>
-                    <select name="pegawai_id" id="select-pegawai" required
-                        style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; background:#fff; outline:none; cursor:pointer;"
-                        onchange="previewPegawai(this.value)">
+                <div class="form-group">
+                    <label class="form-label">Pilih Pegawai <span class="text-danger">*</span></label>
+                    <select name="pegawai_id" id="select-pegawai" class="form-select" required onchange="previewPegawai(this.value)">
                         <option value="">— Pilih Pegawai —</option>
                         @foreach($pegawais as $peg)
                             <option value="{{ $peg->id }}">{{ $peg->nama }} — {{ $peg->nip }}</option>
@@ -301,83 +292,79 @@
                 </div>
 
                 <!-- Preview Pegawai -->
-                <div id="preview-pegawai" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 16px;">
-                    <p style="margin:0 0 8px; font-size:11px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Info Pegawai Terpilih</p>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                        <div><p style="margin:0; font-size:11px; color:#64748b;">Nama</p><p id="prev-nama" style="margin:0; font-size:13px; font-weight:600; color:#0f172a;">—</p></div>
-                        <div><p style="margin:0; font-size:11px; color:#64748b;">NIP</p><p id="prev-nip" style="margin:0; font-size:13px; font-family:monospace; color:#0f172a;">—</p></div>
-                        <div><p style="margin:0; font-size:11px; color:#64748b;">Jabatan</p><p id="prev-jabatan" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
-                        <div><p style="margin:0; font-size:11px; color:#64748b;">Unit</p><p id="prev-unit" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
-                        <div><p style="margin:0; font-size:11px; color:#64748b;">Sub Unit</p><p id="prev-subunit" style="margin:0; font-size:13px; color:#0f172a;">—</p></div>
+                <div id="preview-pegawai" style="display:none; background: var(--surface-page); border: 1px solid var(--n-200); border-radius: var(--r-md); padding: 16px;">
+                    <p style="margin:0 0 12px; font-size:11px; font-weight:600; color:var(--n-500); text-transform:uppercase; letter-spacing:0.5px;">Info Pegawai Terpilih</p>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div><p style="margin:0; font-size:12px; color:var(--n-500);">Nama</p><p id="prev-nama" style="margin:0; font-size:13.5px; font-weight:600; color:var(--n-900);">—</p></div>
+                        <div><p style="margin:0; font-size:12px; color:var(--n-500);">NIP</p><p id="prev-nip" style="margin:0; font-size:13.5px; font-family:monospace; color:var(--n-900);">—</p></div>
+                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:12px; color:var(--n-500);">Jabatan</p><p id="prev-jabatan" style="margin:0; font-size:13.5px; color:var(--n-900);">—</p></div>
+                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:12px; color:var(--n-500);">Unit & Sub Unit</p><p id="prev-unit" style="margin:0; font-size:13.5px; color:var(--n-900);">—</p><p id="prev-subunit" style="margin:0; font-size:12.5px; color:var(--n-600);">—</p></div>
                     </div>
                 </div>
 
-                <!-- Nomor SK -->
-                <div>
-                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Nomor SK <span style="color:#ef4444;">*</span></label>
-                    <input type="text" name="nomor_sk" required placeholder="Contoh: SK/001/2026"
-                        style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                <div class="form-group">
+                    <label class="form-label">Nomor Surat Keputusan (SK) <span class="text-danger">*</span></label>
+                    <input type="text" name="nomor_sk" class="form-input" required placeholder="Contoh: SK/001/2026">
                 </div>
 
-                <!-- Tanggal SK & Tanggal Mulai -->
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div>
-                        <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal SK <span style="color:#ef4444;">*</span></label>
-                        <input type="date" name="tanggal_sk" required
-                            style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label class="form-label">Tanggal SK <span class="text-danger">*</span></label>
+                        <input type="date" name="tanggal_sk" class="form-input" required>
                     </div>
-                    <div>
-                        <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal Mulai <span style="color:#ef4444;">*</span></label>
-                        <input type="date" name="tanggal_mulai" required
-                            style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; color:#374151; box-sizing:border-box; outline:none;">
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Mulai <span class="text-danger">*</span></label>
+                        <input type="date" name="tanggal_mulai" class="form-input" required>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Footer -->
-            <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" id="btn-cancel-modal"
-                    style="padding:9px 18px; border:1px solid #d1d5db; background:#fff; color:#374151; border-radius:8px; font-size:13px; cursor:pointer;">
-                    Batal
-                </button>
-                <button type="submit" id="btn-submit-pemegang"
-                    style="padding:9px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; transition:background 0.2s;"
-                    onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
-                    Simpan Pemegang
-                </button>
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--n-200); display: flex; justify-content: flex-end; gap: 12px; background: var(--surface-page); border-bottom-left-radius: var(--r-xl); border-bottom-right-radius: var(--r-xl);">
+                <button type="button" id="btn-cancel-modal" class="btn btn-secondary">Batal</button>
+                <button type="submit" id="btn-submit-pemegang" class="btn btn-primary">Simpan Pemegang</button>
             </div>
         </form>
 
     </div>
 </div>
+
 <!-- =========== MODAL: Aktivitas Kendaraan =========== -->
-<div id="modal-aktivitas" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:12px; width:100%; max-width:500px; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="modal-aktivitas-title" style="margin:0; font-size:16px; font-weight:600; color:#0f172a;">Tambah Aktivitas Kendaraan</h3>
-            <button onclick="closeAktivitasModal()" type="button" style="background:none;border:none;cursor:pointer;color:#94a3b8;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+<div id="modal-aktivitas" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
+    <div class="modal-dialog" style="background:#fff; border-radius: var(--r-xl); width:100%; max-width:500px; box-shadow: var(--shadow-lg);">
+        <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--n-200); display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="modal-aktivitas-title" style="margin:0; font-size:18px; font-weight:600; color:var(--n-900);">Tambah Aktivitas Kendaraan</h3>
+            <button onclick="closeAktivitasModal()" type="button" class="btn btn-icon btn-secondary" style="border: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
         </div>
         <form id="form-aktivitas" method="POST">
             @csrf
             <input type="hidden" name="_method" id="aktivitas-method" value="POST">
-            <div style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
-                <div>
-                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Tanggal Aktivitas <span style="color:#ef4444;">*</span></label>
-                    <input type="date" name="tanggal_aktivitas" id="akt-tanggal" required style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px;">
+            <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Tanggal Aktivitas <span class="text-danger">*</span></label>
+                    <input type="date" name="tanggal_aktivitas" id="akt-tanggal" class="form-input" required>
                 </div>
-                <div>
-                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Judul Aktivitas <span style="color:#ef4444;">*</span></label>
-                    <input type="text" name="judul_aktivitas" id="akt-judul" required placeholder="Misal: Servis Rutin, Ganti Ban, dll" style="width:100%; padding:9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px;">
+                <div class="form-group">
+                    <label class="form-label">Judul Aktivitas <span class="text-danger">*</span></label>
+                    <input type="text" name="judul_aktivitas" id="akt-judul" class="form-input" required placeholder="Misal: Servis Rutin, Ganti Ban, dll">
                 </div>
-                <div>
-                    <label style="display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px;">Deskripsi</label>
-                    <textarea name="deskripsi" id="akt-deskripsi" rows="3" placeholder="Tambahkan rincian aktivitas jika ada..." style="width:100%; padding: 9px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; font-family:inherit;"></textarea>
+                <div class="form-group">
+                    <label class="form-label">Total Biaya Terpakai (Opsional)</label>
+                    <div class="input-with-icon" style="position: relative;">
+                        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--n-500); font-weight: 600; font-size: 13.5px;">Rp</span>
+                        <input type="number" name="biaya_terpakai" id="akt-biaya" class="form-input" style="padding-left: 40px;" placeholder="0" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi" id="akt-deskripsi" class="form-input" rows="4" placeholder="Tambahkan rincian aktivitas jika ada..."></textarea>
                 </div>
             </div>
-            <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" onclick="closeAktivitasModal()" style="padding:9px 18px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-size:13px; cursor:pointer;">Batal</button>
-                <button type="submit" style="padding:9px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer;">Simpan Aktivitas</button>
+            <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--n-200); display: flex; justify-content: flex-end; gap: 12px; background: var(--surface-page); border-bottom-left-radius: var(--r-xl); border-bottom-right-radius: var(--r-xl);">
+                <button type="button" onclick="closeAktivitasModal()" class="btn btn-secondary">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan Aktivitas</button>
             </div>
         </form>
     </div>
@@ -394,31 +381,33 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => {
                 b.classList.remove('active');
-                b.style.color = 'var(--gray-500)';
+                b.style.color = 'var(--n-500)';
                 b.style.borderBottomColor = 'transparent';
+                b.style.fontWeight = '500';
             });
             tabContents.forEach(c => { c.style.display = 'none'; });
 
             btn.classList.add('active');
-            btn.style.color = 'var(--primary-color)';
-            btn.style.borderBottomColor = 'var(--primary-color)';
+            btn.style.color = 'var(--brand-600)';
+            btn.style.borderBottomColor = 'var(--brand-600)';
+            btn.style.fontWeight = '600';
 
             document.getElementById(btn.getAttribute('data-target')).style.display = 'block';
         });
     });
 
-    // ---- Modal Open/Close ----
-    const modal = document.getElementById('modal-ganti-pemegang');
+    // ---- Modal Open/Close Ganti Pemegang ----
+    const modalPemegang = document.getElementById('modal-ganti-pemegang');
 
     document.getElementById('btn-ganti-pemegang').addEventListener('click', () => {
-        modal.style.display = 'flex';
+        modalPemegang.style.display = 'flex';
     });
-    document.getElementById('btn-close-modal').addEventListener('click', closeModal);
-    document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
-    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.getElementById('btn-close-modal').addEventListener('click', closePemegangModal);
+    document.getElementById('btn-cancel-modal').addEventListener('click', closePemegangModal);
+    modalPemegang.addEventListener('click', e => { if (e.target === modalPemegang) closePemegangModal(); });
 
-    function closeModal() {
-        modal.style.display = 'none';
+    function closePemegangModal() {
+        modalPemegang.style.display = 'none';
         document.getElementById('input-force-replace').value = '0';
     }
 
@@ -427,6 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const box = document.getElementById('preview-pegawai');
         if (!pegawaiId) { box.style.display = 'none'; return; }
 
+        // Murni fetch JS logic yang dipertahankan
         fetch(`/admin/api/pegawai/${pegawaiId}`)
             .then(r => r.json())
             .then(data => {
@@ -440,10 +430,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => { box.style.display = 'none'; });
     };
 
-    // ---- Form Submit: cek needs_confirm ----
+    // ---- Form Submit Ganti Pemegang : cek needs_confirm ----
     document.getElementById('form-ganti-pemegang').addEventListener('submit', async function(e) {
         const forceReplace = document.getElementById('input-force-replace').value;
-        if (forceReplace === '1') return; // sudah dikonfirmasi, lanjut submit biasa
+        if (forceReplace === '1') return; // sudah dikonfirmasi, lanjut submit
 
         e.preventDefault();
 
@@ -461,11 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (data.needs_confirm) {
-                // Tampilkan SIKANDIS confirm dialog
                 const nama = data.pemegang_lama?.nama || 'Pemegang saat ini';
                 const confirmed = await SIKANDIS.confirm({
                     title: 'Konfirmasi Serah Terima',
-                    message: `Kendaraan ini saat ini dipegang oleh ${nama}. Pemegang lama akan dinonaktifkan dan digantikan dengan pemegang baru. Lanjutkan?`,
+                    message: `Kendaraan ini saat ini dipegang oleh \b${nama}\b. Pemegang lama akan dinonaktifkan dan digantikan dengan pemegang baru. Lanjutkan?`,
                     confirmText: 'Ya, Ganti Pemegang',
                     cancelText: 'Batal',
                     type: 'warning',
@@ -476,17 +465,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.submit();
                 }
             } else {
-                // Tidak ada pemegang aktif, redirect dari server response
                 window.location.href = "{{ route('admin.kendaraan.show', $kendaraan->id) }}?tab=pemegang";
             }
         } catch (err) {
-            // Fallback: submit normal
             document.getElementById('input-force-replace').value = '1';
             this.submit();
         }
     });
 
-    // ---- Aktivitas Modal ----
+    // ---- Aktivitas Modal Logic ----
     const modalAkt = document.getElementById('modal-aktivitas');
     const formAkt  = document.getElementById('form-aktivitas');
 
@@ -496,6 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formAkt.reset();
         document.getElementById('aktivitas-method').value = 'POST';
         document.getElementById('akt-tanggal').value = new Date().toISOString().split('T')[0];
+        document.getElementById('akt-biaya').value = '';
         modalAkt.style.display = 'flex';
     };
 
@@ -509,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('aktivitas-method').value = 'PUT';
         document.getElementById('akt-tanggal').value = akt.tanggal_aktivitas.split('T')[0];
         document.getElementById('akt-judul').value = akt.judul_aktivitas;
+        document.getElementById('akt-biaya').value = akt.biaya_terpakai || '';
         document.getElementById('akt-deskripsi').value = akt.deskripsi || '';
         modalAkt.style.display = 'flex';
     };
@@ -523,7 +512,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (confirmed) {
-            const res = await fetch(`/admin/kendaraan-aktivitas/${id}`, {
+            const baseUrl = "{{ route('admin.kendaraan.aktivitas.destroy', ':id') }}";
+            const res = await fetch(baseUrl.replace(':id', id), {
                 method: 'DELETE',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
             });
@@ -548,4 +538,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endsection
-

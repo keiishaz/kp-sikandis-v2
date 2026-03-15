@@ -14,6 +14,7 @@ class KendaraanAktivitas extends Model
         'deskripsi',
         'tanggal_aktivitas',
         'created_by',
+        'biaya_terpakai',
     ];
 
     protected $casts = [

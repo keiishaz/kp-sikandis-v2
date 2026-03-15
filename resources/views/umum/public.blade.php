@@ -10,147 +10,151 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --navy:   #1e3a8a;
-            --blue:   #2563eb;
-            --sky:    #bfdbfe;
-            --light:  #eff6ff;
-            --text:   #0f172a;
-            --sub:    #475569;
-            --muted:  #94a3b8;
-            --border: #e2e8f0;
-            --bg:     #f1f5f9;
-            --card:   #ffffff;
+            --brand-50: #eff6ff;
+            --brand-100: #dbeafe;
+            --brand-500: #3b82f6;
+            --brand-600: #2563eb;
+            --brand-700: #1d4ed8;
+            --brand-900: #1e3a8a;
+            --n-50: #f8fafc;
+            --n-100: #f1f5f9;
+            --n-200: #e2e8f0;
+            --n-400: #94a3b8;
+            --n-500: #64748b;
+            --n-600: #475569;
+            --n-800: #1e293b;
+            --n-900: #0f172a;
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--n-50);
+            color: var(--n-900);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ===== TOPBAR ===== */
         .topbar {
-            background: var(--navy);
+            background: #fff;
             padding: 0 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            height: 48px;
+            gap: 12px;
+            height: 60px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 10;
         }
 
-        .topbar img { height: 34px; width: auto; }
+        .topbar img { height: 38px; width: auto; }
 
         .topbar-text {
-            font-size: 12px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--n-800);
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.5px;
         }
 
         /* ===== HERO SECTION ===== */
         .hero {
-            background: linear-gradient(150deg, #1d4ed8 0%, #3b82f6 60%, #60a5fa 100%);
-            padding: 28px 20px 60px;
+            background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+            padding: 36px 20px 70px;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        /* Elemen dekoratif tipis */
         .hero::before,
         .hero::after {
             content: '';
             position: absolute;
             border-radius: 50%;
-            opacity: 0.08;
+            opacity: 0.1;
             background: #fff;
             z-index: 0;
         }
 
-        .hero::before {
-            width: 260px;
-            height: 260px;
-            top: -80px;
-            right: -60px;
-        }
+        .hero::before { width: 300px; height: 300px; top: -100px; right: -80px; }
+        .hero::after { width: 180px; height: 180px; bottom: -40px; left: -50px; }
 
-        .hero::after {
-            width: 160px;
-            height: 160px;
-            bottom: -30px;
-            left: -40px;
-        }
-
-        .hero-label,
-        .hero-title,
-        .hero-meta {
+        .hero-content {
             position: relative;
             z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .hero-label {
             display: inline-block;
-            background: rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.8);
-            font-size: 11px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 12px;
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            margin-bottom: 12px;
+            backdrop-filter: blur(4px);
+            margin-bottom: 16px;
         }
 
         .hero-title {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
             color: #fff;
             line-height: 1.2;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .hero-meta {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-top: 6px;
         }
 
         .plat-chip {
-            background: rgba(255,255,255,0.18);
-            color: #fff;
-            font-weight: 700;
-            font-size: 14px;
+            background: #fff;
+            color: var(--brand-700);
+            font-weight: 800;
+            font-size: 15px;
             letter-spacing: 1.5px;
-            padding: 5px 14px;
+            padding: 6px 16px;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.28);
-            font-family: 'Courier New', monospace;
+            font-family: monospace;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .status-chip {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
             border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .status-aktif   { background: rgba(34,197,94,0.22); color: #86efac; border: 1px solid rgba(74,222,128,0.3); }
-        .status-nonaktif{ background: rgba(239,68,68,0.22);  color: #fca5a5; border: 1px solid rgba(248,113,113,0.3); }
+        .status-aktif { background: #dcfce7; color: #166534; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .status-nonaktif { background: #fee2e2; color: #991b1b; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-aktif .dot { background: #22c55e; box-shadow: 0 0 0 2px #bbf7d0; }
+        .status-nonaktif .dot { background: #ef4444; box-shadow: 0 0 0 2px #fecaca; }
 
         /* ===== MAIN CONTAINER ===== */
         .main-wrap {
             max-width: 600px;
-            margin: -36px auto 40px;
+            margin: -40px auto 40px;
             padding: 0 16px;
             position: relative;
             z-index: 2;
@@ -158,99 +162,79 @@
 
         /* ===== QR FLOAT CARD ===== */
         .qr-float-card {
-            background: var(--card);
+            background: #fff;
             border-radius: 16px;
-            padding: 20px;
+            padding: 24px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            box-shadow: 0 8px 30px rgba(30,58,138,0.15);
-            margin-bottom: 16px;
+            gap: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+            margin-bottom: 20px;
         }
 
         .qr-box {
             background: #fff;
             border-radius: 12px;
-            padding: 8px;
+            padding: 10px;
+            border: 1px solid var(--n-200);
             flex-shrink: 0;
             display: flex;
-            box-shadow: 0 0 0 0 rgba(37,99,235,0.35);
-            animation: qr-pulse 2.4s ease-in-out infinite;
         }
 
-        @keyframes qr-pulse {
-            0%   { box-shadow: 0 0 0 0 rgba(37,99,235,0.35); }
-            60%  { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
-            100% { box-shadow: 0 0 0 0  rgba(37,99,235,0); }
-        }
-
-        .qr-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .qr-info h3 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .qr-info p {
-            font-size: 12.5px;
-            color: var(--sub);
-            line-height: 1.5;
-        }
+        .qr-info { flex: 1; min-width: 0; }
+        .qr-info h3 { font-size: 16px; font-weight: 700; color: var(--n-900); margin-bottom: 6px; }
+        .qr-info p { font-size: 13px; color: var(--n-500); line-height: 1.5; margin-bottom: 12px; }
 
         .qr-token {
             display: inline-block;
-            margin-top: 8px;
-            background: var(--light);
-            border: 1px solid var(--sky);
-            color: var(--navy);
+            background: var(--brand-50);
+            border: 1px solid var(--brand-100);
+            color: var(--brand-700);
             font-family: monospace;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 2px;
-            padding: 3px 10px;
-            border-radius: 6px;
+            padding: 6px 14px;
+            border-radius: 8px;
         }
 
         /* ===== INFO CARDS ===== */
         .info-card {
-            background: var(--card);
+            background: #fff;
             border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.01);
+            border: 1px solid var(--n-200);
             overflow: hidden;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .info-card-header {
-            background: var(--light);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
+            background: var(--n-50);
+            border-bottom: 1px solid var(--n-200);
+            padding: 16px 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .info-card-header .icon-wrap {
-            width: 28px;
-            height: 28px;
-            background: var(--blue);
-            border-radius: 7px;
+            width: 36px;
+            height: 36px;
+            background: #fff;
+            border: 1px solid var(--n-200);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            color: var(--brand-600);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .info-card-header svg { color: #fff; }
-
         .info-card-header h3 {
-            font-size: 12.5px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--navy);
+            color: var(--n-800);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -261,25 +245,25 @@
         .row {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            padding: 11px 20px;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
+            align-items: center;
+            padding: 14px 20px;
+            gap: 16px;
+            border-bottom: 1px dashed var(--n-200);
         }
 
         .row:last-child { border-bottom: none; }
 
         .row-key {
-            font-size: 12.5px;
-            color: var(--sub);
-            font-weight: 400;
+            font-size: 13.5px;
+            color: var(--n-500);
+            font-weight: 500;
             flex-shrink: 0;
         }
 
         .row-value {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text);
+            color: var(--n-900);
             text-align: right;
             word-break: break-word;
         }
@@ -287,79 +271,70 @@
         .row-value.capitalize { text-transform: capitalize; }
 
         .row-value.mono {
-            font-family: 'Courier New', monospace;
-            background: var(--light);
-            color: var(--navy);
-            padding: 2px 8px;
-            border-radius: 5px;
-            letter-spacing: 0.8px;
-            font-size: 12px;
+            font-family: monospace;
+            background: var(--n-100);
+            color: var(--n-800);
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            font-size: 13px;
         }
 
         /* ===== PEMEGANG EMPTY ===== */
         .empty-pemegang {
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
-            color: var(--muted);
-            font-size: 13px;
-            font-style: italic;
+            color: var(--n-400);
+            font-size: 13.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
         /* ===== FOOTER ===== */
         .footer {
             text-align: center;
-            font-size: 11.5px;
-            color: var(--muted);
-            padding: 4px 16px 24px;
+            font-size: 12px;
+            color: var(--n-500);
+            padding: 12px 16px 32px;
+            line-height: 1.6;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 520px) {
-            .hero-title { font-size: 21px; }
-
-            .qr-float-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .qr-info { text-align: center; }
-
-            .row {
-                flex-direction: column;
-                gap: 2px;
-            }
-
-            .row-value {
-                text-align: left;
-            }
+            .hero-title { font-size: 24px; }
+            .hero { padding: 30px 20px 60px; }
+            .qr-float-card { flex-direction: column; text-align: center; gap: 16px; padding: 20px; }
+            .row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 20px; }
+            .row-value { text-align: left; }
         }
     </style>
 </head>
 <body>
 
-{{-- Top Bar --}}
 <div class="topbar">
     <img src="{{ asset('assets/images/logobkl.png') }}" alt="Logo">
-    <span class="topbar-text">Dinas Pemerintah Provinsi Bengkulu</span>
+    <span class="topbar-text">Pemerintah Kota Bengkulu</span>
 </div>
 
-{{-- Hero --}}
 <div class="hero">
-    <div class="hero-label">{{ $kendaraan->kategori->nama_kategori ?? 'Kendaraan Dinas' }}</div>
-    <h1 class="hero-title">{{ $kendaraan->nama_kendaraan }}</h1>
-    <div class="hero-meta">
-        <span class="plat-chip">{{ $kendaraan->no_polisi }}</span>
-        @if($kendaraan->status === 'aktif')
-            <span class="status-chip status-aktif">● Aktif</span>
-        @else
-            <span class="status-chip status-nonaktif">● Nonaktif</span>
-        @endif
+    <div class="hero-content">
+        <div class="hero-label">{{ $kendaraan->kategori->nama_kategori ?? 'Kendaraan Dinas' }}</div>
+        <h1 class="hero-title">{{ $kendaraan->nama_kendaraan }}</h1>
+        <div class="hero-meta">
+            <span class="plat-chip">{{ $kendaraan->no_polisi }}</span>
+            @if($kendaraan->status === 'aktif')
+                <span class="status-chip status-aktif"><span class="dot"></span> Aktif</span>
+            @else
+                <span class="status-chip status-nonaktif"><span class="dot"></span> Nonaktif</span>
+            @endif
+        </div>
     </div>
 </div>
 
 <div class="main-wrap">
 
-    {{-- QR Float Card --}}
     <div class="qr-float-card">
         <div class="qr-box">
             <div id="qr-code"></div>
@@ -371,12 +346,12 @@
         </div>
     </div>
 
-    {{-- Informasi Kendaraan --}}
     <div class="info-card">
         <div class="info-card-header">
             <div class="icon-wrap">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="1" y="3" width="15" height="13" rx="2" ry="2"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
                     <circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle>
                 </svg>
             </div>
@@ -392,12 +367,12 @@
                 <span class="row-value">{{ $kendaraan->kategori->nama_kategori ?? '-' }}</span>
             </div>
             <div class="row">
-                <span class="row-key">Tahun</span>
+                <span class="row-key">Tahun Keluaran</span>
                 <span class="row-value">{{ $kendaraan->tahun ?? '-' }}</span>
             </div>
             <div class="row">
                 <span class="row-key">Jenis Penggunaan</span>
-                <span class="row-value capitalize">{{ $kendaraan->jenis_penggunaan ?? '-' }}</span>
+                <span class="row-value capitalize">{{ str_replace('_', ' ', $kendaraan->jenis_penggunaan) ?? '-' }}</span>
             </div>
             @if($kendaraan->lokasi_operasional)
             <div class="row">
@@ -408,21 +383,20 @@
         </div>
     </div>
 
-    {{-- Pemegang Kendaraan --}}
     <div class="info-card">
         <div class="info-card-header">
             <div class="icon-wrap">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
-            <h3>Pemegang Kendaraan</h3>
+            <h3>Daftar Pemegang</h3>
         </div>
         <div class="info-card-body">
             @php $pemegang = $kendaraan->pemegangAktif; @endphp
             @if($pemegang && $pemegang->pegawai)
                 <div class="row">
-                    <span class="row-key">Nama</span>
+                    <span class="row-key">Nama Pemegang</span>
                     <span class="row-value">{{ $pemegang->pegawai->nama }}</span>
                 </div>
                 @if($pemegang->pegawai->jabatan)
@@ -439,7 +413,7 @@
                 @endif
                 @if($pemegang->pegawai->subUnit)
                 <div class="row">
-                    <span class="row-key">Sub Unit</span>
+                    <span class="row-key">Sub Unit Kerja</span>
                     <span class="row-value">{{ $pemegang->pegawai->subUnit->nama_sub_unit }}</span>
                 </div>
                 @endif
@@ -450,14 +424,19 @@
                 </div>
                 @endif
             @else
-                <p class="empty-pemegang">Kendaraan ini belum memiliki pemegang aktif.</p>
+                <div class="empty-pemegang">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Kendaraan ini belum memiliki pemegang aktif yang tercatat.</span>
+                </div>
             @endif
         </div>
     </div>
 
     <div class="footer">
-        Data ini dikelola secara resmi oleh Dinas Kominfo Kota Bengkulu.<br>
-        &copy; {{ date('Y') }} SIKANDIS — Sistem Inventarisasi Kendaraan Dinas
+        Data ini dikelola secara resmi oleh <strong>Dinas Kominfo Kota Bengkulu</strong>.<br>
+        &copy; {{ date('Y') }} SIKANDIS — Sistem Informasi Data Kendaraan Dinas
     </div>
 
 </div>
