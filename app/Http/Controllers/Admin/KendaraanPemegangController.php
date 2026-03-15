@@ -10,8 +10,11 @@ use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 class KendaraanPemegangController extends Controller
 {
+    use RoleRoutePrefix;
     /**
      * Proses Ganti / Assign Pemegang Kendaraan.
      * Menjalankan algoritma serah terima:
@@ -147,7 +150,7 @@ class KendaraanPemegangController extends Controller
         });
 
         return redirect()
-            ->route('admin.kendaraan.show', ['kendaraan' => $kendaraan->id, 'tab' => 'pemegang'])
+            ->route($this->rp() . '.kendaraan.show', ['kendaraan' => $kendaraan->id, 'tab' => 'pemegang'])
             ->with('success', 'Pemegang kendaraan berhasil diperbarui.');
     }
 }

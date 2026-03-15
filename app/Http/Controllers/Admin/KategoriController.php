@@ -9,8 +9,11 @@ use App\Models\Kategori;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 class KategoriController extends Controller
 {
+    use RoleRoutePrefix;
     public function index(Request $request)
     {
         $query = Kategori::query();
@@ -40,7 +43,7 @@ class KategoriController extends Controller
             "Nama Kategori: {$kategori->nama_kategori}"
         );
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route($this->rp() . '.kategori.index')
                          ->with('success', "Kategori \"{$kategori->nama_kategori}\" berhasil ditambahkan.");
     }
 
@@ -61,7 +64,7 @@ class KategoriController extends Controller
             "Dari: {$oldName} → {$kategori->nama_kategori}"
         );
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route($this->rp() . '.kategori.index')
                          ->with('success', "Kategori \"{$kategori->nama_kategori}\" berhasil diperbarui.");
     }
 
@@ -73,7 +76,7 @@ class KategoriController extends Controller
 
         ActivityLogger::log('HAPUS KATEGORI KENDARAAN', 'Kategori', $id, "Nama Kategori: {$nama}");
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route($this->rp() . '.kategori.index')
                          ->with('success', "Kategori \"{$nama}\" berhasil dihapus.");
     }
 }

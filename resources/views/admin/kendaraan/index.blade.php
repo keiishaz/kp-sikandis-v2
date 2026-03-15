@@ -19,36 +19,36 @@
     @endif
 
     {{-- Statistik Mini Rata Kiri Kanan --}}
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 24px;">
-        <div style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,0.02); display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom: 20px;">
+        <div style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:14px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center;">
             <div>
-                <div style="font-size:28px; font-weight:700; color:var(--gray-800); line-height:1.2;">{{ $countAktif }}</div>
-                <div style="font-size:13px; font-weight:500; color:var(--gray-500); margin-top:4px;">Total Kendaraan Aktif</div>
+                <div style="font-size:20px; font-weight:700; color:var(--gray-800); line-height:1.2;">{{ $countAktif }}</div>
+                <div style="font-size:12.5px; font-weight:500; color:var(--gray-500); margin-top:3px;">Total Kendaraan Aktif</div>
             </div>
-            <div style="background:#10b98115; color:#10b981; padding:14px; border-radius:12px;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <div style="background:#10b98115; color:#10b981; padding:10px; border-radius:10px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
         </div>
         
-        <div style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,0.02); display:flex; justify-content:space-between; align-items:center;">
+        <div style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:14px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center;">
             <div>
-                <div style="font-size:28px; font-weight:700; color:var(--gray-800); line-height:1.2;">{{ $countNonaktif }}</div>
-                <div style="font-size:13px; font-weight:500; color:var(--gray-500); margin-top:4px;">Total Kendaraan Nonaktif</div>
+                <div style="font-size:20px; font-weight:700; color:var(--gray-800); line-height:1.2;">{{ $countNonaktif }}</div>
+                <div style="font-size:12.5px; font-weight:500; color:var(--gray-500); margin-top:3px;">Total Kendaraan Nonaktif</div>
             </div>
-            <div style="background:#ef444415; color:#ef4444; padding:14px; border-radius:12px;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+            <div style="background:#ef444415; color:#ef4444; padding:10px; border-radius:10px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
             </div>
         </div>
     </div>
 
-    <!-- Wrapper List Aktif/Nonaktif menempel dengan Card tanpa space -->
+    <!-- Wrapper tab menempel di atas card -->
     <div style="display:flex; gap:4px; position:relative; z-index:1; margin-left:16px;">
         <a href="{{ route('admin.kendaraan.index', ['status' => 'aktif', 'q' => request('q')]) }}" 
-           style="padding:14px 28px; font-size:14px; font-weight:700; text-decoration:none; border-top-left-radius:8px; border-top-right-radius:8px; border:1px solid {{ $status === 'aktif' ? 'var(--primary-color)' : 'var(--gray-200)' }}; border-bottom:none; {{ $status === 'aktif' ? 'background:var(--primary-color); color:#fff; border-bottom:none;' : 'background:#f1f5f9; color:var(--gray-500);' }} transition:all 0.2s ease;">
+           style="padding:10px 22px; font-size:13.5px; font-weight:600; text-decoration:none; border-top-left-radius:8px; border-top-right-radius:8px; border:1px solid {{ $status === 'aktif' ? 'var(--primary-color)' : 'var(--gray-200)' }}; border-bottom:none; {{ $status === 'aktif' ? 'background:var(--primary-color); color:#fff;' : 'background:#f1f5f9; color:var(--gray-500);' }} transition:all 0.2s ease;">
            Kendaraan Aktif
         </a>
         <a href="{{ route('admin.kendaraan.index', ['status' => 'nonaktif', 'q' => request('q')]) }}" 
-           style="padding:14px 28px; font-size:14px; font-weight:700; text-decoration:none; border-top-left-radius:8px; border-top-right-radius:8px; border:1px solid {{ $status === 'nonaktif' ? '#ef4444' : 'var(--gray-200)' }}; border-bottom:none; {{ $status === 'nonaktif' ? 'background:#ef4444; color:#fff; border-bottom:none;' : 'background:#f1f5f9; color:var(--gray-500);' }} transition:all 0.2s ease;">
+           style="padding:10px 22px; font-size:13.5px; font-weight:600; text-decoration:none; border-top-left-radius:8px; border-top-right-radius:8px; border:1px solid {{ $status === 'nonaktif' ? '#ef4444' : 'var(--gray-200)' }}; border-bottom:none; {{ $status === 'nonaktif' ? 'background:#ef4444; color:#fff;' : 'background:#f1f5f9; color:var(--gray-500);' }} transition:all 0.2s ease;">
            Kendaraan Nonaktif
         </a>
     </div>

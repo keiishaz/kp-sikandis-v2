@@ -102,7 +102,44 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('operator')->name('operator.')->middleware('role:operator')->group(function () {
-        Route::get('/dashboard', fn() => view('operator.dashboard'))->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Operator\OperatorDashboardController::class, 'index'])->name('dashboard');
+
+        // Modul Kendaraan (akses penuh)
+        Route::resource('kendaraan', KendaraanController::class);
+        Route::post('kendaraan/{kendaraan}/pemegang', [KendaraanPemegangController::class, 'store'])
+             ->name('kendaraan.pemegang.store');
+        Route::post('kendaraan/{kendaraan}/aktivitas', [App\Http\Controllers\Admin\KendaraanAktivitasController::class, 'store'])->name('kendaraan.aktivitas.store');
+        Route::put('kendaraan-aktivitas/{aktivitas}', [App\Http\Controllers\Admin\KendaraanAktivitasController::class, 'update'])->name('kendaraan.aktivitas.update');
+        Route::delete('kendaraan-aktivitas/{aktivitas}', [App\Http\Controllers\Admin\KendaraanAktivitasController::class, 'destroy'])->name('kendaraan.aktivitas.destroy');
+
+        // Modul Master Data (akses penuh)
+        Route::resource('units', UnitController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('units.sub-units', SubUnitController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('pegawai', PegawaiController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('kategori', KategoriController::class)
+             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+        // API: Preview data pegawai (untuk modal form pemegang)
+        Route::get('api/pegawai/{pegawai}', function (\App\Models\Pegawai $pegawai) {
+            $pegawai->load(['unit', 'subUnit']);
+            return response()->json([
+                'id'       => $pegawai->id,
+                'nama'     => $pegawai->nama,
+                'nip'      => $pegawai->nip,
+                'jabatan'  => $pegawai->jabatan,
+                'unit'     => $pegawai->unit?->nama_unit ?? '-',
+                'sub_unit' => $pegawai->subUnit?->nama_sub_unit ?? '-',
+            ]);
+        })->name('api.pegawai.show');
+
+        Route::get('/api/units/{unit}/sub-units', function (Unit $unit) {
+            return response()->json(
+                $unit->subUnits()->orderBy('nama_sub_unit')->get(['id', 'nama_sub_unit'])
+            );
+        })->name('api.units.sub-units');
     });
 });
 

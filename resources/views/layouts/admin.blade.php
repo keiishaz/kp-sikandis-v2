@@ -147,13 +147,79 @@
                         </div>
                     </div>
                 @else
+                    {{-- DASHBOARD OPERATOR --}}
                     <div class="nav-item">
                         <a href="{{ route('operator.dashboard') }}" class="nav-link {{ request()->routeIs('operator.dashboard') ? 'active' : '' }}">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 13H11V3H3V13ZM3 21H11V15H3V21ZM13 21H21V11H13V21ZM13 3V9H21V3H13Z" fill="currentColor"/>
+                                <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" fill="currentColor"/>
                             </svg>
                             <span>Dashboard</span>
                         </a>
+                    </div>
+
+                    {{-- KENDARAAN GROUP --}}
+                    @php
+                        $isOpKendaraanActive = request()->is('operator/kendaraan*');
+                    @endphp
+                    <div class="nav-group {{ $isOpKendaraanActive ? 'expanded' : '' }}">
+                        <button class="nav-group-toggle {{ $isOpKendaraanActive ? 'active' : '' }}">
+                            <div class="nav-link-left">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                </svg>
+                                <span style="font-family:inherit;">Kendaraan</span>
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="nav-group-content">
+                            <div class="nav-item">
+                                <a href="{{ route('operator.kendaraan.index') }}" class="nav-link {{ request()->routeIs('operator.kendaraan.*') ? 'active' : '' }}">
+                                    <span>Data Kendaraan</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- MASTER DATA GROUP --}}
+                    @php
+                        $isOpMasterActive = request()->is('operator/units*') || request()->is('operator/pegawai*') || request()->is('operator/kategori*');
+                    @endphp
+                    <div class="nav-group {{ $isOpMasterActive ? 'expanded' : '' }}">
+                        <button class="nav-group-toggle {{ $isOpMasterActive ? 'active' : '' }}">
+                            <div class="nav-link-left">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                                </svg>
+                                <span style="font-family:inherit;">Master Data</span>
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="nav-group-content">
+                            <div class="nav-item">
+                                <a href="{{ route('operator.units.index') }}" class="nav-link {{ request()->routeIs('operator.units.*') ? 'active' : '' }}">
+                                    <span>Unit Kerja</span>
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a href="{{ route('operator.pegawai.index') }}" class="nav-link {{ request()->routeIs('operator.pegawai.*') ? 'active' : '' }}">
+                                    <span>Pegawai</span>
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a href="{{ route('operator.kategori.index') }}" class="nav-link {{ request()->routeIs('operator.kategori.*') ? 'active' : '' }}">
+                                    <span>Kategori Kendaraan</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 @endif
 

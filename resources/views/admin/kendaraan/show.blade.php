@@ -82,7 +82,7 @@
         </div>
 
         <!-- Tab Contents -->
-        <div style="padding: var(--spacing-lg); background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+        <div style="padding: var(--spacing-md); background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
             
             <!-- Tab 1: Info -->
             <div id="tab-info" class="tab-content" style="display: block;">
@@ -157,39 +157,41 @@
                 </div>
 
                 <!-- Tabel Histori Pemegang -->
-                <div style="background:#fff; border-radius:10px; border:1px solid #e2e8f0; overflow:hidden;">
-                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <div class="table-responsive" style="border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">
+                    <table class="data-table">
                         <thead>
-                            <tr style="background:#f1f5f9; border-bottom:2px solid #e2e8f0;">
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Nama Pegawai</th>
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">NIP</th>
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Nomor SK</th>
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Tanggal Mulai</th>
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Tanggal Selesai</th>
-                                <th style="padding:12px 16px; text-align:left; font-weight:600; color:#475569;">Status</th>
+                            <tr>
+                                <th>Nama Pegawai</th>
+                                <th>NIP</th>
+                                <th>Nomor SK</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($kendaraan->pemegangs as $p)
-                            <tr style="border-bottom:1px solid #f1f5f9; transition:background 0.1s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                                <td style="padding:12px 16px; font-weight:500; color:#0f172a;">{{ $p->pegawai->nama ?? '-' }}</td>
-                                <td style="padding:12px 16px; color:#475569; font-family:monospace;">{{ $p->pegawai->nip ?? '-' }}</td>
-                                <td style="padding:12px 16px; color:#475569;">{{ $p->nomor_sk }}</td>
-                                <td style="padding:12px 16px; color:#475569;">{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
-                                <td style="padding:12px 16px; color:#475569;">{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
-                                <td style="padding:12px 16px;">
+                            <tr>
+                                <td style="font-weight:500;">{{ $p->pegawai->nama ?? '-' }}</td>
+                                <td style="font-family:monospace;font-size:12.5px;">{{ $p->pegawai->nip ?? '-' }}</td>
+                                <td>{{ $p->nomor_sk }}</td>
+                                <td>{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
+                                <td>{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
+                                <td>
                                     @if($p->is_active)
-                                        <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">Aktif</span>
+                                        <span class="status-badge active">Aktif</span>
                                     @else
-                                        <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;">Nonaktif</span>
+                                        <span class="status-badge inactive">Nonaktif</span>
                                     @endif
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" style="padding:40px;text-align:center;color:#94a3b8;font-size:13px;">
-                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;color:#cbd5e1;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                    <p style="margin:0;">Belum ada pemegang yang tercatat untuk kendaraan ini.</p>
+                                <td colspan="6" class="empty-state">
+                                    <div class="empty-content">
+                                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                        <p>Belum ada pemegang yang tercatat.</p>
+                                    </div>
                                 </td>
                             </tr>
                             @endforelse
@@ -208,35 +210,35 @@
                     </button>
                 </div>
 
-                <div class="table-container" style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
-                    <table class="data-table" style="width:100%; border-collapse:collapse;">
+                <div class="table-responsive" style="border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;">
+                    <table class="data-table">
                         <thead>
-                            <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Tanggal</th>
-                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Judul Aktivitas</th>
-                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Deskripsi</th>
-                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Pembuat</th>
-                                <th style="padding:12px 16px; text-align:left; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Waktu Sistem</th>
-                                <th style="padding:12px 16px; text-align:center; font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; width:100px;">Aksi</th>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Judul Aktivitas</th>
+                                <th>Deskripsi</th>
+                                <th>Pembuat</th>
+                                <th>Waktu Sistem</th>
+                                <th class="col-actions">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($kendaraan->aktivitas as $akt)
-                            <tr style="border-bottom:1px solid #f1f5f9;">
-                                <td style="padding:12px 16px; font-size:13px; color:#1e293b; font-weight:500;">{{ $akt->tanggal_aktivitas->translatedFormat('d M Y') }}</td>
-                                <td style="padding:12px 16px; font-size:13px; color:#1e293b; font-weight:600;">{{ $akt->judul_aktivitas }}</td>
-                                <td style="padding:12px 16px; font-size:13px; color:#64748b; line-height:1.4;">{{ $akt->deskripsi ?? '-' }}</td>
-                                <td style="padding:12px 16px; font-size:13px; color:#1e293b;">{{ $akt->creator->name ?? 'System' }}</td>
-                                <td style="padding:12px 16px; font-size:12px; color:#94a3b8;">{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</td>
-                                <td style="padding:12px 16px; text-align:center;">
-                                    <div style="display:flex; justify-content:center; gap:8px;">
-                                        <button type="button" onclick='editAktivitas(@json($akt))' class="btn-action" title="Edit" style="background:#eff6ff; color:#3b82f6; border-radius:4px; padding:4px; border:none; cursor:pointer;">
+                            <tr>
+                                <td style="font-weight:500;">{{ $akt->tanggal_aktivitas->translatedFormat('d M Y') }}</td>
+                                <td style="font-weight:600;">{{ $akt->judul_aktivitas }}</td>
+                                <td style="color:#64748b;line-height:1.4;">{{ $akt->deskripsi ?? '-' }}</td>
+                                <td>{{ $akt->creator->name ?? 'System' }}</td>
+                                <td style="font-size:12px;color:#94a3b8;">{{ $akt->created_at->translatedFormat('d M Y, H:i') }}</td>
+                                <td class="col-actions">
+                                    <div class="action-buttons">
+                                        <button type="button" onclick='editAktivitas(@json($akt))' class="btn-action btn-edit" title="Edit">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                         </button>
                                         <form onsubmit="deleteAktivitas(event, {{ $akt->id }})" action="{{ route('admin.kendaraan.aktivitas.destroy', $akt->id) }}" method="POST" style="display:inline;">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn-action" title="Hapus" style="background:#fef2f2; color:#ef4444; border-radius:4px; padding:4px; border:none; cursor:pointer;">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                            <button type="submit" class="btn-action btn-delete" title="Hapus">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                                             </button>
                                         </form>
                                     </div>
@@ -244,10 +246,10 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" style="padding:40px; text-align:center;">
-                                    <div style="color:#94a3b8;">
-                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.5;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                        <p style="margin:0; font-size:14px;">Belum ada riwayat aktivitas kendaraan.</p>
+                                <td colspan="6" class="empty-state">
+                                    <div class="empty-content">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <p>Belum ada riwayat aktivitas kendaraan.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -262,7 +264,7 @@
 </section>
 
 <!-- =========== MODAL: Ganti Pemegang =========== -->
-<div id="modal-ganti-pemegang" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+<div id="modal-ganti-pemegang" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
     <div style="background:#fff; border-radius:12px; width:100%; max-width:540px; margin:20px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
 
         <!-- Modal Header -->
@@ -350,7 +352,7 @@
     </div>
 </div>
 <!-- =========== MODAL: Aktivitas Kendaraan =========== -->
-<div id="modal-aktivitas" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+<div id="modal-aktivitas" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
     <div style="background:#fff; border-radius:12px; width:100%; max-width:500px; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
         <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
             <h3 id="modal-aktivitas-title" style="margin:0; font-size:16px; font-weight:600; color:#0f172a;">Tambah Aktivitas Kendaraan</h3>
@@ -463,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nama = data.pemegang_lama?.nama || 'Pemegang saat ini';
                 const confirmed = await SIKANDIS.confirm({
                     title: 'Konfirmasi Serah Terima',
-                    message: `Kendaraan ini saat ini dipegang oleh <strong>${nama}</strong>. Pemegang lama akan dinonaktifkan dan digantikan dengan pemegang baru. Lanjutkan?`,
+                    message: `Kendaraan ini saat ini dipegang oleh ${nama}. Pemegang lama akan dinonaktifkan dan digantikan dengan pemegang baru. Lanjutkan?`,
                     confirmText: 'Ya, Ganti Pemegang',
                     cancelText: 'Batal',
                     type: 'warning',

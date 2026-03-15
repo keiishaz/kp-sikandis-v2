@@ -5,7 +5,7 @@
 
 @section('content')
 <section class="form-container">
-    <div class="card" style="padding: 28px;">
+    <div class="card" style="padding: 20px;">
         <nav style="font-size:13px;color:#94a3b8;margin-bottom:24px;display:flex;align-items:center;gap:6px;">
             <a href="{{ route('admin.kendaraan.index') }}" style="color:#3b82f6;text-decoration:none;font-weight:500;">Kendaraan</a>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -17,13 +17,13 @@
         <form action="{{ route('admin.kendaraan.store') }}" method="POST" novalidate>
             @csrf
             
-            <div class="form-group-section" style="margin-bottom: 32px; background: #f8fafc; padding: 28px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div class="form-group-section" style="margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
                 <h4 style="font-size: 15px; font-weight:600; color: var(--gray-700); margin-bottom: 24px; border-bottom: 1px solid var(--gray-200); padding-bottom: 12px; display:flex; align-items:center; gap:8px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-color);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     Identitas Kendaraan
                 </h4>
                 
-                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-field">
                         <label for="nama_kendaraan" style="display:block;margin-bottom:8px;font-size:13px;font-weight:500;color:#475569;">Nama Kendaraan <span style="color:var(--danger-color);">*</span></label>
                         <input id="nama_kendaraan" name="nama_kendaraan" value="{{ old('nama_kendaraan') }}"
@@ -76,13 +76,13 @@
                 </div>
             </div>
 
-            <div class="form-group-section" style="margin-bottom: 32px; background: #f8fafc; padding: 28px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div class="form-group-section" style="margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
                 <h4 style="font-size: 15px; font-weight:600; color: var(--gray-700); margin-bottom: 24px; border-bottom: 1px solid var(--gray-200); padding-bottom: 12px; display:flex; align-items:center; gap:8px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary-color);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     Spesifikasi Mesin & Pajak
                 </h4>
                 
-                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-field">
                         <label for="no_rangka" style="display:block;margin-bottom:8px;font-size:13px;font-weight:500;color:#475569;">Nomor Rangka <span style="color:var(--danger-color);">*</span></label>
                         <input id="no_rangka" name="no_rangka" value="{{ old('no_rangka') }}" style="width:100%;box-sizing:border-box;text-transform:uppercase; padding:10px 14px; font-size:14px; border-radius:8px;" placeholder="17 Digit No Rangka">
@@ -103,13 +103,13 @@
                 </div>
             </div>
 
-            <div class="form-group-section" style="margin-bottom: 32px; background: #f8fafc; padding: 28px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div class="form-group-section" style="margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
                 <h4 style="font-size: 15px; font-weight:600; color: var(--gray-700); margin-bottom: 24px; border-bottom: 1px solid var(--gray-200); padding-bottom: 12px; display:flex; align-items:center; gap:8px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 12 12 12 8"></polyline><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     Informasi Penggunaan
                 </h4>
                 
-                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-field">
                         <label for="jenis_penggunaan_select" style="display:block;margin-bottom:8px;font-size:13px;font-weight:500;color:#475569;">Jenis Penggunaan <span style="color:var(--danger-color);">*</span></label>
                         <select id="jenis_penggunaan_select" name="jenis_penggunaan" style="width:100%;box-sizing:border-box; background:#fff; padding: 10px 14px; font-size:14px; border: 1px solid var(--gray-300); border-radius: 8px; outline:none;">

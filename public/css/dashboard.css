@@ -1385,6 +1385,11 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
+/* Ensure confirm modal is always on top of any other modal/overlay */
+#sikandis-confirm-modal {
+    z-index: 99999 !important;
+}
+
 .confirm-icon {
     width: 72px;
     height: 72px;

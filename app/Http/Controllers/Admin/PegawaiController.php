@@ -10,8 +10,11 @@ use App\Models\Unit;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 class PegawaiController extends Controller
 {
+    use RoleRoutePrefix;
     public function index(Request $request)
     {
         $query = Pegawai::with(['unit', 'subUnit']);
@@ -47,7 +50,7 @@ class PegawaiController extends Controller
             "Nama: {$pegawai->nama} | NIP: {$pegawai->nip}"
         );
 
-        return redirect()->route('admin.pegawai.index')
+        return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$pegawai->nama}\" berhasil ditambahkan.");
     }
 
@@ -73,7 +76,7 @@ class PegawaiController extends Controller
             "Dari: {$old} → {$pegawai->nama} | NIP: {$pegawai->nip}"
         );
 
-        return redirect()->route('admin.pegawai.index')
+        return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$pegawai->nama}\" berhasil diperbarui.");
     }
 
@@ -85,7 +88,7 @@ class PegawaiController extends Controller
 
         ActivityLogger::log('HAPUS PEGAWAI', 'Pegawai', $id, "Nama: {$nama}");
 
-        return redirect()->route('admin.pegawai.index')
+        return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$nama}\" berhasil dihapus.");
     }
 }

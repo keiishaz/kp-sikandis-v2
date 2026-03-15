@@ -9,8 +9,11 @@ use App\Models\Unit;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 class UnitController extends Controller
 {
+    use RoleRoutePrefix;
     public function index(Request $request)
     {
         $query = Unit::withCount('subUnits');
@@ -40,7 +43,7 @@ class UnitController extends Controller
             "Nama: {$unit->nama_unit}"
         );
 
-        return redirect()->route('admin.units.index')
+        return redirect()->route($this->rp() . '.units.index')
                          ->with('success', "Unit \"{$unit->nama_unit}\" berhasil ditambahkan.");
     }
 
@@ -61,14 +64,14 @@ class UnitController extends Controller
             "Dari: {$old} → {$unit->nama_unit}"
         );
 
-        return redirect()->route('admin.units.index')
+        return redirect()->route($this->rp() . '.units.index')
                          ->with('success', "Unit \"{$unit->nama_unit}\" berhasil diperbarui.");
     }
 
     public function destroy(Unit $unit)
     {
         if ($unit->subUnits()->exists()) {
-            return redirect()->route('admin.units.index')
+            return redirect()->route($this->rp() . '.units.index')
                              ->with('error', "Unit \"{$unit->nama_unit}\" tidak dapat dihapus karena masih memiliki sub unit.");
         }
 
@@ -78,7 +81,7 @@ class UnitController extends Controller
 
         ActivityLogger::log('HAPUS UNIT', 'Unit', $id, "Nama: {$nama}");
 
-        return redirect()->route('admin.units.index')
+        return redirect()->route($this->rp() . '.units.index')
                          ->with('success', "Unit \"{$nama}\" berhasil dihapus.");
     }
 }

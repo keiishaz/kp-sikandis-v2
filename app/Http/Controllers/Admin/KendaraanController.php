@@ -13,8 +13,11 @@ use App\Services\QrGeneratorService;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 class KendaraanController extends Controller
 {
+    use RoleRoutePrefix;
     /**
      * Display a listing of the resource.
      */
@@ -116,7 +119,7 @@ class KendaraanController extends Controller
             'created_by'        => \Illuminate\Support\Facades\Auth::id(),
         ]);
 
-        return redirect()->route('admin.kendaraan.index')
+        return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil ditambahkan beserta Token QR.');
     }
 
@@ -181,7 +184,7 @@ class KendaraanController extends Controller
             'created_by'        => \Illuminate\Support\Facades\Auth::id(),
         ]);
 
-        return redirect()->route('admin.kendaraan.index')
+        return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil diperbarui.');
     }
 
@@ -214,7 +217,7 @@ class KendaraanController extends Controller
             'created_by'        => \Illuminate\Support\Facades\Auth::id(),
         ]);
 
-        return redirect()->route('admin.kendaraan.index')
+        return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', "Status kendaraan berhasil {$msg}.");
     }
 }
