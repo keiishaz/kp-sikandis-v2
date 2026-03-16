@@ -7,30 +7,30 @@
 <div class="dashboard">
 
     {{-- PAGE HEADER --}}
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
         <div>
             <nav aria-label="breadcrumb" style="margin-bottom: 12px; font-size: 13.5px;">
-                <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <li>
                         <a href="{{ route('admin.kendaraan.index') }}" style="color: var(--n-500); text-decoration: none; font-weight: 500;">Kendaraan</a>
                     </li>
                     <li style="color: var(--n-400);">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </li>
-                    <li style="color: var(--n-900); font-weight: 600;" aria-current="page">Detail</li>
+                    <li style="color: var(--n-900); font-weight: 600;" aria-current="page">{{ $kendaraan->nama_kendaraan }}</li>
                 </ol>
             </nav>
             <h2 class="page-heading" style="margin-bottom: 8px;">{{ $kendaraan->nama_kendaraan }}</h2>
-            <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <span class="plat-badge">{{ $kendaraan->no_polisi }}</span>
                 <span class="badge badge-neutral">{{ $kendaraan->kategori->nama_kategori ?? '-' }}</span>
                 <span class="badge badge-neutral">Tahun {{ $kendaraan->tahun }}</span>
             </div>
         </div>
         
-        <div style="display: flex; gap: 12px; align-items: center;">
-            <span class="badge {{ $kendaraan->status === 'aktif' ? 'badge-success' : 'badge-danger' }}" style="padding: 8px 16px;">
-                {{ $kendaraan->status === 'aktif' ? 'Status: Aktif' : 'Status: Nonaktif' }}
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span class="badge badge-sm {{ $kendaraan->status === 'aktif' ? 'badge-success' : 'badge-danger' }}">
+                {{ $kendaraan->status === 'aktif' ? 'Aktif' : 'Nonaktif' }}
             </span>
             @php
                 $pajakBadgeClass = match($kendaraan->color_pajak) {
@@ -40,7 +40,7 @@
                     default => 'badge-neutral'
                 };
             @endphp
-            <span class="badge {{ $pajakBadgeClass }}" style="padding: 8px 16px;">
+            <span class="badge badge-sm {{ $pajakBadgeClass }}">
                 Pajak: {{ $kendaraan->status_pajak }}
             </span>
             <a href="{{ route('admin.kendaraan.edit', $kendaraan->id) }}" class="btn btn-primary btn-sm">Edit Kendaraan</a>
@@ -205,7 +205,10 @@
                                     <div style="font-weight: 600; color: var(--n-900);">{{ $akt->tanggal_aktivitas->translatedFormat('d M') }}</div>
                                     <div style="font-size: 11px; color: var(--n-500);">{{ $akt->tanggal_aktivitas->translatedFormat('Y') }}</div>
                                 </div>
-                                <div class="timeline-dot"></div>
+                                <div class="timeline-dot-col">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-line"></div>
+                                </div>
                                 <div class="timeline-content" style="border: 1px solid var(--n-200); box-shadow: none;">
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                                         <h4 class="timeline-title" style="margin: 0; padding-top: 2px;">{{ $akt->judul_aktivitas }}</h4>
@@ -253,8 +256,8 @@
 {{-- MODALS SECTION --}}
 
 <!-- =========== MODAL: Ganti Pemegang =========== -->
-<div id="modal-ganti-pemegang" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
-    <div class="modal-dialog" style="background:#fff; border-radius: var(--r-xl); width:100%; max-width:540px; box-shadow: var(--shadow-lg);">
+<div id="modal-ganti-pemegang" class="modal-overlay">
+    <div class="modal" style="max-width:540px;">
 
         <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--n-200); display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -321,8 +324,8 @@
 </div>
 
 <!-- =========== MODAL: Aktivitas Kendaraan =========== -->
-<div id="modal-aktivitas" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center;">
-    <div class="modal-dialog" style="background:#fff; border-radius: var(--r-xl); width:100%; max-width:500px; box-shadow: var(--shadow-lg);">
+<div id="modal-aktivitas" class="modal-overlay">
+    <div class="modal" style="max-width:500px;">
         <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--n-200); display: flex; justify-content: space-between; align-items: center;">
             <h3 id="modal-aktivitas-title" style="margin:0; font-size:18px; font-weight:600; color:var(--n-900);">Tambah Aktivitas Kendaraan</h3>
             <button onclick="closeAktivitasModal()" type="button" class="btn btn-icon btn-secondary" style="border: none;">
@@ -350,7 +353,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Deskripsi</label>
-                    <textarea name="deskripsi" id="akt-deskripsi" class="form-input" rows="4" placeholder="Tambahkan rincian aktivitas jika ada..."></textarea>
+                    <textarea name="deskripsi" id="akt-deskripsi" class="form-textarea" rows="4" placeholder="Tambahkan rincian aktivitas jika ada..." style="width:100%;"></textarea>
                 </div>
             </div>
             <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--n-200); display: flex; justify-content: flex-end; gap: 12px; background: var(--surface-page); border-bottom-left-radius: var(--r-xl); border-bottom-right-radius: var(--r-xl);">
@@ -364,9 +367,16 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ---- Portal: pindah modal ke <body> agar overlay cover full viewport ----
+    ['modal-ganti-pemegang', 'modal-aktivitas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) document.body.appendChild(el);
+    });
+
     // ---- Tab Switching ----
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
+
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -391,14 +401,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalPemegang = document.getElementById('modal-ganti-pemegang');
 
     document.getElementById('btn-ganti-pemegang').addEventListener('click', () => {
-        modalPemegang.style.display = 'flex';
+        modalPemegang.classList.add('active');
     });
     document.getElementById('btn-close-modal').addEventListener('click', closePemegangModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', closePemegangModal);
     modalPemegang.addEventListener('click', e => { if (e.target === modalPemegang) closePemegangModal(); });
 
     function closePemegangModal() {
-        modalPemegang.style.display = 'none';
+        modalPemegang.classList.remove('active');
         document.getElementById('input-force-replace').value = '0';
     }
 
@@ -475,11 +485,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('aktivitas-method').value = 'POST';
         document.getElementById('akt-tanggal').value = new Date().toISOString().split('T')[0];
         document.getElementById('akt-biaya').value = '';
-        modalAkt.style.display = 'flex';
+        modalAkt.classList.add('active');
     };
 
     window.closeAktivitasModal = function() {
-        modalAkt.style.display = 'none';
+        modalAkt.classList.remove('active');
     };
 
     window.editAktivitas = function(akt) {
@@ -490,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('akt-judul').value = akt.judul_aktivitas;
         document.getElementById('akt-biaya').value = akt.biaya_terpakai || '';
         document.getElementById('akt-deskripsi').value = akt.deskripsi || '';
-        modalAkt.style.display = 'flex';
+        modalAkt.classList.add('active');
     };
 
     window.deleteAktivitas = async function(e, id) {

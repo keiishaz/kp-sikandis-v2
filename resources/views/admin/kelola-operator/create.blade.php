@@ -4,7 +4,7 @@
 @section('topbar_title', 'Kelola Operator')
 
 @section('content')
-<div class="dashboard">
+<div class="form-container">
 
     {{-- BREADCRUMB & HEADER --}}
     <div style="margin-bottom: 24px;">

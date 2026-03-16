@@ -7,14 +7,20 @@
 <div class="form-container">
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" style="margin-bottom: 24px; font-size: 13.5px;">
-        <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px;">
+        <ol style="list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <li>
                 <a href="{{ route('admin.kendaraan.index') }}" style="color: var(--n-500); text-decoration: none; font-weight: 500;">Kendaraan</a>
             </li>
             <li style="color: var(--n-400);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </li>
-            <li style="color: var(--n-900); font-weight: 600;" aria-current="page">Edit Kendaraan</li>
+            <li>
+                <a href="{{ route('admin.kendaraan.show', $kendaraan->id) }}" style="color: var(--n-500); text-decoration: none; font-weight: 500;">{{ $kendaraan->nama_kendaraan }}</a>
+            </li>
+            <li style="color: var(--n-400);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </li>
+            <li style="color: var(--n-900); font-weight: 600;" aria-current="page">Edit</li>
         </ol>
     </nav>
 

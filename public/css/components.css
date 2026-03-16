@@ -156,6 +156,8 @@
 .badge-danger  { background: var(--danger-bg);  color: var(--danger-text);  border-color: var(--danger-border); }
 .badge-info    { background: var(--brand-50);   color: var(--brand-700);    border-color: var(--brand-200); }
 .badge-neutral { background: var(--n-100);      color: var(--n-600);        border-color: var(--n-200); }
+.badge-primary { background: var(--brand-600);  color: #fff;               border-color: var(--brand-700); }
+.badge-sm { font-size: 11px; padding: 3px 10px; font-weight: 600; }
 
 .plat-badge {
   font-family: 'Courier New', Courier, monospace;
@@ -409,8 +411,7 @@
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(15,23,42,0.5);
-  backdrop-filter: blur(2px);
-  z-index: 1000;
+  z-index: 9000;
   display: none;
   align-items: center; justify-content: center;
   padding: 16px;

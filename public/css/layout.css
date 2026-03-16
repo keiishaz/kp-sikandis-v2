@@ -116,7 +116,6 @@
 .page-content {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
   background: var(--surface-page);
 }
 
@@ -276,4 +275,7 @@
 @media (max-width: 640px) {
   .page-content { padding: 16px 12px; }
   .topbar { padding: 0 14px; }
+  .page-heading { font-size: 18px; }
+  .page-subheading { font-size: 12.5px; }
+  .page-intro { flex-direction: column; align-items: flex-start; gap: 12px; }
 }

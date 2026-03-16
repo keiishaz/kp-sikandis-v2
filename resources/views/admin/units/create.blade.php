@@ -4,7 +4,7 @@
 @section('topbar_title', 'Master Data')
 
 @section('content')
-<div class="dashboard">
+<div class="form-container">
 
     {{-- BREADCRUMB & HEADER --}}
     <div style="margin-bottom: 24px;">
@@ -41,6 +41,5 @@
             </div>
         </form>
     </div>
-
 </div>
 @endsection
