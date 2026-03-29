@@ -40,12 +40,19 @@ class StepLoginController extends Controller
 
     public function showPasswordForm()
     {
-        abort_unless(session('login_nip'), 403);
+        if (!session('login_nip')) {
+            return redirect()->route('login');
+        }
+
         return view('auth.login-password');
     }
 
     public function submitPassword(\Illuminate\Http\Request $r)
     {
+        if (!session('login_nip')) {
+            return redirect()->route('login');
+        }
+
         $r->merge(['nip' => session('login_nip')]);
 
         return app(\Laravel\Fortify\Http\Controllers\AuthenticatedSessionController::class)->store(
