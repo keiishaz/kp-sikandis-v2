@@ -3,340 +3,80 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kendaraan;
-use App\Models\Kategori;
-use App\Models\Pegawai;
-use App\Models\QrKendaraan;
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
 use App\Http\Requests\Admin\StoreKendaraanRequest;
 use App\Http\Requests\Admin\UpdateKendaraanRequest;
-use App\Services\QrGeneratorService;
-use App\Services\ActivityLogger;
+use App\Models\Kendaraan;
+use App\Services\KendaraanService;
 use Illuminate\Http\Request;
-
-use App\Http\Controllers\Concerns\RoleRoutePrefix;
 
 class KendaraanController extends Controller
 {
     use RoleRoutePrefix;
-    /**
-     * Display a listing of the resource.
-     */
+
+    public function __construct(private readonly KendaraanService $kendaraanService) {}
+
     public function index(Request $request)
     {
-        $status = $request->get('status', 'aktif');
-        $query = Kendaraan::with('kategori')
-            ->where('status', $status)
-            ->orderBy('created_at', 'desc');
+        $data = $this->kendaraanService->list($request->only(['status', 'q']));
 
-        if ($request->filled('q')) {
-            $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_kendaraan', 'like', "%{$search}%")
-                  ->orWhere('no_polisi', 'like', "%{$search}%")
-                  ->orWhereHas('kategori', function ($qKat) use ($search) {
-                      $qKat->where('nama_kategori', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        $kendaraans = $query->paginate(10)->withQueryString();
-
-        // Menyematkan perhitungan status pajak untuk setiap kendaraan
-        $now = \Carbon\Carbon::now();
-        foreach ($kendaraans as $k) {
-            if (!$k->pajak) {
-                $k->status_pajak = 'belum_diatur';
-                $k->color_pajak = 'gray';
-            } else {
-                $pajakDate = \Carbon\Carbon::parse($k->pajak);
-                if ($pajakDate->isPast()) {
-                    $k->status_pajak = 'Telah Jatuh Tempo';
-                    $k->color_pajak = 'red';
-                } else {
-                    $diffMonths = $now->diffInMonths($pajakDate, false);
-                    if ($diffMonths <= 6) {
-                        $k->status_pajak = 'Hampir Jatuh Tempo';
-                        $k->color_pajak = 'yellow';
-                    } else {
-                        $k->status_pajak = 'Aktif';
-                        $k->color_pajak = 'green';
-                    }
-                }
-            }
-        }
-        
-        $countAktif = Kendaraan::where('status', 'aktif')->count();
-        $countNonaktif = Kendaraan::where('status', 'nonaktif')->count();
-        $kategoris = Kategori::orderBy('nama_kategori', 'asc')->get();
-
-        return view('admin.kendaraan.index', compact('kendaraans', 'status', 'countAktif', 'countNonaktif', 'kategoris'));
+        return view('admin.kendaraan.index', $data);
     }
 
-    /**
-     * Cetak Laporan kendaraan yang terfilter.
-     */
     public function print(Request $request)
     {
-        $status = $request->get('status', 'aktif');
-        $query = Kendaraan::with('kategori', 'pemegangAktif.pegawai.unit', 'pemegangAktif.pegawai.subUnit')
-            ->where('status', $status)
-            ->orderBy('created_at', 'desc');
+        $data = $this->kendaraanService->printData($request->only(['status', 'q', 'kategori_id', 'jenis_penggunaan', 'status_pajak']));
 
-        if ($request->filled('q')) {
-            $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_kendaraan', 'like', "%{$search}%")
-                  ->orWhere('no_polisi', 'like', "%{$search}%")
-                  ->orWhereHas('kategori', function ($qKat) use ($search) {
-                      $qKat->where('nama_kategori', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        if ($request->filled('kategori_id')) {
-            $query->where('kategori_id', $request->kategori_id);
-        }
-
-        if ($request->filled('jenis_penggunaan')) {
-            $query->where('jenis_penggunaan', $request->jenis_penggunaan);
-        }
-
-        if ($request->filled('status_pajak')) {
-            $stPajak = $request->status_pajak;
-            if ($stPajak === 'telah_jatuh_tempo') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '<', now());
-            } elseif ($stPajak === 'hampir_jatuh_tempo') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '>=', now())->whereDate('pajak', '<=', now()->addMonths(6));
-            } elseif ($stPajak === 'aktif') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '>', now()->addMonths(6));
-            }
-        }
-
-        $kendaraans = $query->get();
-
-        $filterLabels = [];
-        if ($request->filled('kategori_id')) {
-            $kat = \App\Models\Kategori::find($request->kategori_id);
-            if ($kat) $filterLabels['Kategori'] = $kat->nama_kategori;
-        }
-        if ($request->filled('jenis_penggunaan')) {
-            $filterLabels['Jenis Penggunaan'] = ucfirst($request->jenis_penggunaan);
-        }
-        if ($request->filled('status_pajak')) {
-            $lbls = ['aktif' => 'Aktif', 'hampir_jatuh_tempo' => 'Hampir Jatuh Tempo', 'telah_jatuh_tempo' => 'Telah Jatuh Tempo'];
-            if(isset($lbls[$request->status_pajak])) $filterLabels['Status Pajak'] = $lbls[$request->status_pajak];
-        }
-
-        $now = \Carbon\Carbon::now();
-        foreach ($kendaraans as $k) {
-            if (!$k->pajak) {
-                $k->status_pajak = 'belum_diatur';
-                $k->color_pajak = 'gray';
-            } else {
-                $pajakDate = \Carbon\Carbon::parse($k->pajak);
-                if ($pajakDate->isPast()) {
-                    $k->status_pajak = 'Telah Jatuh Tempo';
-                    $k->color_pajak = 'red';
-                } else {
-                    $diffMonths = $now->diffInMonths($pajakDate, false);
-                    if ($diffMonths <= 6) {
-                        $k->status_pajak = 'Hampir Jatuh Tempo';
-                        $k->color_pajak = 'yellow';
-                    } else {
-                        $k->status_pajak = 'Aktif';
-                        $k->color_pajak = 'green';
-                    }
-                }
-            }
-        }
-        
-        return view('admin.kendaraan.print', compact('kendaraans', 'status', 'filterLabels'));
+        return view('admin.kendaraan.print', $data);
     }
 
-    /**
-     * Return count of kendaraan matching given print filters (for AJAX live counter).
-     */
     public function printCount(Request $request)
     {
-        $status = $request->get('status', 'aktif');
-        $query = Kendaraan::where('status', $status);
+        $count = $this->kendaraanService->countForPrint($request->only(['status', 'q', 'kategori_id', 'jenis_penggunaan', 'status_pajak']));
 
-        if ($request->filled('q')) {
-            $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_kendaraan', 'like', "%{$search}%")
-                  ->orWhere('no_polisi', 'like', "%{$search}%")
-                  ->orWhereHas('kategori', fn($qKat) => $qKat->where('nama_kategori', 'like', "%{$search}%"));
-            });
-        }
-
-        if ($request->filled('kategori_id')) {
-            $query->where('kategori_id', $request->kategori_id);
-        }
-
-        if ($request->filled('jenis_penggunaan')) {
-            $query->where('jenis_penggunaan', $request->jenis_penggunaan);
-        }
-
-        if ($request->filled('status_pajak')) {
-            $stPajak = $request->status_pajak;
-            if ($stPajak === 'telah_jatuh_tempo') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '<', now());
-            } elseif ($stPajak === 'hampir_jatuh_tempo') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '>=', now())->whereDate('pajak', '<=', now()->addMonths(6));
-            } elseif ($stPajak === 'aktif') {
-                $query->whereNotNull('pajak')->whereDate('pajak', '>', now()->addMonths(6));
-            }
-        }
-
-        return response()->json(['count' => $query->count()]);
+        return response()->json(['count' => $count]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $kategoris = Kategori::orderBy('nama_kategori', 'asc')->get();
-        return view('admin.kendaraan.create', compact('kategoris'));
+        return view('admin.kendaraan.create', $this->kendaraanService->formData());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreKendaraanRequest $request, QrGeneratorService $qrService)
+    public function store(StoreKendaraanRequest $request)
     {
-        $validated = $request->validated();
-
-        // Jika jabatan, pastikan lokasi diset null
-        if ($validated['jenis_penggunaan'] === 'jabatan') {
-            $validated['lokasi_operasional'] = null;
-        }
-
-        // 1. Simpan Data Kendaraan
-        $kendaraan = Kendaraan::create($validated);
-
-        // 2. Auto-Generate Token QR Unik dan Simpan
-        $token = $qrService->generateUniqueToken();
-        QrKendaraan::create([
-            'kendaraan_id' => $kendaraan->id,
-            'token'        => $token,
-        ]);
-
-        // 3. Catat Log Aktivitas Menggunakan ActivityLogger Global
-        ActivityLogger::log(
-            'TAMBAH KENDARAAN',
-            'Kendaraan',
-            $kendaraan->id,
-            "Nama Kendaraan: {$kendaraan->nama_kendaraan}"
-        );
-
-        // 4. Catat ke Riwayat Aktivitas Kendaraan
-        \App\Models\KendaraanAktivitas::create([
-            'kendaraan_id'      => $kendaraan->id,
-            'judul_aktivitas'   => 'Registrasi Kendaraan Baru',
-            'deskripsi'         => "Kendaraan {$kendaraan->nama_kendaraan} ({$kendaraan->no_polisi}) telah didaftarkan ke sistem.",
-            'tanggal_aktivitas' => now()->toDateString(),
-            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
-        ]);
+        $this->kendaraanService->store($request->validated());
 
         return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil ditambahkan beserta Token QR.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Kendaraan $kendaraan)
     {
-        $kendaraan->load([
-            'kategori',
-            'qrKendaraan',
-            'pemegangs' => fn($q) => $q->orderBy('tanggal_mulai', 'desc'),
-            'pemegangs.pegawai.unit',
-            'pemegangs.pegawai.subUnit',
-            'aktivitas' => fn($q) => $q->orderBy('tanggal_aktivitas', 'desc')->orderBy('created_at', 'desc'),
-            'aktivitas.creator',
-        ]);
+        $data = $this->kendaraanService->detail($kendaraan);
 
-        $pegawais = Pegawai::with(['unit', 'subUnit'])->orderBy('nama')->get();
-
-        return view('admin.kendaraan.show', compact('kendaraan', 'pegawais'));
+        return view('admin.kendaraan.show', $data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Kendaraan $kendaraan)
     {
-        $kategoris = Kategori::orderBy('nama_kategori', 'asc')->get();
-        return view('admin.kendaraan.edit', compact('kendaraan', 'kategoris'));
+        return view('admin.kendaraan.edit', array_merge(
+            ['kendaraan' => $kendaraan],
+            $this->kendaraanService->formData()
+        ));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateKendaraanRequest $request, Kendaraan $kendaraan)
     {
-        $validated = $request->validated();
-
-        // Jika diganti menjadi jabatan, maka lokasi harus diset null (dihapus)
-        if ($validated['jenis_penggunaan'] === 'jabatan') {
-            $validated['lokasi_operasional'] = null;
-        }
-
-        $oldNama = $kendaraan->nama_kendaraan;
-        $kendaraan->update($validated);
-
-        // Catat Log Aktivitas (Format Edit yang baku) Menggunakan ActivityLogger Global
-        ActivityLogger::log(
-            'EDIT KENDARAAN',
-            'Kendaraan',
-            $kendaraan->id,
-            "Dari: {$oldNama} → {$validated['nama_kendaraan']}"
-        );
-
-        // Catat ke Riwayat Aktivitas Kendaraan
-        \App\Models\KendaraanAktivitas::create([
-            'kendaraan_id'      => $kendaraan->id,
-            'judul_aktivitas'   => 'Perubahan Data Kendaraan',
-            'deskripsi'         => "Data kendaraan telah diperbarui. Nama sebelumnya: {$oldNama}.",
-            'tanggal_aktivitas' => now()->toDateString(),
-            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
-        ]);
+        $this->kendaraanService->update($kendaraan, $request->validated());
 
         return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', 'Data Kendaraan berhasil diperbarui.');
     }
 
-    /**
-     * Nonaktifkan atau aktifkan status kendaraan (Toggle Status).
-     * Sesuai request 'nonaktifkan kendaraan'.
-     */
     public function destroy(Kendaraan $kendaraan)
     {
-        $newStatus = $kendaraan->status === 'aktif' ? 'nonaktif' : 'aktif';
-        $kendaraan->update(['status' => $newStatus]);
-        
-        $msg = $newStatus === 'nonaktif' ? 'dinonaktifkan' : 'diaktifkan';
-        $logAction = $newStatus === 'nonaktif' ? 'DEAKTIVASI Kendaraan' : 'AKTIVASI Kendaraan';
-
-        // Catat Log Aktivitas Menggunakan ActivityLogger Global
-        ActivityLogger::log(
-            "{$logAction}",
-            'Kendaraan',
-            $kendaraan->id,
-            "{$kendaraan->nama_kendaraan}"
-        );
-
-        // Catat ke Riwayat Aktivitas Kendaraan
-        \App\Models\KendaraanAktivitas::create([
-            'kendaraan_id'      => $kendaraan->id,
-            'judul_aktivitas'   => "Status Kendaraan diubah ke {$newStatus}",
-            'deskripsi'         => "Kendaraan {$kendaraan->nama_kendaraan} telah {$msg}.",
-            'tanggal_aktivitas' => now()->toDateString(),
-            'created_by'        => \Illuminate\Support\Facades\Auth::id(),
-        ]);
+        $updated = $this->kendaraanService->toggleStatus($kendaraan);
+        $msg     = $updated->status === 'nonaktif' ? 'dinonaktifkan' : 'diaktifkan';
 
         return redirect()->route($this->rp() . '.kendaraan.index')
                          ->with('success', "Status kendaraan berhasil {$msg}.");

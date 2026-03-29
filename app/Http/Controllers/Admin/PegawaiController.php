@@ -3,53 +3,37 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RoleRoutePrefix;
 use App\Http\Requests\Admin\StorePegawaiRequest;
 use App\Http\Requests\Admin\UpdatePegawaiRequest;
 use App\Models\Pegawai;
-use App\Models\Unit;
-use App\Services\ActivityLogger;
+use App\Services\PegawaiService;
 use Illuminate\Http\Request;
-
-use App\Http\Controllers\Concerns\RoleRoutePrefix;
 
 class PegawaiController extends Controller
 {
     use RoleRoutePrefix;
+
+    public function __construct(private readonly PegawaiService $pegawaiService) {}
+
     public function index(Request $request)
     {
-        $query = Pegawai::with(['unit', 'subUnit']);
-
-        if ($q = $request->input('q')) {
-            $query->where(function ($qb) use ($q) {
-                $qb->where('nama', 'like', "%{$q}%")
-                   ->orWhere('nik', 'like', "%{$q}%")
-                   ->orWhere('nip', 'like', "%{$q}%");
-            });
-        }
-
-        $pegawais = $query->orderBy('nama')->paginate(15)->withQueryString();
-        $units    = Unit::orderBy('nama_unit')->get();
+        $pegawais = $this->pegawaiService->paginatedList($request->input('q', ''));
+        $units    = $this->pegawaiService->units();
 
         return view('admin.pegawai.index', compact('pegawais', 'units'));
     }
 
     public function create()
     {
-        $units = Unit::orderBy('nama_unit')->get();
+        $units = $this->pegawaiService->units();
 
         return view('admin.pegawai.create', compact('units'));
     }
 
     public function store(StorePegawaiRequest $request)
     {
-        $pegawai = Pegawai::create($request->validated());
-
-        ActivityLogger::log(
-            'TAMBAH PEGAWAI',
-            'Pegawai',
-            $pegawai->id,
-            "Nama: {$pegawai->nama} | NIK: {$pegawai->nik}"
-        );
+        $pegawai = $this->pegawaiService->create($request->validated());
 
         return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$pegawai->nama}\" berhasil ditambahkan.");
@@ -57,7 +41,7 @@ class PegawaiController extends Controller
 
     public function edit(Pegawai $pegawai)
     {
-        $units    = Unit::orderBy('nama_unit')->get();
+        $units    = $this->pegawaiService->units();
         $subUnits = $pegawai->unit
             ? $pegawai->unit->subUnits()->orderBy('nama_sub_unit')->get()
             : collect();
@@ -67,15 +51,7 @@ class PegawaiController extends Controller
 
     public function update(UpdatePegawaiRequest $request, Pegawai $pegawai)
     {
-        $old = $pegawai->nama;
-        $pegawai->update($request->validated());
-
-        ActivityLogger::log(
-            'EDIT PEGAWAI',
-            'Pegawai',
-            $pegawai->id,
-            "Dari: {$old} → {$pegawai->nama} | NIK: {$pegawai->nik}"
-        );
+        $pegawai = $this->pegawaiService->update($pegawai, $request->validated());
 
         return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$pegawai->nama}\" berhasil diperbarui.");
@@ -84,10 +60,7 @@ class PegawaiController extends Controller
     public function destroy(Pegawai $pegawai)
     {
         $nama = $pegawai->nama;
-        $id   = $pegawai->id;
-        $pegawai->delete();
-
-        ActivityLogger::log('HAPUS PEGAWAI', 'Pegawai', $id, "Nama: {$nama}");
+        $this->pegawaiService->delete($pegawai);
 
         return redirect()->route($this->rp() . '.pegawai.index')
                          ->with('success', "Pegawai \"{$nama}\" berhasil dihapus.");
