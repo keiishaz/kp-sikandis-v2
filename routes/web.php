@@ -144,6 +144,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // Halaman publik kendaraan berdasarkan token QR (diletakkan di paling bawah agar tidak bentrok dengan rute lain)
-Route::get('/{token}', [PublicKendaraanController::class, 'show'])
+Route::get('/scan/{kode}', [PublicKendaraanController::class, 'show'])
      ->name('kendaraan.publik')
-     ->where('token', '[A-Za-z0-9]{9}');
+     ->where('kode', '[A-Za-z0-9]{9}');

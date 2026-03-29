@@ -9,15 +9,15 @@ class PublicKendaraanController extends Controller
 {
     /**
      * Halaman publik kendaraan berdasarkan token QR.
-     * URL: /{token}
+     * URL: /scan/{kode}
      */
-    public function show(string $token)
+    public function show(string $kode)
     {
         $qr = QrKendaraan::with([
             'kendaraan.kategori',
             'kendaraan.pemegangAktif.pegawai.unit',
             'kendaraan.pemegangAktif.pegawai.subUnit',
-        ])->where('token', $token)->first();
+        ])->where('token', $kode)->first();
 
         // Tampilkan halaman not-found jika token tidak ada di database
         if (! $qr || ! $qr->kendaraan) {

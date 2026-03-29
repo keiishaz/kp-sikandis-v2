@@ -271,7 +271,7 @@ function regenerateAll() {
         area.appendChild(printItem);
 
         new QRCode(qrDiv, {
-            text: baseUrl + '/' + item.token,
+            text: baseUrl + '/scan/' + item.token,
             width: qrSize,
             height: qrSize,
             colorDark: '#000000',
