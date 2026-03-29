@@ -114,18 +114,16 @@
 
 </div>
 
-{{-- Modal QR Besar --}}
-<div id="qrModal" class="modal" style="display:none; position:fixed; inset:0; z-index:9000; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); backdrop-filter: blur(2px);">
-    <div class="modal-dialog" style="background:#fff; border-radius:var(--r-xl); width:340px; box-shadow:var(--shadow-lg); text-align: center; position: relative;">
-        
-        <button onclick="closeQrModal()" class="btn btn-icon btn-secondary" style="position:absolute; top:12px; right:12px; border:none; z-index:10;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-
-        <div class="modal-body" style="padding: 32px 24px 24px;">
-            <h4 style="margin: 0 0 20px; font-size: 16px; font-weight: 600; color: var(--n-900);">Pindai QR Kendaraan</h4>
-            
-            <div style="display: inline-block; padding: 12px; border: 2px solid var(--n-200); border-radius: var(--r-lg); background: #fff; margin-bottom: 20px; box-shadow: var(--shadow-sm); position: relative;">
+<div id="qrModal" class="modal-overlay">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--n-200); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin:0; font-size:18px; font-weight:600; color:var(--n-900);">Pindai QR Kendaraan</h3>
+            <button onclick="closeQrModal()" type="button" class="btn btn-icon btn-secondary" style="border: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 32px 24px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <div style="display: inline-block; padding: 12px; border: 2px solid var(--n-200); border-radius: var(--r-lg); background: #fff; margin-bottom: 24px; box-shadow: var(--shadow-sm); position: relative;">
                 <img id="qrModalImg" src="" alt="QR Besar" style="width: 200px; height: 200px; display: block; border-radius: 4px;">
                 <img src="{{ asset('assets/images/logobkl.png') }}" alt="logo" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 42px; height: 42px; padding: 2px; background: #fff; border-radius: 6px; object-fit: contain;">
             </div>
@@ -137,14 +135,19 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Portal modal ke body agar overlay full viewport
+    document.body.appendChild(document.getElementById('qrModal'));
+});
+
 function openQrModal(token, url) {
     document.getElementById('qrModalToken').textContent = token;
     document.getElementById('qrModalImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(url)}&color=000000&bgcolor=ffffff&margin=2`;
-    document.getElementById('qrModal').style.display = 'flex';
+    document.getElementById('qrModal').classList.add('active');
 }
 
 function closeQrModal() {
-    document.getElementById('qrModal').style.display = 'none';
+    document.getElementById('qrModal').classList.remove('active');
 }
 
 document.getElementById('qrModal').addEventListener('click', function(e) {

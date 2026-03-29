@@ -145,11 +145,7 @@
   margin-bottom: 24px;
 }
 
-.form-page {
-  max-width: 720px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
+
 
 .inline-stats {
   display: flex; gap: 16px; margin-bottom: 20px;
@@ -306,8 +302,18 @@
 }
 
 /* 8. FORM PAGES */
-.form-page { max-width: 720px; margin-left: auto; margin-right: auto; }
-.form-container { display: flex; flex-direction: column; gap: 20px; max-width: 720px; margin: 0 auto; }
+.form-page { max-width: 840px; }
+.form-container { display: flex; flex-direction: column; gap: 24px; max-width: 840px; margin: 0 auto; width: 100%; }
+
+/* Fix universal double-spacing issues in create/edit/index wrappers! 
+   These strip out inline margin-bottoms from headers so that the spacing is purely controlled by flex gap (18px or 24px). */
+.form-container > div:first-child[style*="margin-bottom"],
+.form-container > nav[style*="margin-bottom"],
+.form-container > div.page-intro[style*="margin-bottom"],
+.dashboard > div:first-child[style*="margin-bottom"],
+.dashboard > .page-intro[style*="margin-bottom"] {
+    margin-bottom: 0 !important;
+}
 .breadcrumb {
   display: flex; align-items: center; gap: 6px;
   font-size: 13px; color: var(--n-400);
