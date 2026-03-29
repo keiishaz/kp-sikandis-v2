@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
 
         // URL: admin/kendaraan
         Route::get('kendaraan/print', [KendaraanController::class, 'print'])->name('kendaraan.print');
+        Route::get('kendaraan/print-count', [KendaraanController::class, 'printCount'])->name('kendaraan.print-count');
         Route::resource('kendaraan', KendaraanController::class);
 
         // Ganti / assign pemegang kendaraan
@@ -143,6 +144,7 @@ Route::middleware('auth')->group(function () {
 
         // Modul Kendaraan (akses penuh)
         Route::get('kendaraan/print', [KendaraanController::class, 'print'])->name('kendaraan.print');
+        Route::get('kendaraan/print-count', [KendaraanController::class, 'printCount'])->name('kendaraan.print-count');
         Route::resource('kendaraan', KendaraanController::class);
         Route::post('kendaraan/{kendaraan}/pemegang', [KendaraanPemegangController::class, 'store'])
              ->name('kendaraan.pemegang.store');

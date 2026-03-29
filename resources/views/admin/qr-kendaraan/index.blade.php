@@ -71,17 +71,18 @@
                                 {{ $qr->token }}
                             </a>
                         </td>
-                        <td style="text-align: center;">
-                            <div onclick="openQrModal('{{ $qr->token }}', '{{ route('kendaraan.publik', $qr->token) }}')" style="display: inline-block; padding: 4px; border: 1px solid var(--n-200); border-radius: var(--r-md); cursor: pointer; transition: transform 0.2s; background: #fff;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Perbesar QR">
+                        <td style="text-align: center; vertical-align: middle;">
+                            <div onclick="openQrModal('{{ $qr->token }}', '{{ route('kendaraan.publik', $qr->token) }}')" style="position: relative; display: inline-block; padding: 4px; border: 1px solid var(--n-200); border-radius: var(--r-md); cursor: pointer; transition: transform 0.2s; background: #fff;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Perbesar QR">
                                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data={{ urlencode(route('kendaraan.publik', $qr->token)) }}&color=000000&bgcolor=ffffff&margin=2" alt="QR {{ $qr->token }}" width="70" height="70" style="display: block; border-radius: 4px;" loading="lazy">
+                                <img src="{{ asset('assets/images/logobkl.png') }}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; padding: 2px; background: #ffffff; border-radius: 4px; object-fit: contain;">
                             </div>
                         </td>
-                        <td style="text-align: center;">
+                        <td style="text-align: center; vertical-align: middle;">
                             <span class="badge {{ $qr->scan_count > 0 ? 'badge-info' : 'badge-neutral' }}" style="padding: 6px 12px; font-size: 13px;">
                                 {{ number_format($qr->scan_count) }}x Scan
                             </span>
                         </td>
-                        <td style="text-align: center;" class="action-cell">
+                        <td style="text-align: center; vertical-align: middle;">
                             <button type="button" onclick="printSingleEl(this)" class="btn btn-secondary btn-sm" style="color: var(--brand-700); border-color: var(--brand-200); background: var(--brand-50);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                                 Cetak

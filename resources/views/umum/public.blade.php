@@ -336,8 +336,9 @@
 <div class="main-wrap">
 
     <div class="qr-float-card">
-        <div class="qr-box">
+        <div class="qr-box" style="position: relative;">
             <div id="qr-code"></div>
+            <img src="{{ asset('assets/images/logobkl.png') }}" alt="logo" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; padding: 2px; background: #fff; border-radius: 4px; object-fit: contain;">
         </div>
         <div class="qr-info">
             <h3>Kendaraan Resmi Terverifikasi</h3>

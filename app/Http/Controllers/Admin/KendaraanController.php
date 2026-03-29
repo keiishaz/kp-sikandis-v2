@@ -67,8 +67,9 @@ class KendaraanController extends Controller
         
         $countAktif = Kendaraan::where('status', 'aktif')->count();
         $countNonaktif = Kendaraan::where('status', 'nonaktif')->count();
+        $kategoris = Kategori::orderBy('nama_kategori', 'asc')->get();
 
-        return view('admin.kendaraan.index', compact('kendaraans', 'status', 'countAktif', 'countNonaktif'));
+        return view('admin.kendaraan.index', compact('kendaraans', 'status', 'countAktif', 'countNonaktif', 'kategoris'));
     }
 
     /**
@@ -92,7 +93,39 @@ class KendaraanController extends Controller
             });
         }
 
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        if ($request->filled('jenis_penggunaan')) {
+            $query->where('jenis_penggunaan', $request->jenis_penggunaan);
+        }
+
+        if ($request->filled('status_pajak')) {
+            $stPajak = $request->status_pajak;
+            if ($stPajak === 'telah_jatuh_tempo') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '<', now());
+            } elseif ($stPajak === 'hampir_jatuh_tempo') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '>=', now())->whereDate('pajak', '<=', now()->addMonths(6));
+            } elseif ($stPajak === 'aktif') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '>', now()->addMonths(6));
+            }
+        }
+
         $kendaraans = $query->get();
+
+        $filterLabels = [];
+        if ($request->filled('kategori_id')) {
+            $kat = \App\Models\Kategori::find($request->kategori_id);
+            if ($kat) $filterLabels['Kategori'] = $kat->nama_kategori;
+        }
+        if ($request->filled('jenis_penggunaan')) {
+            $filterLabels['Jenis Penggunaan'] = ucfirst($request->jenis_penggunaan);
+        }
+        if ($request->filled('status_pajak')) {
+            $lbls = ['aktif' => 'Aktif', 'hampir_jatuh_tempo' => 'Hampir Jatuh Tempo', 'telah_jatuh_tempo' => 'Telah Jatuh Tempo'];
+            if(isset($lbls[$request->status_pajak])) $filterLabels['Status Pajak'] = $lbls[$request->status_pajak];
+        }
 
         $now = \Carbon\Carbon::now();
         foreach ($kendaraans as $k) {
@@ -117,7 +150,46 @@ class KendaraanController extends Controller
             }
         }
         
-        return view('admin.kendaraan.print', compact('kendaraans', 'status'));
+        return view('admin.kendaraan.print', compact('kendaraans', 'status', 'filterLabels'));
+    }
+
+    /**
+     * Return count of kendaraan matching given print filters (for AJAX live counter).
+     */
+    public function printCount(Request $request)
+    {
+        $status = $request->get('status', 'aktif');
+        $query = Kendaraan::where('status', $status);
+
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_kendaraan', 'like', "%{$search}%")
+                  ->orWhere('no_polisi', 'like', "%{$search}%")
+                  ->orWhereHas('kategori', fn($qKat) => $qKat->where('nama_kategori', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        if ($request->filled('jenis_penggunaan')) {
+            $query->where('jenis_penggunaan', $request->jenis_penggunaan);
+        }
+
+        if ($request->filled('status_pajak')) {
+            $stPajak = $request->status_pajak;
+            if ($stPajak === 'telah_jatuh_tempo') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '<', now());
+            } elseif ($stPajak === 'hampir_jatuh_tempo') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '>=', now())->whereDate('pajak', '<=', now()->addMonths(6));
+            } elseif ($stPajak === 'aktif') {
+                $query->whereNotNull('pajak')->whereDate('pajak', '>', now()->addMonths(6));
+            }
+        }
+
+        return response()->json(['count' => $query->count()]);
     }
 
     /**

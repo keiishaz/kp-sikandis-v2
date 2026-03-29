@@ -188,6 +188,10 @@
             <h3>Daftar Inventaris Kendaraan Dinas</h3>
         </div>
 
+        <div style="font-size: 13px; margin-bottom: 14px; line-height: 1.6;">
+            Berikut merupakan data inventaris kendaraan dinas di lingkungan Pemerintah Kota Bengkulu berdasarkan parameter filter yang ditetapkan:
+        </div>
+
         <table class="meta-table">
             <tr>
                 <td class="meta-label">Dicetak Oleh</td>
@@ -196,10 +200,22 @@
                 <td>: {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }}</td>
             </tr>
             <tr>
-                <td class="meta-label">Filter Status</td>
+                <td class="meta-label">Status Kendaraan</td>
                 <td>: <span style="text-transform: capitalize">{{ $status }}</span></td>
-                <td class="meta-label">Filter Baris (Pencarian)</td>
+                <td class="meta-label">Pencarian Teks</td>
                 <td>: {{ request('q') ? request('q') : 'Semua Data' }}</td>
+            </tr>
+            <tr>
+                <td class="meta-label">Kategori Kendaraan</td>
+                <td>: {{ $filterLabels['Kategori'] ?? 'Semua Kategori' }}</td>
+                <td class="meta-label">Jenis Penggunaan</td>
+                <td>: {{ $filterLabels['Jenis Penggunaan'] ?? 'Semua' }}</td>
+            </tr>
+            <tr>
+                <td class="meta-label">Status Pajak</td>
+                <td>: {{ $filterLabels['Status Pajak'] ?? 'Semua' }}</td>
+                <td class="meta-label">Total Hasil</td>
+                <td>: {{ $kendaraans->count() }} Data</td>
             </tr>
         </table>
 
