@@ -243,13 +243,23 @@
                         @endif
                     </td>
                     <td>
-                        @if($k->pemegangAktif && $k->pemegangAktif->pegawai)
-                            <strong>{{ $k->pemegangAktif->pegawai->nama }}</strong><br>
+                        @if($k->pemegangAktif)
+                            @php
+                                $hp = $k->pemegangAktif;
+                                $nama = $hp->nama_pegawai ?? ($hp->pegawai->nama ?? 'Pegawai Internal');
+                                $nip = $hp->nip ?? ($hp->pegawai->nip ?? '-');
+                                $jabatan = $hp->jabatan_pegawai ?? ($hp->pegawai->jabatan ?? '');
+                                $unit = $hp->unit_pegawai ?? ($hp->pegawai->unit->nama_unit ?? '');
+                            @endphp
+                            <strong>{{ $nama }}</strong><br>
                             <span style="font-size: 10px;">
-                                NIP: {{ $k->pemegangAktif->pegawai->nip }}<br>
-                                {{ $k->pemegangAktif->pegawai->jabatan }}
-                                @if($k->pemegangAktif->pegawai->unit)
-                                    - {{ $k->pemegangAktif->pegawai->unit->nama_unit }}
+                                NIP: {{ $nip }}<br>
+                                {{ $jabatan }}
+                                @if($unit)
+                                    - {{ $unit }}
+                                @endif
+                                @if($hp->source_system === 'API')
+                                    <br><i>(Pegawai Internal)</i>
                                 @endif
                             </span>
                         @else

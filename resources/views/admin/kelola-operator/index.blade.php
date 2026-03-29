@@ -59,6 +59,11 @@
                             </a>
                         </th>
                         <th>
+                            <a href="{{ $sortLink('nik') }}" style="color: inherit; text-decoration: none; display: flex; align-items: center;">
+                                NIK <span style="font-size: 10px; margin-left: 4px; color: var(--n-400);">{{ $sortIndicator('nik') }}</span>
+                            </a>
+                        </th>
+                        <th>
                             <a href="{{ $sortLink('nip') }}" style="color: inherit; text-decoration: none; display: flex; align-items: center;">
                                 NIP <span style="font-size: 10px; margin-left: 4px; color: var(--n-400);">{{ $sortIndicator('nip') }}</span>
                             </a>
@@ -71,7 +76,8 @@
                     @forelse($operators as $op)
                         <tr>
                             <td><div class="cell-primary">{{ $op->name }}</div></td>
-                            <td><span class="plat-badge" style="background:transparent;border:none;padding:0;color:var(--n-600);">{{ $op->nip }}</span></td>
+                            <td><span class="plat-badge" style="background:var(--brand-50);border:1px solid var(--brand-100);color:var(--brand-700);">{{ $op->nik }}</span></td>
+                            <td><span class="plat-badge" style="background:transparent;border:none;padding:0;color:var(--n-600);">{{ $op->nip ?: '-' }}</span></td>
                             <td>
                                 @if(isset($op->last_login_at))
                                     <div style="font-size: 13px; color: var(--n-700);">{{ \Carbon\Carbon::parse($op->last_login_at)->translatedFormat('d M Y, H:i') }}</div>

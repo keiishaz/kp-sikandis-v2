@@ -26,11 +26,15 @@ class ProfileController extends Controller
 
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'nik'  => ['required', 'numeric', 'digits:16', \Illuminate\Validation\Rule::unique('users', 'nik')->ignore($user->id)],
+            'nip'  => ['nullable', 'string', 'max:30', \Illuminate\Validation\Rule::unique('users', 'nip')->ignore($user->id)],
             // password opsional, namun jika diisi minimal 8 karakter dan harus dikonfirmasi
             'password' => ['nullable', 'string', 'min:8', 'confirmed', Password::defaults()],
         ]);
 
         $user->name = $validatedData['name'];
+        $user->nik  = $validatedData['nik'];
+        $user->nip  = $validatedData['nip'];
 
         if (!empty($validatedData['password'])) {
             $user->password = Hash::make($validatedData['password']);

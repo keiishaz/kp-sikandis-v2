@@ -144,6 +144,7 @@
                         <thead>
                             <tr>
                                 <th>Nama Pegawai</th>
+                                <th>Asal Pegawai</th>
                                 <th>NIP</th>
                                 <th>Nomor SK</th>
                                 <th>Tanggal Mulai</th>
@@ -155,9 +156,19 @@
                             @forelse($kendaraan->pemegangs as $p)
                                 <tr>
                                     <td>
-                                        <div class="cell-primary">{{ $p->pegawai->nama ?? '-' }}</div>
+                                        <div class="cell-primary" style="font-weight: 600;">{{ $p->nama_pegawai ?? ($p->pegawai->nama ?? 'Pegawai Internal') }}</div>
+                                        @if($p->jabatan_pegawai)
+                                            <div style="font-size: 11px; color: var(--n-500); margin-top: 2px;">{{ $p->jabatan_pegawai }}</div>
+                                        @endif
                                     </td>
-                                    <td><span style="font-family: monospace; font-size: 13px; color: var(--n-600);">{{ $p->pegawai->nip ?? '-' }}</span></td>
+                                    <td>
+                                        @if($p->source_system === 'API')
+                                            <span class="badge" style="font-size:10px; padding:2px 8px; background:var(--brand-100); color:var(--brand-700); border: 1px solid var(--brand-200);">Internal (API)</span>
+                                        @else
+                                            <span class="badge" style="font-size:10px; padding:2px 8px; background:var(--n-100); color:var(--n-700); border: 1px solid var(--n-200);">Eksternal</span>
+                                        @endif
+                                    </td>
+                                    <td><span style="font-family: monospace; font-size: 13px; color: var(--n-600);">{{ $p->nip ?? ($p->pegawai->nip ?? '-') }}</span></td>
                                     <td>{{ $p->nomor_sk }}</td>
                                     <td>{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
                                     <td>{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
@@ -171,7 +182,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <div class="empty-state">
                                             <div class="empty-state-icon">
                                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
@@ -275,14 +286,54 @@
 
             <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
 
+                {{-- Pilihan Sumber Data --}}
                 <div class="form-group">
-                    <label class="form-label">Pilih Pegawai <span class="text-danger">*</span></label>
-                    <select name="pegawai_id" id="select-pegawai" class="form-select" required onchange="previewPegawai(this.value)">
-                        <option value="">— Pilih Pegawai —</option>
-                        @foreach($pegawais as $peg)
-                            <option value="{{ $peg->id }}">{{ $peg->nama }} — {{ $peg->nip }}</option>
-                        @endforeach
-                    </select>
+                    <label class="form-label">Sumber Data Pegawai <span class="text-danger">*</span></label>
+                    <div style="display: flex; gap: 16px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="source_system" value="API" checked onchange="toggleSource('API')">
+                            <span style="font-weight: 500;">Internal (API)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="source_system" value="Manual" onchange="toggleSource('Manual')">
+                            <span style="font-weight: 500;">Eksternal (Manual)</span>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- SECTION: INTERNAL API --}}
+                <div id="section-internal" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">NIP Pegawai Internal <span class="text-danger">*</span></label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" name="nip" id="input-api-nip" class="form-input" placeholder="Ketik NIP..." style="flex: 1;">
+                            <button type="button" id="btn-fetch-api" class="btn btn-secondary">Cari API</button>
+                        </div>
+                        <small id="api-error" class="text-danger" style="display:none; margin-top:4px; font-size:12px;"></small>
+                    </div>
+                </div>
+
+                {{-- SECTION: EKSTERNAL MANUAL --}}
+                <div id="section-eksternal" style="display: none; flex-direction: column; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Unit Eksternal <span class="text-danger">*</span></label>
+                        <select id="select-unit-eksternal" class="form-select">
+                            <option value="">— Pilih Unit Eksternal —</option>
+                            @foreach(\App\Models\Unit::orderBy('nama_unit')->get() as $unit)
+                                <option value="{{ $unit->id }}">{{ $unit->nama_unit }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="group-search-eksternal" style="display:none; position: relative;">
+                        <label class="form-label">Cari Pegawai (Nama/NIP/NIK) <span class="text-danger">*</span></label>
+                        <input type="text" id="input-search-eksternal" class="form-input" placeholder="Ketik untuk mencari..." autocomplete="off">
+                        
+                        <div id="dropdown-eksternal" style="display:none; position:absolute; top:100%; left:0; right:0; background:var(--surface-card); border:1px solid var(--n-200); border-radius:var(--r-md); box-shadow:var(--shadow-md); z-index:1000; max-height:200px; overflow-y:auto; margin-top:4px;">
+                            <!-- Dropdown list -->
+                        </div>
+                    </div>
+                    <input type="hidden" name="pegawai_id" id="input-pegawai-id">
                 </div>
 
                 <!-- Preview Pegawai -->
@@ -291,8 +342,10 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div><p style="margin:0; font-size:12px; color:var(--n-500);">Nama</p><p id="prev-nama" style="margin:0; font-size:13.5px; font-weight:600; color:var(--n-900);">—</p></div>
                         <div><p style="margin:0; font-size:12px; color:var(--n-500);">NIP</p><p id="prev-nip" style="margin:0; font-size:13.5px; font-family:monospace; color:var(--n-900);">—</p></div>
-                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:12px; color:var(--n-500);">Jabatan</p><p id="prev-jabatan" style="margin:0; font-size:13.5px; color:var(--n-900);">—</p></div>
-                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:12px; color:var(--n-500);">Unit & Sub Unit</p><p id="prev-unit" style="margin:0; font-size:13.5px; color:var(--n-900);">—</p><p id="prev-subunit" style="margin:0; font-size:12.5px; color:var(--n-600);">—</p></div>
+                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:11px; color:var(--n-500); text-transform:uppercase; letter-spacing:0.3px;">Jabatan</p><p id="prev-jabatan" style="margin:2px 0 0; font-size:13.5px; font-weight:500; color:var(--n-900);">—</p></div>
+                        <div style="grid-column: 1 / -1;"><p style="margin:0; font-size:11px; color:var(--n-500); text-transform:uppercase; letter-spacing:0.3px;">Pangkat / Golongan</p><p id="prev-pangkat" style="margin:2px 0 0; font-size:13.5px; font-weight:500; color:var(--n-900);">—</p></div>
+                        <div id="container-prev-unit" style="grid-column: 1 / -1;"><p style="margin:0; font-size:11px; color:var(--n-500); text-transform:uppercase; letter-spacing:0.3px;">Unit Kerja / OPD</p><p id="prev-unit" style="margin:2px 0 0; font-size:13.5px; font-weight:500; color:var(--n-900);">—</p></div>
+                        <div id="container-prev-subunit" style="grid-column: 1 / -1;"><p style="margin:0; font-size:11px; color:var(--n-500); text-transform:uppercase; letter-spacing:0.3px;">Sub Unit</p><p id="prev-subunit" style="margin:2px 0 0; font-size:13px; color:var(--n-600);">—</p></div>
                     </div>
                 </div>
 
@@ -412,24 +465,121 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('input-force-replace').value = '0';
     }
 
-    // ---- AJAX Preview Pegawai ----
-    window.previewPegawai = function(pegawaiId) {
-        const box = document.getElementById('preview-pegawai');
-        if (!pegawaiId) { box.style.display = 'none'; return; }
-
-        // Murni fetch JS logic yang dipertahankan
-        fetch(`/admin/api/pegawai/${pegawaiId}`)
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('prev-nama').textContent    = data.nama     || '—';
-                document.getElementById('prev-nip').textContent     = data.nip      || '—';
-                document.getElementById('prev-jabatan').textContent = data.jabatan  || '—';
-                document.getElementById('prev-unit').textContent    = data.unit     || '—';
-                document.getElementById('prev-subunit').textContent = data.sub_unit || '—';
-                box.style.display = 'block';
-            })
-            .catch(() => { box.style.display = 'none'; });
+    // ---- Realtime / Dynamic UI Logic ----
+    window.toggleSource = function(source) {
+        document.getElementById('section-internal').style.display = source === 'API' ? 'flex' : 'none';
+        document.getElementById('section-eksternal').style.display = source === 'Manual' ? 'flex' : 'none';
+        
+        // Reset previews
+        document.getElementById('preview-pegawai').style.display = 'none';
+        document.getElementById('input-api-nip').value = '';
+        document.getElementById('input-search-eksternal').value = '';
+        document.getElementById('input-pegawai-id').value = '';
+        document.getElementById('select-unit-eksternal').value = '';
+        document.getElementById('group-search-eksternal').style.display = 'none';
     };
+
+    // Internal API Fetching
+    document.getElementById('btn-fetch-api').addEventListener('click', async () => {
+        const nip = document.getElementById('input-api-nip').value.trim();
+        const err = document.getElementById('api-error');
+        const box = document.getElementById('preview-pegawai');
+        
+        if (!nip) return;
+        err.style.display = 'none';
+        box.style.display = 'none';
+
+        try {
+            document.getElementById('btn-fetch-api').textContent = 'Mencari...';
+            const res = await fetch(`/api/dummy-pegawai/${nip}`);
+            if (!res.ok) throw new Error('Data tidak ditemukan');
+            const data = await res.json();
+            
+            document.getElementById('prev-nama').textContent    = data.nama     || '—';
+            document.getElementById('prev-nip').textContent     = data.nip      || '—';
+            document.getElementById('prev-jabatan').textContent = data.jabatan  || '—';
+            document.getElementById('prev-pangkat').textContent = data.pangkat  || '—';
+            document.getElementById('prev-unit').textContent    = data.opd      || '—';
+            document.getElementById('container-prev-subunit').style.display = 'none';
+            document.getElementById('container-prev-unit').style.display = 'block';
+            
+            box.style.display = 'block';
+        } catch (error) {
+            err.textContent = error.message;
+            err.style.display = 'block';
+        } finally {
+             document.getElementById('btn-fetch-api').textContent = 'Cari API';
+        }
+    });
+
+    // Eksternal Manual unit change
+    document.getElementById('select-unit-eksternal').addEventListener('change', function() {
+        document.getElementById('group-search-eksternal').style.display = this.value ? 'block' : 'none';
+        document.getElementById('input-search-eksternal').value = '';
+        document.getElementById('preview-pegawai').style.display = 'none';
+    });
+
+    // Eksternal Search Keyup
+    let eksternalTimeout;
+    const searchInput = document.getElementById('input-search-eksternal');
+    const dropdown = document.getElementById('dropdown-eksternal');
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(eksternalTimeout);
+        const q = this.value.trim();
+        const unitId = document.getElementById('select-unit-eksternal').value;
+        
+        if (q.length < 2) { dropdown.style.display = 'none'; return; }
+        
+        eksternalTimeout = setTimeout(async () => {
+            const res = await fetch(`/api/eksternal-search?unit_id=${unitId}&q=${encodeURIComponent(q)}`);
+            if (res.ok) {
+                const results = await res.json();
+                dropdown.innerHTML = '';
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div style="padding:12px; color:var(--n-500); font-size:13px; text-align:center;">Tidak ada data ditemukan</div>';
+                } else {
+                    results.forEach(item => {
+                        const div = document.createElement('div');
+                        div.style.padding = '8px 12px';
+                        div.style.cursor = 'pointer';
+                        div.style.borderBottom = '1px solid var(--n-100)';
+                        div.innerHTML = `<div style="font-weight:600; font-size:13px;">${item.nama}</div><div style="font-size:11px; color:var(--n-500);">${item.nip || item.nik} - ${item.unit}</div>`;
+                        div.addEventListener('mouseenter', () => div.style.background = 'var(--n-50)');
+                        div.addEventListener('mouseleave', () => div.style.background = 'none');
+                        div.addEventListener('click', () => {
+                            selectEksternalPegawai(item);
+                            dropdown.style.display = 'none';
+                        });
+                        dropdown.appendChild(div);
+                    });
+                }
+                dropdown.style.display = 'block';
+            }
+        }, 300);
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    function selectEksternalPegawai(data) {
+        searchInput.value = data.nama;
+        document.getElementById('input-pegawai-id').value = data.id;
+        
+        document.getElementById('prev-nama').textContent    = data.nama     || '—';
+        document.getElementById('prev-nip').textContent     = data.nip || data.nik || '—';
+        document.getElementById('prev-jabatan').textContent = data.jabatan  || '—';
+        document.getElementById('prev-pangkat').textContent = '—';
+        document.getElementById('prev-unit').textContent    = data.unit     || '—';
+        document.getElementById('container-prev-subunit').style.display = 'block';
+        document.getElementById('container-prev-unit').style.display = 'block';
+        document.getElementById('prev-subunit').textContent = data.sub_unit || '—';
+        
+        document.getElementById('preview-pegawai').style.display = 'block';
+    }
 
     // ---- Form Submit Ganti Pemegang : cek needs_confirm ----
     document.getElementById('form-ganti-pemegang').addEventListener('submit', async function(e) {

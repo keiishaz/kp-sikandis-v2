@@ -34,25 +34,25 @@ class FortifyServiceProvider extends ServiceProvider
         // });
 
         Fortify::authenticateUsing(function (Request $request) {
-            $nip = $request->nip ?? session('login_nip');
+            $nik = $request->nik ?? session('login_nik');
             
             // Simpan metadata device/IP dari Request untuk pencatatan detail login sukses
             $ip = $request->ip();
             $userAgent = $request->userAgent();
 
-            $user = User::where('nip', $nip)->first();
+            $user = User::where('nik', $nik)->first();
 
             if (!$user) {
-                \App\Services\LoginLogger::log('LOGIN FAIL', "NIP tidak ditemukan: {$nip}");
+                \App\Services\LoginLogger::log('LOGIN FAIL', "NIK tidak ditemukan: {$nik}");
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'password' => "NIP tidak ditemukan"
+                    'password' => "NIK tidak ditemukan"
                 ]);
             }
 
             // Check if user is blocked
             if ($user->locked_until && now()->lt($user->locked_until)) {
                 $sec = now()->diffInSeconds($user->locked_until);
-                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nip . " (Sisa {$sec} detik)");
+                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nik . " (Sisa {$sec} detik)");
                 session()->flash('locked_until', $user->locked_until);
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'password' => "Akun dikunci. Tunggu {$sec} detik sebelum mencoba lagi."
@@ -68,11 +68,11 @@ class FortifyServiceProvider extends ServiceProvider
                     'last_login_user_agent' => $userAgent,
                 ])->save();
 
-                \App\Services\LoginLogger::log('LOGIN SUCCESS', $user->nip, [
+                \App\Services\LoginLogger::log('LOGIN SUCCESS', $user->nik, [
                     'ip' => $ip,
                     'user_agent' => $userAgent
                 ]);
-                session()->forget('login_nip');
+                session()->forget('login_nik');
 
                 return $user;
             }
@@ -82,9 +82,9 @@ class FortifyServiceProvider extends ServiceProvider
             
             if ($user->failed_login_attempts >= 3) {
                 $user->forceFill(['locked_until' => now()->addMinute()])->save();
-                \App\Services\LoginLogger::log('LOGIN LOCKED 1 MIN', $user->nip);
+                \App\Services\LoginLogger::log('LOGIN LOCKED 1 MIN', $user->nik);
             } else {
-                \App\Services\LoginLogger::log('LOGIN FAIL PASSWORD', $user->nip);
+                \App\Services\LoginLogger::log('LOGIN FAIL PASSWORD', $user->nik);
             }
 
             $remain = max(0, 3 - $user->failed_login_attempts);

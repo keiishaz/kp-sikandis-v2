@@ -25,11 +25,17 @@ class KendaraanPemegangController extends Controller
     public function store(Request $request, Kendaraan $kendaraan)
     {
         $request->validate([
-            'pegawai_id'    => 'required|exists:pegawais,id',
+            'source_system' => 'required|in:API,Manual',
             'nomor_sk'      => 'required|string|max:100',
             'tanggal_sk'    => 'required|date',
             'tanggal_mulai' => 'required|date',
         ]);
+
+        if ($request->source_system === 'Manual') {
+            $request->validate(['pegawai_id' => 'required|exists:pegawais,id']);
+        } else {
+            $request->validate(['nip' => 'required|string|max:18']);
+        }
 
         $pemegangLama = KendaraanPemegang::where('kendaraan_id', $kendaraan->id)
             ->where('is_active', true)
@@ -43,8 +49,8 @@ class KendaraanPemegangController extends Controller
             return response()->json([
                 'needs_confirm' => true,
                 'pemegang_lama' => [
-                    'nama' => $pemegangLama->pegawai->nama,
-                    'nip'  => $pemegangLama->pegawai->nip,
+                    'nama' => $pemegangLama->nama_pegawai ?? ($pemegangLama->pegawai->nama ?? 'Pegawai Internal'),
+                    'nip'  => $pemegangLama->nip ?? ($pemegangLama->pegawai->nip ?? '-'),
                 ],
             ]);
         }
@@ -53,11 +59,36 @@ class KendaraanPemegangController extends Controller
         if (!$pemegangLama && $isAjax && !$request->boolean('force_replace')) {
             // Proses simpan langsung, lalu return JSON sukses
             DB::transaction(function () use ($request, $kendaraan) {
-                $pegawaiBaru = Pegawai::findOrFail($request->pegawai_id);
+                $isManual = ($request->source_system === 'Manual');
+                $jabatanBaru = ''; 
+                if ($isManual) {
+                    $peg = Pegawai::with('unit')->find($request->pegawai_id);
+                    $namaBaru = $peg->nama;
+                    $nipBaru = $peg->nip;
+                    $jabatanBaru = $peg->jabatan;
+                    $opdBaru = $peg->unit?->nama_unit;
+                } else {
+                    $service = new \App\Services\PegawaiInternalService();
+                    $internalPeg = $service->fetchPegawaiByNip($request->nip);
+                    $namaBaru = $internalPeg ? $internalPeg['nama'] : 'Unknown (API)';
+                    $nipBaru = $request->nip;
+                    $jabatanBaru = $internalPeg ? $internalPeg['jabatan'] : '—';
+                    $opdBaru = $internalPeg ? $internalPeg['opd'] : '';
+                    
+                    // Tambahkan keterangan pangkat jika ada di data API
+                    if ($internalPeg && !empty($internalPeg['pangkat']) && $internalPeg['pangkat'] !== ' ()') {
+                        $jabatanBaru .= " | " . $internalPeg['pangkat'];
+                    }
+                }
 
                 KendaraanPemegang::create([
                     'kendaraan_id'    => $kendaraan->id,
-                    'pegawai_id'      => $pegawaiBaru->id,
+                    'source_system'   => $request->source_system,
+                    'pegawai_id'      => $isManual ? $request->pegawai_id : null,
+                    'nip'             => $isManual ? null : $request->nip,
+                    'nama_pegawai'    => $namaBaru,
+                    'jabatan_pegawai' => $jabatanBaru,
+                    'unit_pegawai'    => $opdBaru,
                     'nomor_sk'        => $request->nomor_sk,
                     'tanggal_sk'      => $request->tanggal_sk,
                     'tanggal_mulai'   => $request->tanggal_mulai,
@@ -69,14 +100,18 @@ class KendaraanPemegangController extends Controller
                     'TAMBAH PEMEGANG',
                     'Kendaraan',
                     $kendaraan->id,
-                    "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$pegawaiBaru->nama}, NIP: {$pegawaiBaru->nip}, SK: {$request->nomor_sk}"
+                    "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$namaBaru}, NIP: {$nipBaru}, Source: {$request->source_system}, SK: {$request->nomor_sk}"
                 );
 
-                // Catat ke Riwayat Aktivitas Kendaraan
+                $deskripsiAktivitas = "Pegawai {$namaBaru} (NIP: {$nipBaru}) ditugaskan sebagai pemegang kendaraan. SK: {$request->nomor_sk}.";
+                if (!$isManual && $opdBaru) {
+                    $deskripsiAktivitas .= " (OPD: {$opdBaru})";
+                }
+
                 \App\Models\KendaraanAktivitas::create([
                     'kendaraan_id'      => $kendaraan->id,
                     'judul_aktivitas'   => 'Penugasan Pemegang Kendaraan',
-                    'deskripsi'         => "Pegawai {$pegawaiBaru->nama} (NIP: {$pegawaiBaru->nip}) ditugaskan sebagai pemegang kendaraan. SK: {$request->nomor_sk}.",
+                    'deskripsi'         => $deskripsiAktivitas,
                     'tanggal_aktivitas' => $request->tanggal_mulai,
                     'created_by'        => \Illuminate\Support\Facades\Auth::id(),
                 ]);
@@ -87,8 +122,30 @@ class KendaraanPemegangController extends Controller
 
         // Submit akhir (force_replace = 1 atau non-AJAX): proses serah terima
         DB::transaction(function () use ($request, $kendaraan, $pemegangLama) {
-            $pegawaiBaru = Pegawai::findOrFail($request->pegawai_id);
+            $isManual = ($request->source_system === 'Manual');
+            $jabatanBaru = '';
+            if ($isManual) {
+                $peg = Pegawai::with('unit')->find($request->pegawai_id);
+                $namaBaru = $peg->nama;
+                $nipBaru = $peg->nip;
+                $jabatanBaru = $peg->jabatan;
+                $opdBaru = $peg->unit?->nama_unit;
+            } else {
+                $service = new \App\Services\PegawaiInternalService();
+                $internalPeg = $service->fetchPegawaiByNip($request->nip);
+                $namaBaru = $internalPeg ? $internalPeg['nama'] : 'Unknown (API)';
+                $nipBaru = $request->nip;
+                $jabatanBaru = $internalPeg ? $internalPeg['jabatan'] : '—';
+                $opdBaru = $internalPeg ? $internalPeg['opd'] : '';
+
+                if ($internalPeg && !empty($internalPeg['pangkat']) && $internalPeg['pangkat'] !== ' ()') {
+                    $jabatanBaru .= " | " . $internalPeg['pangkat'];
+                }
+            }
+            
             $today = now()->toDateString();
+            $namaLama = $pemegangLama ? ($pemegangLama->nama_pegawai ?? ($pemegangLama->pegawai ? $pemegangLama->pegawai->nama : 'Pegawai Internal')) : '';
+            $nipLama  = $pemegangLama ? ($pemegangLama->nip ?? ($pemegangLama->pegawai->nip ?? '-')) : '';
 
             if ($pemegangLama) {
                 $pemegangLama->update([
@@ -100,13 +157,18 @@ class KendaraanPemegangController extends Controller
                     'NONAKTIF PEMEGANG',
                     'Kendaraan',
                     $kendaraan->id,
-                    "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai Dilepas: {$pemegangLama->pegawai->nama}, NIP: {$pemegangLama->pegawai->nip}"
+                    "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai Dilepas: {$namaLama}, NIP: {$nipLama}"
                 );
             }
 
             KendaraanPemegang::create([
                 'kendaraan_id'    => $kendaraan->id,
-                'pegawai_id'      => $pegawaiBaru->id,
+                'source_system'   => $request->source_system,
+                'pegawai_id'      => $isManual ? $request->pegawai_id : null,
+                'nip'             => $isManual ? null : $request->nip,
+                'nama_pegawai'    => $namaBaru,
+                'jabatan_pegawai' => $jabatanBaru,
+                'unit_pegawai'    => $opdBaru,
                 'nomor_sk'        => $request->nomor_sk,
                 'tanggal_sk'      => $request->tanggal_sk,
                 'tanggal_mulai'   => $request->tanggal_mulai,
@@ -118,35 +180,36 @@ class KendaraanPemegangController extends Controller
                 'TAMBAH PEMEGANG',
                 'Kendaraan',
                 $kendaraan->id,
-                "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$pegawaiBaru->nama}, NIP: {$pegawaiBaru->nip}, SK: {$request->nomor_sk}"
+                "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$namaBaru}, NIP: {$nipBaru}, Source: {$request->source_system}, SK: {$request->nomor_sk}"
             );
+
+            $deskripsiAktivitas = "";
+            $judulAktivitas = "";
 
             if ($pemegangLama) {
                 ActivityLogger::log(
                     'SERAH TERIMA PEMEGANG',
                     'Kendaraan',
                     $kendaraan->id,
-                    "Kendaraan: {$kendaraan->nama_kendaraan}, Dari: {$pemegangLama->pegawai->nama} → {$pegawaiBaru->nama}, SK: {$request->nomor_sk}"
+                    "Kendaraan: {$kendaraan->nama_kendaraan}, Dari: {$namaLama} → {$namaBaru}, SK: {$request->nomor_sk}"
                 );
-
-                // Catat ke Riwayat Aktivitas Kendaraan
-                \App\Models\KendaraanAktivitas::create([
-                    'kendaraan_id'      => $kendaraan->id,
-                    'judul_aktivitas'   => 'Serah Terima Pemegang Kendaraan',
-                    'deskripsi'         => "Serah terima kendaraan dari {$pemegangLama->pegawai->nama} kepada {$pegawaiBaru->nama}. SK: {$request->nomor_sk}.",
-                    'tanggal_aktivitas' => $request->tanggal_mulai,
-                    'created_by'        => \Illuminate\Support\Facades\Auth::id(),
-                ]);
+                $judulAktivitas = 'Serah Terima Pemegang Kendaraan';
+                $deskripsiAktivitas = "Serah terima kendaraan dari {$namaLama} kepada {$namaBaru}. SK: {$request->nomor_sk}.";
             } else {
-                // Catat ke Riwayat Aktivitas Kendaraan (Jika baru pertama kali assign)
-                \App\Models\KendaraanAktivitas::create([
-                    'kendaraan_id'      => $kendaraan->id,
-                    'judul_aktivitas'   => 'Penugasan Pemegang Kendaraan',
-                    'deskripsi'         => "Pegawai {$pegawaiBaru->nama} (NIP: {$pegawaiBaru->nip}) ditugaskan sebagai pemegang kendaraan. SK: {$request->nomor_sk}.",
-                    'tanggal_aktivitas' => $request->tanggal_mulai,
-                    'created_by'        => \Illuminate\Support\Facades\Auth::id(),
-                ]);
+                $judulAktivitas = 'Penugasan Pemegang Kendaraan';
+                $deskripsiAktivitas = "Pegawai {$namaBaru} (NIP: {$nipBaru}) ditugaskan sebagai pemegang kendaraan. SK: {$request->nomor_sk}.";
             }
+            if (!$isManual && $opdBaru) {
+                $deskripsiAktivitas .= " (OPD: {$opdBaru})";
+            }
+
+            \App\Models\KendaraanAktivitas::create([
+                'kendaraan_id'      => $kendaraan->id,
+                'judul_aktivitas'   => $judulAktivitas,
+                'deskripsi'         => $deskripsiAktivitas,
+                'tanggal_aktivitas' => $request->tanggal_mulai,
+                'created_by'        => \Illuminate\Support\Facades\Auth::id(),
+            ]);
         });
 
         return redirect()

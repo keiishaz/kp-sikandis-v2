@@ -22,8 +22,8 @@ Route::get('/', function () {
 });
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [StepLoginController::class, 'showNipForm'])->name('login');
-    Route::post('/login-nip', [StepLoginController::class, 'checkNip'])->name('login.nip');
+    Route::get('/login', [StepLoginController::class, 'showNikForm'])->name('login');
+    Route::post('/login-nik', [StepLoginController::class, 'checkNik'])->name('login.nik');
     Route::get('/login-password', [StepLoginController::class, 'showPasswordForm'])->name('login.password');
     Route::post('/login-password', [StepLoginController::class, 'submitPassword'])->name('login.password.submit');
 });
@@ -34,6 +34,42 @@ Route::middleware('auth')->group(function () {
     // Profil Pengguna
     Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    // Shared APIs untuk Modal Kendaraan Pemegang
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/eksternal-search', function (\Illuminate\Http\Request $request) {
+            $unitId = $request->query('unit_id');
+            $keyword = $request->query('q');
+
+            $query = \App\Models\Pegawai::with(['unit', 'subUnit']);
+            if ($unitId) $query->where('unit_id', $unitId);
+            if ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                      ->orWhere('nip', 'like', "%{$keyword}%")
+                      ->orWhere('nik', 'like', "%{$keyword}%");
+                });
+            }
+
+            return response()->json($query->take(20)->get()->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'nama' => $p->nama,
+                    'nip' => $p->nip,
+                    'nik' => $p->nik,
+                    'jabatan' => $p->jabatan,
+                    'unit' => $p->unit?->nama_unit ?? '-',
+                    'sub_unit' => $p->subUnit?->nama_sub_unit ?? '-'
+                ];
+            }));
+        })->name('eksternal.search');
+
+        Route::get('/dummy-pegawai/{nip}', function ($nip, \App\Services\PegawaiInternalService $service) {
+            $data = $service->fetchPegawaiByNip($nip);
+            if ($data) return response()->json($data);
+            return response()->json(['message' => 'Data pegawai internal tidak ditemukan.'], 404);
+        })->name('dummy-pegawai.show');
+    });
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');

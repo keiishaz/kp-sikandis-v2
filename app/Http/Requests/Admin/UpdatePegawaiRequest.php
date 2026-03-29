@@ -18,8 +18,14 @@ class UpdatePegawaiRequest extends FormRequest
 
         return [
             'nama'        => ['required', 'string', 'max:150'],
-            'nip'         => [
+            'nik'         => [
                 'required',
+                'numeric',
+                'digits:16',
+                Rule::unique('pegawais', 'nik')->ignore($pegawaiId),
+            ],
+            'nip'         => [
+                'nullable',
                 'numeric',
                 'digits:18',
                 Rule::unique('pegawais', 'nip')->ignore($pegawaiId),
@@ -34,7 +40,10 @@ class UpdatePegawaiRequest extends FormRequest
     {
         return [
             'nama.required'        => 'Nama wajib diisi.',
-            'nip.required'         => 'NIP wajib diisi.',
+            'nik.required'         => 'NIK wajib diisi.',
+            'nik.numeric'          => 'NIK harus berupa angka.',
+            'nik.digits'           => 'NIK harus terdiri dari tepat 16 digit.',
+            'nik.unique'           => 'NIK ini sudah terdaftar dalam sistem.',
             'nip.numeric'          => 'NIP harus berupa angka (tanpa spasi atau tanda baca).',
             'nip.digits'           => 'NIP harus terdiri dari tepat 18 digit.',
             'nip.unique'           => 'NIP ini sudah terdaftar dalam sistem.',

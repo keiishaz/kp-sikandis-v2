@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('pegawais', function (Blueprint $table) {
             $table->id();
+            $table->string('nik', 16)->unique();
             $table->string('nama', 150);
-            $table->char('nip', 18)->unique();
+            $table->char('nip', 18)->unique()->nullable();
             $table->string('jabatan', 100);
             $table->foreignId('unit_id')->constrained('units');
             $table->foreignId('sub_unit_id')->constrained('sub_units');

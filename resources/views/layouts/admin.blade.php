@@ -76,8 +76,8 @@
                             </div>
                         </div>
 
-                        <div class="nav-section-label">Master Data</div>
-                        <!-- MASTER DATA GROUP -->
+                        <div class="nav-section-label">Manajemen Eksternal</div>
+                        <!-- MANAJEMEN EKSTERNAL GROUP -->
                         @php
                             $isMasterDataActive = request()->routeIs('admin.units.*', 'admin.pegawai.*', 'admin.kelola-operator.*');
                         @endphp
@@ -88,17 +88,17 @@
                                     <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                                     <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                                 </svg>
-                                <span>Master Data</span>
+                                <span>Manajemen Eksternal</span>
                                 <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </button>
                             <div class="nav-group-body">
                                 <a href="{{ route('admin.units.index') }}" class="nav-sub-item {{ request()->routeIs('admin.units.*') ? 'active' : '' }}">
-                                    Unit Kerja
+                                    Unit Eksternal
                                 </a>
                                 <a href="{{ route('admin.pegawai.index') }}" class="nav-sub-item {{ request()->routeIs('admin.pegawai.*') ? 'active' : '' }}">
-                                    Pegawai
+                                    Pegawai Eksternal
                                 </a>
                                 <a href="{{ route('admin.kelola-operator.index') }}" class="nav-sub-item {{ request()->routeIs('admin.kelola-operator.*') ? 'active' : '' }}">
                                     Operator
@@ -164,8 +164,8 @@
                             </div>
                         </div>
 
-                        <div class="nav-section-label">Master Data</div>
-                        {{-- MASTER DATA GROUP --}}
+                        <div class="nav-section-label">Manajemen Eksternal</div>
+                        {{-- MANAJEMEN EKSTERNAL GROUP --}}
                         @php
                             $isOpMasterActive = request()->is('operator/units*') || request()->is('operator/pegawai*') || request()->is('operator/kategori*');
                         @endphp
@@ -176,17 +176,17 @@
                                     <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                                     <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                                 </svg>
-                                <span>Master Data</span>
+                                <span>Manajemen Eksternal</span>
                                 <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </button>
                             <div class="nav-group-body">
                                 <a href="{{ route('operator.units.index') }}" class="nav-sub-item {{ request()->routeIs('operator.units.*') ? 'active' : '' }}">
-                                    Unit Kerja
+                                    Unit Eksternal
                                 </a>
                                 <a href="{{ route('operator.pegawai.index') }}" class="nav-sub-item {{ request()->routeIs('operator.pegawai.*') ? 'active' : '' }}">
-                                    Pegawai
+                                    Pegawai Eksternal
                                 </a>
                                 <a href="{{ route('operator.kategori.index') }}" class="nav-sub-item {{ request()->routeIs('operator.kategori.*') ? 'active' : '' }}">
                                     Kategori Kendaraan

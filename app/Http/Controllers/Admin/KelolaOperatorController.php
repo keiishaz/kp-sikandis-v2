@@ -20,11 +20,12 @@ class KelolaOperatorController extends Controller
         if ($q = $request->input('q')) {
             $query->where(function ($builder) use ($q) {
                 $builder->where('name', 'like', "%{$q}%")
+                        ->orWhere('nik', 'like', "%{$q}%")
                         ->orWhere('nip', 'like', "%{$q}%");
             });
         }
 
-        $validSorts = ['name', 'nip'];
+        $validSorts = ['name', 'nik', 'nip'];
         $sort = in_array($request->input('sort'), $validSorts) ? $request->input('sort') : 'name';
         $dir  = $request->input('dir') === 'desc' ? 'desc' : 'asc';
 
@@ -44,12 +45,14 @@ class KelolaOperatorController extends Controller
 
         $data = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'nip'      => ['required', 'string', 'max:30', 'unique:users,nip'],
+            'nik'      => ['required', 'numeric', 'digits:16', 'unique:users,nik'],
+            'nip'      => ['nullable', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:6'],
         ]);
 
         User::create([
             'name'     => $data['name'],
+            'nik'      => $data['nik'],
             'nip'      => $data['nip'],
             'password' => Hash::make($data['password']),
             'role_id'  => $operatorRole->id,
@@ -73,11 +76,13 @@ class KelolaOperatorController extends Controller
     {
         $data = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'nip'      => ['required', 'string', 'max:30', Rule::unique('users', 'nip')->ignore($kelola_operator->id)],
+            'nik'      => ['required', 'numeric', 'digits:16', Rule::unique('users', 'nik')->ignore($kelola_operator->id)],
+            'nip'      => ['nullable', 'string', 'max:30'],
             'password' => ['nullable', 'string', 'min:6'],
         ]);
 
         $kelola_operator->name = $data['name'];
+        $kelola_operator->nik  = $data['nik'];
         $kelola_operator->nip  = $data['nip'];
 
         if (!empty($data['password'])) {

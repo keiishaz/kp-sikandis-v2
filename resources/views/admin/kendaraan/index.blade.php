@@ -97,8 +97,13 @@
                                 </span>
                             </td>
                             <td>
-                                @if($k->pemegangAktif?->pegawai)
-                                    <div class="cell-primary">{{ $k->pemegangAktif->pegawai->nama }}</div>
+                                @if($k->pemegangAktif)
+                                    <div class="cell-primary">
+                                        {{ $k->pemegangAktif->nama_pegawai ?? ($k->pemegangAktif->pegawai->nama ?? 'Pegawai Internal') }}
+                                    </div>
+                                    @if($k->pemegangAktif->source_system === 'API')
+                                        <div style="font-size: 11px; color: var(--n-500); font-family: monospace;">{{ $k->pemegangAktif->nip }}</div>
+                                    @endif
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif
@@ -113,7 +118,18 @@
                                 <form action="{{ route('admin.kendaraan.destroy', $k->id) }}" method="POST" style="display: inline-block;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" onclick="var form = this.closest('form'); SIKANDIS.confirm({title: 'Konfirmasi', message: '{{ $k->status === 'aktif' ? 'Nonaktifkan kendaraan ini?' : 'Aktifkan kendaraan ini?' }}', confirmText: 'Ya, Lanjutkan', cancelText: 'Batal', type: 'warning'}).then(function(res) { if(res) form.submit(); })" class="btn btn-secondary btn-icon" title="{{ $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}" style="{{ $k->status === 'aktif' ? 'color: var(--danger-text); border-color: var(--danger-border); background: var(--danger-bg);' : 'color: var(--success-text); border-color: var(--success-border); background: var(--success-bg);' }}">
+                                    @php
+                                        $btnStyle = $k->status === 'aktif' 
+                                            ? 'color: var(--danger-text); border-color: var(--danger-border); background: var(--danger-bg);' 
+                                            : 'color: var(--success-text); border-color: var(--success-border); background: var(--success-bg);';
+                                        $confirmMsg = $k->status === 'aktif' ? 'Nonaktifkan kendaraan ini?' : 'Aktifkan kendaraan ini?';
+                                        $btnTitle = $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan';
+                                    @endphp
+                                    <button type="button" 
+                                        onclick="var form = this.closest('form'); SIKANDIS.confirm({title: 'Konfirmasi', message: '{{ $confirmMsg }}', confirmText: 'Ya, Lanjutkan', cancelText: 'Batal', type: 'warning'}).then(function(res) { if(res) form.submit(); })" 
+                                        class="btn btn-secondary btn-icon" 
+                                        title="{{ $btnTitle }}" 
+                                        style="{{ $btnStyle }}">
                                         @if($k->status === 'aktif')
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
                                         @else

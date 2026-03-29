@@ -36,11 +36,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="nip" class="form-label">
-                        NIP <span class="text-danger">*</span>
-                        <span style="font-size:11px; color:var(--n-400); font-weight:400; margin-left: 4px;">(18 digit angka)</span>
+                    <label for="nik" class="form-label">
+                        NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span>
+                        <span style="font-size:11px; color:var(--n-400); font-weight:400; margin-left: 4px;">(16 digit angka)</span>
                     </label>
-                    <input type="text" id="nip" name="nip" value="{{ old('nip') }}" class="form-input" style="font-family: monospace; letter-spacing: .5px;" placeholder="000000000000000000">
+                    <input type="text" id="nik" name="nik" value="{{ old('nik') }}" class="form-input" style="font-family: monospace; letter-spacing: .5px;" placeholder="0000000000000000" minlength="16" maxlength="16" pattern="\d{16}" required>
+                    @error('nik')<div class="form-error">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="nip" class="form-label">
+                        NIP (Nomor Induk Pegawai) <span style="font-size:11px; color:var(--n-400); font-weight:400; margin-left: 4px;">(Opsional, 18 digit angka)</span>
+                    </label>
+                    <input type="text" id="nip" name="nip" value="{{ old('nip') }}" class="form-input" style="font-family: monospace; letter-spacing: .5px;" placeholder="Opsional">
                     @error('nip')<div class="form-error">{{ $message }}</div>@enderror
                 </div>
 

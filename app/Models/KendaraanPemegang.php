@@ -9,6 +9,11 @@ class KendaraanPemegang extends Model
 {
     protected $fillable = [
         'kendaraan_id',
+        'source_system',
+        'nip',
+        'nama_pegawai',
+        'jabatan_pegawai',
+        'unit_pegawai',
         'pegawai_id',
         'nomor_sk',
         'tanggal_sk',

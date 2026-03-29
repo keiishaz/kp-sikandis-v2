@@ -16,8 +16,10 @@ return new class extends Migration
             $table->foreignId('kendaraan_id')
               ->constrained('kendaraans')
               ->cascadeOnDelete();
-
+            $table->enum('source_system', ['API', 'Manual']);  
+            $table->string('nip', 18)->nullable();  
             $table->foreignId('pegawai_id')
+              ->nullable()
               ->constrained('pegawais')
               ->cascadeOnDelete();
             

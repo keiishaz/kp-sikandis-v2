@@ -350,7 +350,7 @@
                         <div class="step-dot">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <div class="step-label">NIP</div>
+                        <div class="step-label">NIK</div>
                     </div>
                     <div class="step-item active">
                         <div class="step-dot">2</div>
@@ -361,7 +361,7 @@
                 {{-- Form Header --}}
                 <div class="form-header">
                     <h2 class="form-title">Verifikasi Password</h2>
-                    <p class="form-subtitle">Masukkan password untuk NIP yang dipilih</p>
+                    <p class="form-subtitle">Masukkan password untuk NIK yang dipilih</p>
                 </div>
 
                 {{-- Alert Error --}}
@@ -383,9 +383,9 @@
                     @csrf
                     
                     <div class="form-group">
-                        <input type="hidden" name="nip" value="{{ session('login_nip') }}">
-                        <label for="nip" class="form-label">NIP</label>
-                        <input type="text" id="nip" class="form-input input-readonly" value="{{ session('login_nip') }}" readonly tabindex="-1">
+                        <input type="hidden" name="nik" value="{{ session('login_nik') }}">
+                        <label for="nik" class="form-label">NIK</label>
+                        <input type="text" id="nik" class="form-input input-readonly" value="{{ session('login_nik') }}" readonly tabindex="-1">
                     </div>
 
                     <div class="form-group">
@@ -406,7 +406,7 @@
                     </button>
 
                     <a href="{{ route('login') }}" class="back-link">
-                        &larr; Ganti NIP
+                        &larr; Ganti NIK
                     </a>
                 </form>
 

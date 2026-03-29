@@ -18,8 +18,9 @@ class AdminSeeder extends Seeder
         $adminRole = Role::where('nama_role', 'admin')->first();
 
         User::firstOrCreate(
-            ['nip' => '198001012006041001'],
+            ['nik' => '1234567890123456'],
             [
+                'nip' => '198001012006041001',
                 'name' => 'Keisha Azzahra',
                 'password' => Hash::make('Admin#12345'),
                 'role_id' => $adminRole->id,

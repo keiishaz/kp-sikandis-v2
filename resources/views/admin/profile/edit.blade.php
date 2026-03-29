@@ -39,6 +39,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span></label>
+                    <input type="text" name="nik" value="{{ old('nik', auth()->user()?->nik) }}" class="form-input" required minlength="16" maxlength="16" pattern="\d{16}" placeholder="16 digit angka NIK">
+                    @error('nik')<div class="form-error">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">NIP (Nomor Induk Pegawai) <span style="color:var(--n-400); font-weight: 400; font-size: 12px; margin-left: 4px;">(Opsional)</span></label>
+                    <input type="text" name="nip" value="{{ old('nip', auth()->user()?->nip) }}" class="form-input" placeholder="Opsional jika tidak ada NIP">
+                    @error('nip')<div class="form-error">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Password Baru <span style="color:var(--n-400); font-weight: 400; font-size: 12px; margin-left: 4px;">(Opsional)</span></label>
                     <input type="password" name="password" class="form-input" placeholder="Biarkan kosong jika tidak ingin mengubah">
                     @error('password')<div class="form-error">{{ $message }}</div>@enderror

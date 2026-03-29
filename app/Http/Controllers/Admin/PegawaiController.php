@@ -22,6 +22,7 @@ class PegawaiController extends Controller
         if ($q = $request->input('q')) {
             $query->where(function ($qb) use ($q) {
                 $qb->where('nama', 'like', "%{$q}%")
+                   ->orWhere('nik', 'like', "%{$q}%")
                    ->orWhere('nip', 'like', "%{$q}%");
             });
         }
@@ -47,7 +48,7 @@ class PegawaiController extends Controller
             'TAMBAH PEGAWAI',
             'Pegawai',
             $pegawai->id,
-            "Nama: {$pegawai->nama} | NIP: {$pegawai->nip}"
+            "Nama: {$pegawai->nama} | NIK: {$pegawai->nik}"
         );
 
         return redirect()->route($this->rp() . '.pegawai.index')
@@ -73,7 +74,7 @@ class PegawaiController extends Controller
             'EDIT PEGAWAI',
             'Pegawai',
             $pegawai->id,
-            "Dari: {$old} → {$pegawai->nama} | NIP: {$pegawai->nip}"
+            "Dari: {$old} → {$pegawai->nama} | NIK: {$pegawai->nik}"
         );
 
         return redirect()->route($this->rp() . '.pegawai.index')

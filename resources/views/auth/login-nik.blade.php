@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login SIKANDIS - Masukkan NIP</title>
+    <title>Login SIKANDIS - Masukkan NIK</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -287,7 +287,7 @@
                     <div class="step-line"></div>
                     <div class="step-item active">
                         <div class="step-dot">1</div>
-                        <div class="step-label">NIP</div>
+                        <div class="step-label">NIK</div>
                     </div>
                     <div class="step-item inactive">
                         <div class="step-dot">2</div>
@@ -298,11 +298,11 @@
                 {{-- Form Header --}}
                 <div class="form-header">
                     <h2 class="form-title">Masuk ke SIKANDIS</h2>
-                    <p class="form-subtitle">Masukkan NIP Anda untuk melanjutkan</p>
+                    <p class="form-subtitle">Masukkan NIK Anda untuk melanjutkan</p>
                 </div>
 
                 {{-- Alert Error --}}
-                @error('nip')
+                @error('nik')
                 <div class="alert-error">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     <p>{{ $message }}</p>
@@ -310,14 +310,14 @@
                 @enderror
 
                 {{-- Form --}}
-                <form method="POST" action="{{ route('login.nip') }}" novalidate>
+                <form method="POST" action="{{ route('login.nik') }}" novalidate>
                     @csrf
                     
                     <div class="form-group">
-                        <label for="nip" class="form-label">Nomor Induk Pegawai</label>
+                        <label for="nik" class="form-label">Nomor Induk Kependudukan (NIK)</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            <input type="text" id="nip" name="nip" class="form-input" value="{{ old('nip') }}" placeholder="Contoh: 199001012020121001" required autofocus autocomplete="username">
+                            <input type="text" id="nik" name="nik" class="form-input" value="{{ old('nik') }}" placeholder="16 digit NIK..." minlength="16" maxlength="16" required autofocus autocomplete="username">
                         </div>
                     </div>
 

@@ -9,7 +9,7 @@ class Pegawai extends Model
 {
     protected $table = 'pegawais';
 
-    protected $fillable = ['nama', 'nip', 'jabatan', 'unit_id', 'sub_unit_id'];
+    protected $fillable = ['nama', 'nik', 'nip', 'jabatan', 'unit_id', 'sub_unit_id'];
 
     public function unit(): BelongsTo
     {

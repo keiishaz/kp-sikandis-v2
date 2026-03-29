@@ -37,6 +37,7 @@
                     <tr>
                         <th style="width:50px; text-align: center;">No</th>
                         <th>Nama</th>
+                        <th>NIK</th>
                         <th>NIP</th>
                         <th>Jabatan</th>
                         <th>Unit</th>
@@ -49,7 +50,8 @@
                         <tr>
                             <td style="text-align: center;">{{ $pegawais->firstItem() + $i }}</td>
                             <td><div class="cell-primary">{{ $pegawai->nama }}</div></td>
-                            <td><span style="font-family:monospace; font-size: 13px; color: var(--n-600); letter-spacing:.5px;">{{ $pegawai->nip }}</span></td>
+                            <td><span style="font-family:monospace; font-size: 13px; color: var(--brand-700); letter-spacing:.5px;">{{ $pegawai->nik }}</span></td>
+                            <td><span style="font-family:monospace; font-size: 13px; color: var(--n-600); letter-spacing:.5px;">{{ $pegawai->nip ?: '-' }}</span></td>
                             <td>{{ $pegawai->jabatan }}</td>
                             <td>{{ $pegawai->unit?->nama_unit ?? '-' }}</td>
                             <td>{{ $pegawai->subUnit?->nama_sub_unit ?? '-' }}</td>
