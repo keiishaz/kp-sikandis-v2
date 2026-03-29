@@ -72,6 +72,55 @@ class KendaraanController extends Controller
     }
 
     /**
+     * Cetak Laporan kendaraan yang terfilter.
+     */
+    public function print(Request $request)
+    {
+        $status = $request->get('status', 'aktif');
+        $query = Kendaraan::with('kategori', 'pemegangAktif.pegawai.unit', 'pemegangAktif.pegawai.subUnit')
+            ->where('status', $status)
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_kendaraan', 'like', "%{$search}%")
+                  ->orWhere('no_polisi', 'like', "%{$search}%")
+                  ->orWhereHas('kategori', function ($qKat) use ($search) {
+                      $qKat->where('nama_kategori', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $kendaraans = $query->get();
+
+        $now = \Carbon\Carbon::now();
+        foreach ($kendaraans as $k) {
+            if (!$k->pajak) {
+                $k->status_pajak = 'belum_diatur';
+                $k->color_pajak = 'gray';
+            } else {
+                $pajakDate = \Carbon\Carbon::parse($k->pajak);
+                if ($pajakDate->isPast()) {
+                    $k->status_pajak = 'Telah Jatuh Tempo';
+                    $k->color_pajak = 'red';
+                } else {
+                    $diffMonths = $now->diffInMonths($pajakDate, false);
+                    if ($diffMonths <= 6) {
+                        $k->status_pajak = 'Hampir Jatuh Tempo';
+                        $k->color_pajak = 'yellow';
+                    } else {
+                        $k->status_pajak = 'Aktif';
+                        $k->color_pajak = 'green';
+                    }
+                }
+            }
+        }
+        
+        return view('admin.kendaraan.print', compact('kendaraans', 'status'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
