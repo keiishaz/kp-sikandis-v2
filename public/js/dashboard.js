@@ -308,7 +308,16 @@ function showConfirm(options = {}) {
 
     // Set content
     titleEl.textContent = options.title || 'Konfirmasi';
-    messageEl.textContent = options.message || 'Apakah Anda yakin ingin melanjutkan?';
+    
+    let msg = options.message || 'Apakah Anda yakin ingin melanjutkan?';
+    // Handle the \b... \b notation as bold (common in some Indonesian legacy systems/preferences)
+    // or simply as a custom bold delimiter. We use <strong> for semantic bolding.
+    msg = msg.replace(/\u0008/g, '\b'); // Ensure we catch the literal backspace char if it was interpreted
+    msg = msg.replace(/\\b/g, '<strong>').replace(/<strong>(.*?)<strong>/g, '<strong>$1</strong>'); // This handles literal \b
+    // Since \b in JS backticks is U+0008, let's catch that too
+    msg = msg.replace(/\x08(.*?)\x08/g, '<strong>$1</strong>');
+    
+    messageEl.innerHTML = msg;
     btnConfirm.textContent = options.confirmText || 'Ya, Lanjutkan';
     btnCancel.textContent = options.cancelText || 'Batal';
 
@@ -372,9 +381,9 @@ function initBetterConfirms() {
             if (isDelete) {
                 options.message = 'Data ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.';
             } else if (submitter.innerText.toLowerCase().includes('regenerate')) {
-                options.title = 'Regenerate QR Code?';
+                options.title = 'Buat Ulang QR Code?';
                 options.message = 'QR Code lama tidak akan berfungsi lagi setelah Anda membuat yang baru.';
-                options.confirmText = 'Ya, Regenerate';
+                options.confirmText = 'Ya, Buat Ulang';
                 options.type = 'warning';
             }
 

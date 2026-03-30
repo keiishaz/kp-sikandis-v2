@@ -23,7 +23,7 @@ return new class extends Migration
               ->constrained('pegawais')
               ->cascadeOnDelete();
             
-            $table->string('nomor_sk');
+            $table->string('nomor_sk')->unique();
             $table->date('tanggal_sk');
             $table->boolean('is_active')->default(true);
  

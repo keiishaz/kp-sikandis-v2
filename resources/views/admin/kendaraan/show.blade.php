@@ -307,7 +307,7 @@
                         <label class="form-label">NIP Pegawai Internal <span class="text-danger">*</span></label>
                         <div style="display: flex; gap: 8px;">
                             <input type="text" name="nip" id="input-api-nip" class="form-input" placeholder="Ketik NIP..." style="flex: 1;">
-                            <button type="button" id="btn-fetch-api" class="btn btn-secondary">Cari API</button>
+                            <button type="button" id="btn-fetch-api" class="btn btn-secondary">Cari Data</button>
                         </div>
                         <small id="api-error" class="text-danger" style="display:none; margin-top:4px; font-size:12px;"></small>
                     </div>
@@ -351,7 +351,8 @@
 
                 <div class="form-group">
                     <label class="form-label">Nomor Surat Keputusan (SK) <span class="text-danger">*</span></label>
-                    <input type="text" name="nomor_sk" class="form-input" required placeholder="Contoh: SK/001/2026">
+                    <input type="text" name="nomor_sk" id="input-nomor-sk" class="form-input" required placeholder="Contoh: SK/001/2026">
+                    <div id="error-nomor-sk" class="form-error" style="display:none; color:var(--danger-text); font-size:12px; margin-top:4px;"></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -508,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             err.textContent = error.message;
             err.style.display = 'block';
         } finally {
-             document.getElementById('btn-fetch-api').textContent = 'Cari API';
+             document.getElementById('btn-fetch-api').textContent = 'Cari Data';
         }
     });
 
@@ -597,6 +598,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                 body: formData,
             });
+
+            // Reset error states
+            document.getElementById('error-nomor-sk').style.display = 'none';
+            document.getElementById('input-nomor-sk').classList.remove('is-invalid');
+
+            if (res.status === 422) {
+                const errorData = await res.json();
+                if (errorData.errors && errorData.errors.nomor_sk) {
+                    const errorEl = document.getElementById('error-nomor-sk');
+                    errorEl.textContent = errorData.errors.nomor_sk[0];
+                    errorEl.style.display = 'block';
+                    document.getElementById('input-nomor-sk').classList.add('is-invalid');
+                }
+                return; // Stop processing if validation fails
+            }
 
             if (!res.ok) throw new Error('Server error');
             const data = await res.json();

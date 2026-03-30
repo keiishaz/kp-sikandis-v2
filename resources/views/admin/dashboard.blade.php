@@ -78,7 +78,7 @@
             </div>
             <div class="metric-value text-warning" style="color: var(--warning-text);">{{ $pajakSegera ?? 0 }}</div>
             <div class="metric-footer">
-                <span class="metric-trend metric-trend--neutral" style="background: var(--warning-bg); color: var(--warning-text);">≤ 30 hr</span>
+                <span class="metric-trend metric-trend--neutral" style="background: var(--warning-bg); color: var(--warning-text);">≤ 30 hari</span>
                 <span class="metric-trend-label">Perlu dicek</span>
             </div>
         </div>
@@ -374,7 +374,7 @@
         if (document.querySelector("#qrScanChart")) {
             var options = {
                 series: [{
-                    name: 'Scan QR',
+                    name: 'Pemindaian QR',
                     data: {!! json_encode($qrChartData ?? []) !!}
                 }],
                 chart: {
