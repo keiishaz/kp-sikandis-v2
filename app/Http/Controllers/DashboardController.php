@@ -2,21 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    public function __construct(private readonly DashboardService $dashboardService) {}
+
     public function index()
     {
         $user = Auth::user();
-
-        if ($user->role && $user->role->nama_role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        } elseif ($user->role && $user->role->nama_role === 'operator') {
-            return redirect()->route('operator.dashboard');
+        $isAdmin = $user->role && $user->role->nama_role === 'admin';
+        
+        if ($isAdmin) {
+            $data = $this->dashboardService->getAdminSummary();
+            $data['roleTitle'] = 'Admin';
+        } else {
+            $data = $this->dashboardService->getOperatorSummary();
+            $data['roleTitle'] = 'Operator';
         }
 
-        return view('dashboard');
+        return view('dashboard', $data);
     }
 }

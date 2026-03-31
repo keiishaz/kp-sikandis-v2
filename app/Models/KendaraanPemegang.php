@@ -38,4 +38,27 @@ class KendaraanPemegang extends Model
     {
         return $this->belongsTo(Pegawai::class);
     }
+
+    /**
+     * Display Helpers for names, position, and unit
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->pegawai ? $this->pegawai->nama : ($this->nama_pegawai ?? '-');
+    }
+
+    public function getDisplayJabatanAttribute(): string
+    {
+        return $this->pegawai ? $this->pegawai->jabatan : ($this->jabatan_pegawai ?? '-');
+    }
+
+    public function getDisplayUnitAttribute(): string
+    {
+        if ($this->pegawai) {
+            $unit = $this->pegawai->unit?->nama_unit;
+            $subUnit = $this->pegawai->subUnit?->nama_sub_unit;
+            return $subUnit ? "{$unit} — {$subUnit}" : ($unit ?? '-');
+        }
+        return $this->unit_pegawai ?? '-';
+    }
 }

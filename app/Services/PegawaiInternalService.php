@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PegawaiInternalService
 {
@@ -14,6 +15,7 @@ class PegawaiInternalService
      */
     public function fetchPegawaiByNip(string $nip): ?array
     {
+        $nip = trim($nip);
         try {
             // URL yang diberikan user
             $url = 'https://api-splp.layanan.go.id/t/bengkulukota.go.id/data_kinerja/1.0/api/pegawai/' . $nip . '/get_pegawai';
@@ -51,9 +53,15 @@ class PegawaiInternalService
                     'opd'     => $opd,
                     'pangkat' => ($data['pangkat'] ?? $data['PANGKAT'] ?? '') . ' (' . ($data['golongan'] ?? $data['GOLONGAN'] ?? '') . '/' . ($data['ruang'] ?? $data['RUANG'] ?? '') . ')',
                 ];
+                Log::warning("API Pegawai Internal returned unsuccessful (Status: {$response->status()}) for NIP: {$nip}", [
+                    'url' => $url,
+                    'response' => $response->body()
+                ]);
             }
         } catch (\Exception $e) {
-             // Silahkan cek log laravel jika terjadi error koneksi
+            Log::error("Exception while fetching Pegawai Internal (NIP: {$nip}): " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
         }
 
         return null;

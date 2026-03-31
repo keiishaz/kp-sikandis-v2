@@ -41,7 +41,7 @@ class LoginStepTest extends TestCase
 
         // Step 2: Submit Password
         $this->post('/login-password', ['password' => 'password'])
-             ->assertRedirect(route('admin.dashboard'));
+             ->assertRedirect(route('dashboard'));
              
         $this->assertAuthenticatedAs($user);
         
@@ -64,7 +64,7 @@ class LoginStepTest extends TestCase
 
         // Step 2: Submit Password
         $this->post('/login-password', ['password' => 'password'])
-             ->assertRedirect(route('operator.dashboard'));
+             ->assertRedirect(route('dashboard'));
              
         $this->assertAuthenticatedAs($user);
     }
@@ -121,7 +121,7 @@ class LoginStepTest extends TestCase
         $this->actingAs($user);
 
         // Should redirect to admin dashboard
-        $this->get(route('operator.dashboard'))->assertRedirect(route('admin.dashboard'));
+        $this->get(route('dashboard'))->assertRedirect(route('dashboard'));
     }
 
     public function test_operator_cannot_access_admin_dashboard()
@@ -131,7 +131,7 @@ class LoginStepTest extends TestCase
         $this->actingAs($user);
 
         // Should redirect to operator dashboard
-        $this->get(route('admin.dashboard'))->assertRedirect(route('operator.dashboard'));
+        $this->get(route('dashboard'))->assertRedirect(route('dashboard'));
     }
 
     public function test_logout_functionality()

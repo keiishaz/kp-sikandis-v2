@@ -23,7 +23,7 @@ class LogViewerController extends Controller
 
         $logs = $this->logService->readAktivitasLog($q, $date, 15, $page);
 
-        return view('admin.log.aktivitas', compact('logs'));
+        return view('log.aktivitas', compact('logs'));
     }
 
     public function login(Request $request)
@@ -34,6 +34,6 @@ class LogViewerController extends Controller
 
         $logs = $this->logService->readLoginLog($q, $date, 15, $page);
 
-        return view('admin.log.login', compact('logs'));
+        return view('log.login', compact('logs'));
     }
 }

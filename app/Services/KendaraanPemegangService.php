@@ -63,8 +63,9 @@ class KendaraanPemegangService
             ];
         }
 
-        // Source: API
-        $internal = $this->pegawaiInternalService->fetchPegawaiByNip($data['nip']);
+        // Source: API - Trim NIP to prevent trailing/leading spaces from causing 404
+        $nip      = trim($data['nip'] ?? '');
+        $internal = $this->pegawaiInternalService->fetchPegawaiByNip($nip);
 
         $jabatan = $internal['jabatan'] ?? '—';
         if (! empty($internal['pangkat']) && $internal['pangkat'] !== ' ()') {

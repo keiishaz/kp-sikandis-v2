@@ -14,6 +14,7 @@ use App\Repositories\OperatorRepository;
 use App\Repositories\PegawaiRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,5 +37,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::defaultView('vendor.pagination.sikandis');
+
+        Gate::define('is-admin', fn($user) => $user->role?->nama_role === 'admin');
+        Gate::define('is-operator', fn($user) => $user->role?->nama_role === 'operator');
+        Gate::define('manage-master', fn($user) => $user->role?->nama_role === 'admin');
+        Gate::define('view-log', fn($user) => $user->role?->nama_role === 'admin');
     }
 }

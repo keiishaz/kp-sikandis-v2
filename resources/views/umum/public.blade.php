@@ -395,29 +395,19 @@
         </div>
         <div class="info-card-body">
             @php $pemegang = $kendaraan->pemegangAktif; @endphp
-            @if($pemegang && $pemegang->pegawai)
+            @if($pemegang && ($pemegang->pegawai || $pemegang->nama_pegawai))
                 <div class="row">
                     <span class="row-key">Nama Pemegang</span>
-                    <span class="row-value">{{ $pemegang->pegawai->nama }}</span>
+                    <span class="row-value">{{ $pemegang->display_name }}</span>
                 </div>
-                @if($pemegang->pegawai->jabatan)
                 <div class="row">
                     <span class="row-key">Jabatan</span>
-                    <span class="row-value">{{ $pemegang->pegawai->jabatan }}</span>
+                    <span class="row-value">{{ $pemegang->display_jabatan }}</span>
                 </div>
-                @endif
-                @if($pemegang->pegawai->unit)
                 <div class="row">
                     <span class="row-key">Unit Kerja</span>
-                    <span class="row-value">{{ $pemegang->pegawai->unit->nama_unit }}</span>
+                    <span class="row-value">{{ $pemegang->display_unit }}</span>
                 </div>
-                @endif
-                @if($pemegang->pegawai->subUnit)
-                <div class="row">
-                    <span class="row-key">Sub Unit Kerja</span>
-                    <span class="row-value">{{ $pemegang->pegawai->subUnit->nama_sub_unit }}</span>
-                </div>
-                @endif
                 @if($pemegang->tanggal_mulai)
                 <div class="row">
                     <span class="row-key">Memegang Sejak</span>

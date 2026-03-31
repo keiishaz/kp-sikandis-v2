@@ -9,21 +9,21 @@ use App\Models\SubUnit;
 use App\Models\Unit;
 use App\Services\ActivityLogger;
 
-use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 
 class SubUnitController extends Controller
 {
-    use RoleRoutePrefix;
+    
     public function index(Unit $unit)
     {
         $subUnits = $unit->subUnits()->orderBy('nama_sub_unit')->paginate(15);
 
-        return view('admin.units.sub-units.index', compact('unit', 'subUnits'));
+        return view('units.sub-units.index', compact('unit', 'subUnits'));
     }
 
     public function create(Unit $unit)
     {
-        return view('admin.units.sub-units.create', compact('unit'));
+        return view('units.sub-units.create', compact('unit'));
     }
 
     public function store(StoreSubUnitRequest $request, Unit $unit)
@@ -37,13 +37,13 @@ class SubUnitController extends Controller
             "Nama: {$subUnit->nama_sub_unit} | Unit: {$unit->nama_unit}"
         );
 
-        return redirect()->route($this->rp() . '.units.sub-units.index', $unit)
+        return redirect()->route('units.sub-units.index', $unit)
                          ->with('success', "Sub unit \"{$subUnit->nama_sub_unit}\" berhasil ditambahkan.");
     }
 
     public function edit(Unit $unit, SubUnit $sub_unit)
     {
-        return view('admin.units.sub-units.edit', compact('unit', 'sub_unit'));
+        return view('units.sub-units.edit', compact('unit', 'sub_unit'));
     }
 
     public function update(UpdateSubUnitRequest $request, Unit $unit, SubUnit $sub_unit)
@@ -58,7 +58,7 @@ class SubUnitController extends Controller
             "Dari: {$old} → {$sub_unit->nama_sub_unit} | Unit: {$unit->nama_unit}"
         );
 
-        return redirect()->route($this->rp() . '.units.sub-units.index', $unit)
+        return redirect()->route('units.sub-units.index', $unit)
                          ->with('success', "Sub unit \"{$sub_unit->nama_sub_unit}\" berhasil diperbarui.");
     }
 
@@ -75,7 +75,7 @@ class SubUnitController extends Controller
             "Nama: {$nama} | Unit: {$unit->nama_unit}"
         );
 
-        return redirect()->route($this->rp() . '.units.sub-units.index', $unit)
+        return redirect()->route('units.sub-units.index', $unit)
                          ->with('success', "Sub unit \"{$nama}\" berhasil dihapus.");
     }
 }

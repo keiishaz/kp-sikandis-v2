@@ -16,12 +16,12 @@ class KelolaOperatorController extends Controller
     {
         $operators = $this->operatorService->paginatedList($request->only(['q', 'sort', 'dir']));
 
-        return view('admin.kelola-operator.index', compact('operators'));
+        return view('kelola-operator.index', compact('operators'));
     }
 
     public function create()
     {
-        return view('admin.kelola-operator.create');
+        return view('kelola-operator.create');
     }
 
     public function store(Request $request)
@@ -35,18 +35,18 @@ class KelolaOperatorController extends Controller
 
         $this->operatorService->create($data);
 
-        return redirect()->route('admin.kelola-operator.index')
+        return redirect()->route('kelola-operator.index')
                          ->with('success', 'Operator berhasil ditambahkan.');
     }
 
     public function show(User $kelola_operator)
     {
-        return view('admin.kelola-operator.show', ['operator' => $kelola_operator]);
+        return view('kelola-operator.show', ['operator' => $kelola_operator]);
     }
 
     public function edit(User $kelola_operator)
     {
-        return view('admin.kelola-operator.edit', ['operator' => $kelola_operator]);
+        return view('kelola-operator.edit', ['operator' => $kelola_operator]);
     }
 
     public function update(Request $request, User $kelola_operator)
@@ -60,7 +60,7 @@ class KelolaOperatorController extends Controller
 
         $this->operatorService->update($kelola_operator, $data);
 
-        return redirect()->route('admin.kelola-operator.index')
+        return redirect()->route('kelola-operator.index')
                          ->with('success', 'Operator berhasil diperbarui.');
     }
 
@@ -68,7 +68,7 @@ class KelolaOperatorController extends Controller
     {
         $this->operatorService->delete($kelola_operator);
 
-        return redirect()->route('admin.kelola-operator.index')
+        return redirect()->route('kelola-operator.index')
                          ->with('success', 'Operator berhasil dihapus.');
     }
 }

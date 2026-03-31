@@ -9,11 +9,11 @@ use App\Models\Unit;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\Concerns\RoleRoutePrefix;
+
 
 class UnitController extends Controller
 {
-    use RoleRoutePrefix;
+    
     public function index(Request $request)
     {
         $query = Unit::withCount('subUnits');
@@ -24,12 +24,12 @@ class UnitController extends Controller
 
         $units = $query->orderBy('nama_unit')->paginate(15)->withQueryString();
 
-        return view('admin.units.index', compact('units'));
+        return view('units.index', compact('units'));
     }
 
     public function create()
     {
-        return view('admin.units.create');
+        return view('units.create');
     }
 
     public function store(StoreUnitRequest $request)
@@ -43,13 +43,13 @@ class UnitController extends Controller
             "Nama: {$unit->nama_unit}"
         );
 
-        return redirect()->route($this->rp() . '.units.index')
+        return redirect()->route('units.index')
                          ->with('success', "Unit \"{$unit->nama_unit}\" berhasil ditambahkan.");
     }
 
     public function edit(Unit $unit)
     {
-        return view('admin.units.edit', compact('unit'));
+        return view('units.edit', compact('unit'));
     }
 
     public function update(UpdateUnitRequest $request, Unit $unit)
@@ -64,14 +64,14 @@ class UnitController extends Controller
             "Dari: {$old} → {$unit->nama_unit}"
         );
 
-        return redirect()->route($this->rp() . '.units.index')
+        return redirect()->route('units.index')
                          ->with('success', "Unit \"{$unit->nama_unit}\" berhasil diperbarui.");
     }
 
     public function destroy(Unit $unit)
     {
         if ($unit->subUnits()->exists()) {
-            return redirect()->route($this->rp() . '.units.index')
+            return redirect()->route('units.index')
                              ->with('error', "Unit \"{$unit->nama_unit}\" tidak dapat dihapus karena masih memiliki sub unit.");
         }
 
@@ -81,7 +81,7 @@ class UnitController extends Controller
 
         ActivityLogger::log('HAPUS UNIT', 'Unit', $id, "Nama: {$nama}");
 
-        return redirect()->route($this->rp() . '.units.index')
+        return redirect()->route('units.index')
                          ->with('success', "Unit \"{$nama}\" berhasil dihapus.");
     }
 }

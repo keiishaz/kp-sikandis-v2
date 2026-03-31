@@ -109,6 +109,10 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->with('pemegangAktif.pegawai')
             ->orderBy('pajak', 'asc')
             ->limit($limit)
-            ->get();
+            ->get()
+            ->map(function ($k) use ($today) {
+                $k->sisa_hari = $today->diffInDays(Carbon::parse($k->pajak), false);
+                return $k;
+            });
     }
 }
