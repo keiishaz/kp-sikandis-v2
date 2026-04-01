@@ -360,25 +360,47 @@ function initBetterConfirms() {
         // 1. Check for data-confirm attribute on the form itself (Highest priority)
         const formConfirmMsg = form.getAttribute('data-confirm');
         
-        // 2. Fallback to submitter button markers
-        const isDelete = submitter && (submitter.classList.contains('btn-delete') || submitter.closest('.btn-delete') || submitter.title?.toLowerCase().includes('hapus') || (submitter.style.color && submitter.style.color.includes('danger')));
-        const isWarning = submitter && (submitter.classList.contains('btn-warning') || submitter.closest('.btn-warning'));
+        // 2. Identify Action Type
+        const isLogout = submitter && (
+            submitter.classList.contains('logout-btn') || 
+            submitter.closest('.logout-btn') || 
+            submitter.innerText.toLowerCase().includes('keluar') || 
+            submitter.title?.toLowerCase().includes('keluar') ||
+            (submitter.closest('form') && submitter.closest('form').action.includes('logout'))
+        );
+        
+        const isDelete = !isLogout && submitter && (
+            submitter.classList.contains('btn-delete') || 
+            submitter.closest('.btn-delete') || 
+            submitter.title?.toLowerCase().includes('hapus') || 
+            (submitter.style.color && submitter.style.color.includes('danger'))
+        );
+        
+        const isWarning = submitter && (
+            submitter.classList.contains('btn-warning') || 
+            submitter.closest('.btn-warning')
+        );
 
-        if (formConfirmMsg || isDelete || isWarning) {
+        if (formConfirmMsg || isLogout || isDelete || isWarning) {
             if (form.dataset.confirmed) return; // Allow submit if already confirmed
 
             e.preventDefault();
 
             let options = {
-                type: isDelete ? 'danger' : 'warning',
-                title: isDelete ? 'Konfirmasi Tindakan' : 'Konfirmasi',
+                type: isLogout ? 'warning' : (isDelete ? 'danger' : 'warning'),
+                title: isLogout ? 'Keluar dari Sistem?' : (isDelete ? 'Konfirmasi Tindakan' : 'Konfirmasi'),
                 message: formConfirmMsg || 'Apakah Anda yakin ingin melanjutkan?',
-                confirmText: isDelete ? 'Ya, Lanjutkan' : 'Ya, Setuju'
+                confirmText: isLogout ? 'Ya, Keluar' : (isDelete ? 'Ya, Lanjutkan' : 'Ya, Setuju')
             };
 
             // Context-specific defaults if no message provided
             if (!formConfirmMsg) {
-                if (isDelete) {
+                if (isLogout) {
+                    options.title = 'Keluar dari Sistem?';
+                    options.message = 'Apakah Anda yakin ingin mengakhiri sesi ini?';
+                    options.confirmText = 'Ya, Keluar';
+                    options.type = 'warning';
+                } else if (isDelete) {
                     options.title = 'Hapus Data?';
                     options.message = 'Data ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.';
                     options.confirmText = 'Ya, Hapus';
