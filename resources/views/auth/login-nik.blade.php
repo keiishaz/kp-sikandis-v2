@@ -19,110 +19,134 @@
             --n-200: #e2e8f0;
             --n-400: #94a3b8;
             --n-500: #64748b;
+            --n-700: #334155;
             --n-800: #1e293b;
             --n-900: #0f172a;
-            --danger-bg: #fef2f2;
-            --danger-border: #fecaca;
-            --danger-text: #b91c1c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--n-50);
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 0);
+            background-size: 24px 24px;
             color: var(--n-900);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(30, 58, 138, 0.05) 0px, transparent 50%);
-        }
-
-        .login-wrapper {
-            width: 100%;
-            max-width: 420px;
             padding: 20px;
         }
 
-        .brand-header {
+        .login-card {
+            background: #fff;
+            width: 100%;
+            max-width: 820px;
+            min-height: 480px;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Branding Side (Solid Blue) */
+        .brand-side {
+            flex: 1;
+            background-color: var(--brand-600);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255,255,255,0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0,0,0,0.08) 0px, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #fff;
             text-align: center;
-            margin-bottom: 32px;
         }
 
         .logo-box {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
             background: #fff;
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 12px;
         }
-
         .logo-img { width: 100%; height: 100%; object-fit: contain; }
 
-        .app-name {
-            font-size: 24px;
+        .brand-name {
+            font-size: 26px;
             font-weight: 800;
-            color: var(--brand-900);
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
 
-        .app-desc {
-            font-size: 13px;
-            color: var(--n-500);
+        .brand-divider {
+            width: 40px;
+            height: 3px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+
+        .brand-desc {
+            font-size: 14.5px;
             font-weight: 500;
-            line-height: 1.4;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.8);
+            max-width: 240px;
         }
 
-        .login-card {
+        /* Form Side (Clean White) */
+        .form-side {
+            flex: 1;
             background: #fff;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.1);
-            border: 1px solid var(--n-100);
+            /* No dots in white panel as requested */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .form-header {
+            margin-bottom: 32px;
+        }
+        .form-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--n-900);
+            margin-bottom: 8px;
+        }
+        .form-subtitle {
+            font-size: 14px;
+            color: var(--n-500);
+            line-height: 1.5;
         }
 
         .step-indicator {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 32px;
+            justify-content: center; /* Centered as requested */
+            gap: 6px;
+            margin-bottom: 24px;
         }
         .step-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: var(--n-200);
+            width: 24px; height: 5px; border-radius: 3px; background: var(--n-100);
         }
         .step-dot.active {
-            width: 24px; border-radius: 4px; background: var(--brand-600);
+            background: var(--brand-600);
         }
 
-        .form-header {
-            margin-bottom: 28px;
-            text-align: center;
-        }
-        .form-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--n-800);
-            margin-bottom: 8px;
-        }
-        .form-subtitle {
-            font-size: 13.5px;
-            color: var(--n-500);
-        }
-
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 24px; }
         .form-label {
             display: block;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 600;
             color: var(--n-700);
             margin-bottom: 8px;
@@ -134,66 +158,77 @@
             color: var(--n-400); pointer-events: none;
         }
         .form-input {
-            width: 100%; height: 48px;
+            width: 100%; height: 50px;
             padding: 0 16px 0 42px;
-            border: 1.5px solid var(--n-200);
-            border-radius: 12px;
-            font-size: 14.5px;
+            border: 2px solid var(--n-50);
+            border-radius: 10px;
+            font-size: 15px;
             color: var(--n-900);
+            background: #fff;
             font-family: inherit;
             outline: none;
             transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .form-input:focus {
             border-color: var(--brand-600);
-            box-shadow: 0 0 0 4px var(--brand-100);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
         }
 
         .btn-submit {
-            width: 100%; height: 48px;
+            width: 100%; height: 50px;
             background: var(--brand-600);
             color: #fff; border: none;
-            border-radius: 12px;
-            font-size: 14.5px; font-weight: 600;
+            border-radius: 10px;
+            font-size: 15px; font-weight: 600;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            gap: 8px; transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            gap: 10px; transition: all 0.2s;
         }
         .btn-submit:hover {
             background: var(--brand-700);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.2);
         }
 
         .alert-error {
             display: flex; align-items: center; gap: 10px;
-            background: var(--danger-bg); border: 1px solid var(--danger-border);
+            background: #fff1f2; border: 1px solid #fecdd3;
             padding: 12px 14px; border-radius: 10px; margin-bottom: 20px;
         }
-        .alert-error svg { color: var(--danger-text); flex-shrink: 0; }
-        .alert-error p { color: var(--danger-text); font-size: 12.5px; font-weight: 500; }
+        .alert-error svg { color: #e11d48; flex-shrink: 0; }
+        .alert-error p { color: #9f1239; font-size: 13px; font-weight: 600; }
 
         .login-footer {
-            margin-top: 32px;
-            text-align: center;
-            font-size: 12px;
+            margin-top: 28px;
+            font-size: 12.5px;
             color: var(--n-400);
-            line-height: 1.5;
+            line-height: 1.6;
+            text-align: center; /* Centered as requested */
+        }
+
+        @media (max-width: 860px) {
+            .login-card { flex-direction: column; max-width: 420px; min-height: auto; }
+            .brand-side { padding: 32px; }
+            .form-side { padding: 32px; }
+            .brand-name { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-wrapper">
-        <header class="brand-header">
+    <div class="login-card">
+        <!-- Sidebar Branding -->
+        <div class="brand-side">
             <div class="logo-box">
                 <img src="{{ asset('assets/images/logo-kominfo.png') }}" alt="Logo Kominfo" class="logo-img">
             </div>
-            <h1 class="app-name">SIKANDIS</h1>
-            <p class="app-desc">Sistem Informasi Kendaraan Dinas<br>Kota Bengkulu</p>
-        </header>
+            <h1 class="brand-name">SIKANDIS</h1>
+            <div class="brand-divider"></div>
+            <p class="brand-desc">Sistem Informasi Kendaraan Dinas Kota Bengkulu</p>
+        </div>
 
-        <main class="login-card">
+        <!-- Main Form Area -->
+        <main class="form-side">
             <div class="step-indicator">
                 <div class="step-dot active"></div>
                 <div class="step-dot"></div>
@@ -201,7 +236,7 @@
 
             <div class="form-header">
                 <h2 class="form-title">Autentikasi Pengguna</h2>
-                <p class="form-subtitle">Masukkan NIK Anda untuk masuk</p>
+                <p class="form-subtitle">Langkah 1 dari 2: Identifikasi NIK</p>
             </div>
 
             @error('nik')
@@ -223,15 +258,15 @@
 
                 <button type="submit" class="btn-submit">
                     Lanjutkan
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </form>
-        </main>
 
-        <footer class="login-footer">
-            &copy; {{ date('Y') }} Dinas Kominfo Kota Bengkulu<br>
-            Tim Magang Project SIKANDIS
-        </footer>
+            <footer class="login-footer">
+                &copy; {{ date('Y') }} Dinas Kominfo Bengkulu<br>
+                Tim Magang SIKANDIS
+            </footer>
+        </main>
     </div>
 
 </body>
