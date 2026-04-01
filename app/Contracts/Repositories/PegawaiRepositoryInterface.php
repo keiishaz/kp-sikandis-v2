@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface PegawaiRepositoryInterface
 {
-    public function paginate(string $search = '', int $perPage = 15): LengthAwarePaginator;
+    public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator;
 
     public function allWithRelations(): Collection;
 

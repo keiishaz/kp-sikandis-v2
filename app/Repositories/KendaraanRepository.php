@@ -105,6 +105,20 @@ class KendaraanRepository implements KendaraanRepositoryInterface
             $this->applyPajakFilter($query, $filters['status_pajak']);
         }
 
+        // Filter by Unit/OPD (Manual or API)
+        if (! empty($filters['unit_id'])) {
+            $query->whereHas('pemegangAktif.pegawai', function ($q) use ($filters) {
+                $q->where('unit_id', $filters['unit_id']);
+            });
+        }
+
+        if (! empty($filters['opd_name'])) {
+            $query->whereHas('pemegangAktif', function ($q) use ($filters) {
+                $q->where('source_system', '!=', 'manual')
+                  ->where('unit_pegawai', $filters['opd_name']);
+            });
+        }
+
         return $query;
     }
 

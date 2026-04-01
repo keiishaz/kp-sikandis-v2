@@ -4,7 +4,68 @@
 @section('topbar_title', 'Data Kendaraan ' . (auth()->user()->role->nama_role === 'admin' ? 'Admin' : 'Operator'))
 
 @section('content')
+<style>
+    .filter-panel {
+        background: var(--n-50);
+        border: 1px solid var(--n-200);
+        border-radius: var(--r-md);
+        padding: 20px;
+        margin-bottom: 20px;
+        display: none;
+        animation: slideDown 0.3s ease-out;
+    }
+    .filter-panel.active { display: block; }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
+    .filter-group { margin-bottom: 16px; }
+    .filter-label { 
+        display: block; 
+        font-size: 12px; 
+        font-weight: 700; 
+        color: var(--n-600); 
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .filter-chip-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        background: var(--brand-50);
+        color: var(--brand-700);
+        border: 1px solid var(--brand-200);
+        border-radius: 50px;
+        font-size: 12.5px;
+        font-weight: 500;
+    }
+    .filter-chip-remove {
+        margin-left: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand-400);
+        transition: color 0.2s;
+    }
+    .filter-chip-remove:hover { color: var(--brand-700); }
+
+    .summary-text {
+        font-size: 13px;
+        color: var(--n-500);
+        margin-bottom: 12px;
+    }
+</style>
 
     {{-- PAGE HEADER --}}
     <div class="page-intro">
@@ -22,45 +83,178 @@
 
     {{-- TAB NAVIGATION --}}
     <div class="tab-nav">
-        <a href="{{ route('kendaraan.index', ['status' => 'aktif', 'q' => request('q')]) }}" 
+        <a href="{{ route('kendaraan.index', array_merge(request()->query(), ['status' => 'aktif'])) }}" 
            class="tab-nav-item {{ $status === 'aktif' ? 'active' : '' }}">
             Kendaraan Aktif
             <span class="badge {{ $status === 'aktif' ? 'badge-primary' : 'badge-neutral' }}">{{ $countAktif }}</span>
         </a>
-        <a href="{{ route('kendaraan.index', ['status' => 'nonaktif', 'q' => request('q')]) }}" 
+        <a href="{{ route('kendaraan.index', array_merge(request()->query(), ['status' => 'nonaktif'])) }}" 
            class="tab-nav-item {{ $status === 'nonaktif' ? 'active' : '' }}">
             Kendaraan Nonaktif
-           <span class="badge {{ $status === 'nonaktif' ? 'badge-danger' : 'badge-neutral' }}">{{ $countNonaktif }}</span>
+            <span class="badge {{ $status === 'nonaktif' ? 'badge-danger' : 'badge-neutral' }}">{{ $countNonaktif }}</span>
         </a>
     </div>
 
     {{-- SEARCH TOOLBAR & TABLE CARD --}}
     <div class="card" style="border-top-left-radius: 0;">
         <div class="table-toolbar">
-            <form action="{{ route('kendaraan.index') }}" method="GET" style="display: flex; gap: 8px;">
+            <form id="searchForm" action="{{ route('kendaraan.index') }}" method="GET" class="toolbar-left">
                 <input type="hidden" name="status" value="{{ $status }}">
+                
+                {{-- Search Input --}}
                 <div class="search-input-wrapper">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="search-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="search" name="q" value="{{ request('q') }}" placeholder="Cari nopol atau nama kendaraan..." class="form-input">
+                    <input type="search" name="q" value="{{ request('q') }}" placeholder="Cari nopol atau nama kendaraan..." class="form-input" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-secondary">Cari</button>
+
+                {{-- Advanced Filter Toggle --}}
+                @php
+                    $activeFilterCount = collect(request()->except(['q', 'status', 'page']))->filter()->count();
+                @endphp
+                <button type="button" id="btnToggleFilter" class="btn-filter {{ $activeFilterCount > 0 ? 'active' : '' }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    Filter Advanced
+                    @if($activeFilterCount > 0)
+                        <span class="filter-badge">{{ $activeFilterCount }}</span>
+                    @endif
+                </button>
+
+                {{-- HIDDEN INPUTS FOR ALL FILTERS (to ensure they are submitted together) --}}
+                <div id="filterInputsContainer">
+                    @foreach(request()->except(['q', 'status', 'page', 'kategori_id', 'jenis_penggunaan', 'status_pajak', 'unit_id', 'opd_name']) as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    {{-- Specific hidden inputs for unit_id and opd_name to map the dinas_opd selection --}}
+                    <input type="hidden" name="unit_id" value="{{ request('unit_id') }}">
+                    <input type="hidden" name="opd_name" value="{{ request('opd_name') }}">
+                </div>
             </form>
-            
-            <button type="button" onclick="openPrintModal()" class="btn btn-secondary" style="margin-left: auto; color: var(--brand-700); border-color: var(--brand-200); background: var(--brand-50);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Cetak Laporan
-            </button>
+
+            <div class="toolbar-right">
+                <button type="button" onclick="openPrintModal()" class="btn btn-secondary" style="height: 42px; color: var(--brand-700); border-color: var(--brand-200); background: var(--brand-50);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Cetak Laporan
+                </button>
+            </div>
+        </div>
+
+        {{-- THE HIDDEN FILTER PANEL CONTENT --}}
+        <div id="advancedFilterPanel" class="filter-panel {{ $activeFilterCount > 0 ? 'active' : '' }}">
+            <div class="filter-grid">
+                {{-- Filter Kategori --}}
+                <div class="filter-group">
+                    <label class="filter-label">Kategori</label>
+                    <select name="kategori_id" form="searchForm" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        @foreach($kategoris as $kat)
+                            <option value="{{ $kat->id }}" {{ request('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filter Jenis Penggunaan --}}
+                <div class="filter-group">
+                    <label class="filter-label">Jenis Penggunaan</label>
+                    <select name="jenis_penggunaan" form="searchForm" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Jenis</option>
+                        <option value="jabatan" {{ request('jenis_penggunaan') == 'jabatan' ? 'selected' : '' }}>Jabatan</option>
+                        <option value="operasional" {{ request('jenis_penggunaan') == 'operasional' ? 'selected' : '' }}>Operasional</option>
+                    </select>
+                </div>
+
+                {{-- Filter Status Pajak --}}
+                <div class="filter-group">
+                    <label class="filter-label">Status Masa Pajak</label>
+                    <select name="status_pajak" form="searchForm" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Status</option>
+                        <option value="aktif" {{ request('status_pajak') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="hampir_jatuh_tempo" {{ request('status_pajak') == 'hampir_jatuh_tempo' ? 'selected' : '' }}>Hampir Jatuh Tempo</option>
+                        <option value="telah_jatuh_tempo" {{ request('status_pajak') == 'telah_jatuh_tempo' ? 'selected' : '' }}>Telah Jatuh Tempo</option>
+                    </select>
+                </div>
+
+                {{-- Filter Dinas/OPD (Dinamis) --}}
+                <div class="filter-group">
+                    <label class="filter-label">Tugas Dinas / OPD</label>
+                    <select name="dinas_opd" form="searchForm" class="form-select" id="dinasFilter" onchange="handleDinasChange(this)">
+                        <option value="">Semua Dinas</option>
+                        
+                        <optgroup label="Unit Kerja Internal (Manual)">
+                            @foreach($manualUnits as $un)
+                                <option value="unit:{{ $un->id }}" {{ request('unit_id') == $un->id ? 'selected' : '' }}>{{ $un->nama_unit }}</option>
+                            @endforeach
+                        </optgroup>
+
+                        <optgroup label="OPD Penanggung Jawab (API)">
+                            @foreach($apiOpds as $opd)
+                                <option value="opd:{{ $opd }}" {{ request('opd_name') == $opd ? 'selected' : '' }}>{{ $opd }}</option>
+                            @endforeach
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="card-body-flush table-wrapper">
-            <table class="data-table">
+            
+            {{-- Filter Chips & Summary --}}
+            <div class="filter-summary">
+                <div class="filter-chip-container">
+                    @if($activeFilterCount > 0 || request('q'))
+                        @if(request('q'))
+                            <div class="filter-chip">
+                                Cari: "{{ request('q') }}"
+                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('kategori_id'))
+                            <div class="filter-chip">
+                                @php $katName = $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori'; @endphp
+                                Kategori: {{ $katName }}
+                                <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('jenis_penggunaan'))
+                            <div class="filter-chip">
+                                Jenis: {{ ucfirst(request('jenis_penggunaan')) }}
+                                <span class="filter-chip-remove" onclick="removeFilter('jenis_penggunaan')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('status_pajak'))
+                            <div class="filter-chip">
+                                Pajak: {{ str_replace('_', ' ', ucfirst(request('status_pajak'))) }}
+                                <span class="filter-chip-remove" onclick="removeFilter('status_pajak')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('unit_id'))
+                            <div class="filter-chip">
+                                Dinas: {{ $manualUnits->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit Kerja' }}
+                                <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('opd_name'))
+                            <div class="filter-chip">
+                                Dinas (API): {{ request('opd_name') }}
+                                <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
+                            </div>
+                        @endif
+                        <a href="{{ route('kendaraan.index', ['status' => $status]) }}" class="filter-reset">Reset Semua</a>
+                    @endif
+                </div>
+                <div class="summary-text">
+                    Menampilkan <strong>{{ $kendaraans->firstItem() ?? 0 }} - {{ $kendaraans->lastItem() ?? 0 }}</strong> dari <strong>{{ $kendaraans->total() }}</strong> kendaraan
+                </div>
+            </div>
+
+            <div style="padding: 0 20px 20px;">
+                <table class="data-table">
                 <thead>
                     <tr>
                         <th>No. Polisi</th>
                         <th>Nama Kendaraan</th>
                         <th>Kategori</th>
                         <th>Jenis</th>
-                        <th>Status Pajak</th>
+                        <th>Status Masa Pajak</th>
                         <th>Pemegang Aktif</th>
                         <th style="text-align: right;">Aksi</th>
                     </tr>
@@ -98,45 +292,34 @@
                             </td>
                             <td>
                                 @if($k->pemegangAktif)
-                                    <div class="cell-primary">
-                                        {{ $k->pemegangAktif->nama_pegawai ?? ($k->pemegangAktif->pegawai->nama ?? 'Pegawai Internal') }}
-                                    </div>
-                                    @if($k->pemegangAktif->source_system === 'API')
-                                        <div style="font-size: 11px; color: var(--n-500); font-family: monospace;">{{ $k->pemegangAktif->nip }}</div>
-                                    @endif
+                                    <div class="cell-primary">{{ $k->pemegangAktif->display_name }}</div>
+                                    <div class="cell-secondary" style="font-size: 11px;">{{ $k->pemegangAktif->display_opd }}</div>
                                 @else
-                                    <span class="text-muted">—</span>
+                                    <span style="font-size: 12px; color: var(--n-400); font-style: italic;">Pool (Standby)</span>
                                 @endif
                             </td>
                             <td class="action-cell">
-                                <a href="{{ route('kendaraan.show', $k->id) }}" class="btn btn-secondary btn-icon" title="Detail">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                </a>
-                                <a href="{{ route('kendaraan.edit', $k->id) }}" class="btn btn-secondary btn-icon" title="Edit">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </a>
-                                <form action="{{ route('kendaraan.destroy', $k->id) }}" method="POST" style="display: inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    @php
-                                        $btnStyle = $k->status === 'aktif' 
-                                            ? 'color: var(--danger-text); border-color: var(--danger-border); background: var(--danger-bg);' 
-                                            : 'color: var(--success-text); border-color: var(--success-border); background: var(--success-bg);';
-                                        $confirmMsg = $k->status === 'aktif' ? 'Nonaktifkan kendaraan ini?' : 'Aktifkan kendaraan ini?';
-                                        $btnTitle = $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan';
-                                    @endphp
-                                    <button type="button" 
-                                        onclick="var form = this.closest('form'); SIKANDIS.confirm({title: 'Konfirmasi', message: '{{ $confirmMsg }}', confirmText: 'Ya, Lanjutkan', cancelText: 'Batal', type: 'warning'}).then(function(res) { if(res) form.submit(); })" 
-                                        class="btn btn-secondary btn-icon" 
-                                        title="{{ $btnTitle }}" 
-                                        style="{{ $btnStyle }}">
-                                        @if($k->status === 'aktif')
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                                        @else
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        @endif
-                                    </button>
-                                </form>
+                                <div class="action-group">
+                                    <a href="{{ route('kendaraan.show', $k->id) }}" class="btn btn-icon btn-secondary" title="Detail">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 12 12 12 8"></polyline><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    </a>
+                                    <a href="{{ route('kendaraan.edit', $k->id) }}" class="btn btn-icon btn-secondary" title="Edit">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </a>
+                                    @can('delete-kendaraan')
+                                    <form action="{{ route('kendaraan.destroy', $k->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status kendaraan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-icon btn-secondary" title="{{ $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}" style="{{ $k->status === 'aktif' ? 'color: var(--danger-600); border-color: var(--danger-200); background: var(--danger-50);' : 'color: var(--success-600); border-color: var(--success-200); background: var(--success-50);' }}">
+                                            @if($k->status === 'aktif')
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                                            @else
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                            @endif
+                                        </button>
+                                    </form>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -144,12 +327,10 @@
                             <td colspan="7">
                                 <div class="empty-state">
                                     <div class="empty-state-icon">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle>
-                                        </svg>
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                     </div>
                                     <div class="empty-state-title">Tidak ada data kendaraan ditemukan</div>
-                                    <div class="empty-state-text">Cobalah kata kunci pencarian yang lain atau tambah kendaraan baru.</div>
+                                    <div class="empty-state-text">Cobalah kata kunci pencarian yang lain atau ubah filter Anda.</div>
                                 </div>
                             </td>
                         </tr>
@@ -159,13 +340,13 @@
         </div>
         
         @if($kendaraans->hasPages())
-        <div class="card-footer" style="background: white;">
+        <div class="card-footer" style="background: white; border-top: 1px solid var(--n-200);">
             {{ $kendaraans->links('pagination::bootstrap-5') }}
         </div>
         @endif
     </div>
 
-    {{-- MODAL PRINT FILTER (akan diportal ke body via JS) --}}
+    {{-- MODAL PRINT FILTER --}}
     <div id="modalPrintFilter" class="modal-overlay">
         <div class="modal" style="max-width: 480px;">
             <div class="modal-header">
@@ -179,7 +360,7 @@
                 <div class="modal-body" style="padding: 24px;">
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label" style="font-size: 13.5px; font-weight: 600; color: var(--n-800); margin-bottom: 8px;">Kategori Kendaraan</label>
-                        <select name="kategori_id" id="filterKategori" class="form-select" style="width: 100%; padding: 10px 14px; border: 1px solid var(--n-200); border-radius: var(--r-md);">
+                        <select name="kategori_id" class="form-select">
                             <option value="">Semua Kategori</option>
                             @foreach($kategoris as $kat)
                                 <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
@@ -189,7 +370,7 @@
 
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label" style="font-size: 13.5px; font-weight: 600; color: var(--n-800); margin-bottom: 8px;">Jenis Penggunaan</label>
-                        <select name="jenis_penggunaan" id="filterJenis" class="form-select" style="width: 100%; padding: 10px 14px; border: 1px solid var(--n-200); border-radius: var(--r-md);">
+                        <select name="jenis_penggunaan" class="form-select">
                             <option value="">Semua</option>
                             <option value="jabatan">Jabatan</option>
                             <option value="operasional">Operasional</option>
@@ -198,7 +379,7 @@
 
                     <div class="form-group" style="margin-bottom: 16px;">
                         <label class="form-label" style="font-size: 13.5px; font-weight: 600; color: var(--n-800); margin-bottom: 8px;">Status Pajak</label>
-                        <select name="status_pajak" id="filterPajak" class="form-select" style="width: 100%; padding: 10px 14px; border: 1px solid var(--n-200); border-radius: var(--r-md);">
+                        <select name="status_pajak" class="form-select">
                             <option value="">Semua</option>
                             <option value="aktif">Aktif</option>
                             <option value="hampir_jatuh_tempo">Hampir Jatuh Tempo</option>
@@ -212,15 +393,14 @@
                         <span style="font-size: 13px; color: var(--brand-700);">
                             Jumlah data yang akan masuk laporan:
                             <strong id="printCountVal" style="font-size: 15px; font-weight: 700;">—</strong>
-                            <span id="printCountSpinner" style="display:none; font-size:12px; color: var(--n-400);">memuat...</span>
                         </span>
                     </div>
                 </div>
 
-                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--n-200); display: flex; justify-content: flex-end; gap: 12px; background: var(--n-50); border-bottom-left-radius: var(--r-lg); border-bottom-right-radius: var(--r-lg);">
+                <div class="modal-footer" style="padding: 16px 24px;">
                     <button type="button" class="btn btn-secondary" onclick="closePrintModal()">Batal</button>
-                    <button type="submit" class="btn btn-primary" onclick="closePrintModal()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                         Cetak Sekarang
                     </button>
                 </div>
@@ -232,59 +412,73 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Portal modal ke body agar overlay full viewport (fix shadow issue)
+    // Toggle Filter Panel
+    const btnToggleFilter = document.getElementById('btnToggleFilter');
+    const filterPanel = document.getElementById('advancedFilterPanel');
+    
+    if (btnToggleFilter && filterPanel) {
+        btnToggleFilter.addEventListener('click', () => {
+            filterPanel.classList.toggle('active');
+        });
+    }
+
+    // Portal modal
     document.body.appendChild(document.getElementById('modalPrintFilter'));
-
-    // Click outside to close
-    document.getElementById('modalPrintFilter').addEventListener('click', function (e) {
-        if (e.target === this) closePrintModal();
-    });
-
-    // Listen to filter changes for live count
-    ['filterKategori', 'filterJenis', 'filterPajak'].forEach(function (id) {
-        document.getElementById(id).addEventListener('change', fetchPrintCount);
-    });
 });
 
-var printCountTimer = null;
-var countUrl = '{{ route("kendaraan.print-count") }}';
-var printStatus = '{{ $status }}';
-var printQ = '{{ addslashes(request("q", "")) }}';
+function handleDinasChange(select) {
+    const value = select.value;
+    const form = document.getElementById('searchForm');
+    const unitIdInput = form.querySelector('input[name="unit_id"]');
+    const opdNameInput = form.querySelector('input[name="opd_name"]');
 
-function openPrintModal() {
-    document.getElementById('modalPrintFilter').classList.add('active');
-    fetchPrintCount();
+    if (value === "") {
+        unitIdInput.value = "";
+        opdNameInput.value = "";
+    } else if (value.startsWith('unit:')) {
+        unitIdInput.value = value.split(':')[1];
+        opdNameInput.value = "";
+    } else if (value.startsWith('opd:')) {
+        unitIdInput.value = "";
+        opdNameInput.value = value.split(':')[1];
+    }
+    
+    form.submit();
 }
 
-function closePrintModal() {
-    document.getElementById('modalPrintFilter').classList.remove('active');
+function removeFilter(key) {
+    const form = document.getElementById('searchForm');
+    // Using form.elements is robust for elements linked via form attribute
+    const input = form.elements[key];
+    if (input) {
+        if (input.tagName === 'SELECT') input.selectedIndex = 0;
+        else input.value = '';
+    }
+    form.submit();
 }
 
-function fetchPrintCount() {
-    clearTimeout(printCountTimer);
-    printCountTimer = setTimeout(function () {
-        var params = new URLSearchParams({
-            status:           printStatus,
-            q:                printQ,
-            kategori_id:      document.getElementById('filterKategori').value,
-            jenis_penggunaan: document.getElementById('filterJenis').value,
-            status_pajak:     document.getElementById('filterPajak').value,
-        });
-
-        document.getElementById('printCountVal').textContent = '—';
-        document.getElementById('printCountSpinner').style.display = 'inline';
-
-        fetch(countUrl + '?' + params.toString())
-            .then(r => r.json())
-            .then(function (data) {
-                document.getElementById('printCountVal').textContent = data.count;
-                document.getElementById('printCountSpinner').style.display = 'none';
-            })
-            .catch(function () {
-                document.getElementById('printCountVal').textContent = '?';
-                document.getElementById('printCountSpinner').style.display = 'none';
-            });
-    }, 300);
+function removeDinasFilters() {
+    const form = document.getElementById('searchForm');
+    form.elements['unit_id'].value = '';
+    form.elements['opd_name'].value = '';
+    const select = document.getElementById('dinasFilter');
+    if (select) select.selectedIndex = 0;
+    form.submit();
 }
+
+function openPrintModal() { document.getElementById('modalPrintFilter').classList.add('active'); fetchPrintCount(); }
+function closePrintModal() { document.getElementById('modalPrintFilter').classList.remove('active'); }
+
+async function fetchPrintCount() {
+    const form = document.getElementById('formPrintFilter');
+    const formData = new FormData(form);
+    const params = new URLSearchParams(formData);
+    const res = await fetch(`{{ route('kendaraan.print-count') }}?${params.toString()}`);
+    const data = await res.json();
+    document.getElementById('printCountVal').textContent = data.count;
+}
+
+// Modal select change listener
+document.querySelectorAll('#formPrintFilter select').forEach(s => s.addEventListener('change', fetchPrintCount));
 </script>
 @endpush

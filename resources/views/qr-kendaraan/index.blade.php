@@ -13,35 +13,95 @@
     </form>
 
     {{-- PAGE HEADER & TOOLBAR --}}
-    <div class="page-intro" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <h2 class="page-heading">QR Kendaraan</h2>
-            <p class="page-subheading" style="margin-top: 4px;">Daftar QR Code kendaraan aktif — scan counter &amp; cetak label</p>
-        </div>
-        
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <form method="GET" action="{{ route('qr-kendaraan.index') }}" style="display: flex; gap: 8px;">
-                <div class="search-input-wrapper" style="width: 240px; margin-bottom: 0;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <div class="card" style="margin-top: 24px;">
+        <div class="table-toolbar">
+            <form id="searchForm" method="GET" action="{{ route('qr-kendaraan.index') }}" class="toolbar-left">
+                {{-- Search Input --}}
+                <div class="search-input-wrapper">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="search-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="search" name="q" class="search-input" placeholder="Cari kendaraan atau token..." value="{{ request('q') }}" autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-secondary">Cari</button>
-                @if(request('q'))
-                    <a href="{{ route('qr-kendaraan.index') }}" class="btn btn-secondary">Reset</a>
-                @endif
+
+                {{-- Advanced Filter Toggle --}}
+                @php
+                    $activeFilterCount = collect(request()->only(['kategori_id', 'scan_status']))->filter()->count();
+                @endphp
+                <button type="button" id="btnToggleFilter" class="btn-filter {{ $activeFilterCount > 0 ? 'active' : '' }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    Filter
+                    @if($activeFilterCount > 0)
+                        <span class="filter-badge">{{ $activeFilterCount }}</span>
+                    @endif
+                </button>
             </form>
 
-            <button type="button" id="btn-print-selected" onclick="printSelected()" class="btn btn-primary" disabled style="opacity: 0.5;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Cetak Terpilih (<span id="selected-count">0</span>)
-            </button>
+            <div class="toolbar-right">
+                <button type="button" id="btn-print-selected" onclick="printSelected()" class="btn btn-primary" disabled style="opacity: 0.5; height: 42px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Cetak Terpilih (<span id="selected-count">0</span>)
+                </button>
+            </div>
         </div>
-    </div>
 
-    {{-- TABLE CARD --}}
-    <div class="card">
+        {{-- Filter Panel --}}
+        <div id="advancedFilterPanel" class="filter-panel {{ $activeFilterCount > 0 ? 'active' : '' }}">
+            <div class="filter-grid">
+                {{-- Filter Kategori --}}
+                <div class="filter-group">
+                    <label class="filter-label">Kategori Kendaraan</label>
+                    <select name="kategori_id" form="searchForm" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        @foreach($kategoris as $kat)
+                            <option value="{{ $kat->id }}" {{ request('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filter Scan Status --}}
+                <div class="filter-group">
+                    <label class="filter-label">Status Distribusi (Scan)</label>
+                    <select name="scan_status" form="searchForm" class="form-select" onchange="this.form.submit()">
+                        <option value="">Semua</option>
+                        <option value="never" {{ request('scan_status') == 'never' ? 'selected' : '' }}>Belum Pernah Discan</option>
+                        <option value="active" {{ request('scan_status') == 'active' ? 'selected' : '' }}>Sudah Pernah Discan</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="card-body-flush table-wrapper">
-            <table class="data-table">
+             {{-- Filter Chips & Summary --}}
+             <div class="filter-summary">
+                <div class="filter-chip-container">
+                    @if($activeFilterCount > 0 || request('q'))
+                        @if(request('q'))
+                            <div class="filter-chip">
+                                Cari: "{{ request('q') }}"
+                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('kategori_id'))
+                            <div class="filter-chip">
+                                Kategori: {{ $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori' }}
+                                <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
+                            </div>
+                        @endif
+                        @if(request('scan_status'))
+                            <div class="filter-chip">
+                                Status: {{ request('scan_status') === 'never' ? 'Belum Discan' : 'Sudah Discan' }}
+                                <span class="filter-chip-remove" onclick="removeFilter('scan_status')">&times;</span>
+                            </div>
+                        @endif
+                        <a href="{{ route('qr-kendaraan.index') }}" class="filter-reset">Reset Semua</a>
+                    @endif
+                </div>
+                <div class="summary-text">
+                    Menampilkan <strong>{{ $qrs->firstItem() ?? 0 }} - {{ $qrs->lastItem() ?? 0 }}</strong> dari <strong>{{ $qrs->total() }}</strong> QR Kendaraan
+                </div>
+            </div>
+
+            <div style="padding: 0 20px 20px;">
+                <table class="data-table">
                 <thead>
                     <tr>
                         <th style="width: 48px; text-align: center; padding-left: 20px;">
@@ -64,6 +124,7 @@
                             <div class="cell-primary" style="margin-bottom: 4px;">{{ $qr->kendaraan->nama_kendaraan }}</div>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <span class="plat-badge">{{ $qr->kendaraan->no_polisi }}</span>
+                                <span class="badge badge-neutral" style="font-size: 10px;">{{ $qr->kendaraan->kategori->nama_kategori ?? '-' }}</span>
                             </div>
                         </td>
                         <td>
@@ -82,11 +143,13 @@
                                 {{ number_format($qr->scan_count) }}x Scan
                             </span>
                         </td>
-                        <td style="text-align: center; vertical-align: middle;">
-                            <button type="button" onclick="printSingleEl(this)" class="btn btn-secondary btn-sm" style="color: var(--brand-700); border-color: var(--brand-200); background: var(--brand-50);">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                                Cetak
-                            </button>
+                        <td style="text-align: center; vertical-align: middle;" class="action-cell">
+                            <div class="action-group" style="justify-content: center;">
+                                <button type="button" onclick="printSingleEl(this)" class="btn btn-secondary btn-sm" style="color: var(--brand-700); border-color: var(--brand-200); background: var(--brand-50);">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                    Cetak
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -96,8 +159,8 @@
                                 <div class="empty-state-icon">
                                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><rect x="7" y="7" width="3" height="3"></rect><rect x="14" y="7" width="3" height="3"></rect><rect x="7" y="14" width="3" height="3"></rect><rect x="14" y="14" width="3" height="3"></rect></svg>
                                 </div>
-                                <div class="empty-state-title">Belum ada data QR Kendaraan</div>
-                                <div class="empty-state-desc">QR akan otomatis dibuat setelah kendaraan terdaftar.</div>
+                                <div class="empty-state-title">Data tidak ditemukan</div>
+                                <div class="empty-state-desc">Silakan sesuaikan filter atau kata kunci Anda.</div>
                             </div>
                         </td>
                     </tr>
@@ -135,11 +198,32 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle Filter Panel
+    const btnToggleFilter = document.getElementById('btnToggleFilter');
+    const filterPanel = document.getElementById('advancedFilterPanel');
+    
+    if (btnToggleFilter && filterPanel) {
+        btnToggleFilter.addEventListener('click', () => {
+            filterPanel.classList.toggle('active');
+        });
+    }
+
     // Portal modal ke body agar overlay full viewport
     document.body.appendChild(document.getElementById('qrModal'));
 });
+
+function removeFilter(key) {
+    const form = document.getElementById('searchForm');
+    const input = form.querySelector(`input[name="${key}"], select[name="${key}"]`);
+    if (input) {
+        if (input.tagName === 'SELECT') input.selectedIndex = 0;
+        else input.value = '';
+    }
+    form.submit();
+}
 
 function openQrModal(token, url) {
     document.getElementById('qrModalToken').textContent = token;
@@ -192,4 +276,5 @@ function submitPrint(items) {
     document.getElementById('form-print').submit();
 }
 </script>
+@endpush
 @endsection

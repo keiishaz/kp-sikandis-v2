@@ -24,6 +24,11 @@ class OperatorRepository implements OperatorRepositoryInterface
             });
         }
 
+        if (! empty($filters['login_status'])) {
+            if ($filters['login_status'] === 'never') $query->whereNull('last_login_at');
+            if ($filters['login_status'] === 'active') $query->whereNotNull('last_login_at');
+        }
+
         $validSorts = ['name', 'nik', 'nip'];
         $sort = in_array($filters['sort'] ?? null, $validSorts) ? $filters['sort'] : 'name';
         $dir  = ($filters['dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';

@@ -61,4 +61,12 @@ class KendaraanPemegang extends Model
         }
         return $this->unit_pegawai ?? '-';
     }
+
+    public function getDisplayOpdAttribute(): string
+    {
+        if ($this->pegawai) {
+            return $this->pegawai->unit?->nama_unit ?? 'Lainnya/Manual';
+        }
+        return $this->unit_pegawai ?? 'Lainnya/API';
+    }
 }

@@ -32,12 +32,23 @@ class KendaraanService
         $counts    = $this->kendaraanRepo->countByStatus();
         $kategoris = $this->kategoriRepo->all();
 
+        // ─── Filter Support (Advanced) ───
+        $manualUnits = \App\Models\Unit::orderBy('nama_unit')->get();
+        $apiOpds     = \App\Models\KendaraanPemegang::where('source_system', '!=', 'manual')
+                        ->whereNotNull('unit_pegawai')
+                        ->distinct()
+                        ->orderBy('unit_pegawai')
+                        ->pluck('unit_pegawai');
+
         return [
             'kendaraans'    => $paginator,
             'status'        => $filters['status'] ?? 'aktif',
             'countAktif'    => $counts['aktif'],
             'countNonaktif' => $counts['nonaktif'],
             'kategoris'     => $kategoris,
+            'manualUnits'   => $manualUnits,
+            'apiOpds'       => $apiOpds,
+            'filters'       => $filters, 
         ];
     }
 
@@ -48,10 +59,16 @@ class KendaraanService
         $kendaraans = $this->kendaraanRepo->forPrint($filters);
         $this->decoratePajakStatus($kendaraans);
 
+        // Group by OPD for classified report
+        $grouped = $kendaraans->groupBy(function($k) {
+            return $k->pemegangAktif ? $k->pemegangAktif->display_opd : 'Unit Kerja Lainnya / Belum Ditentukan (Pool-Standby)';
+        })->sortKeys();
+
         return [
-            'kendaraans'   => $kendaraans,
-            'status'       => $filters['status'] ?? 'aktif',
-            'filterLabels' => $this->buildFilterLabels($filters),
+            'groupedKendaraans' => $grouped,
+            'totalCount'        => $kendaraans->count(),
+            'status'            => $filters['status'] ?? 'aktif',
+            'filterLabels'      => $this->buildFilterLabels($filters),
         ];
     }
 

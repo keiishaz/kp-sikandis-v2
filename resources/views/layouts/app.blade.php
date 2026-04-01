@@ -21,8 +21,8 @@
     <div class="app-layout">
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon" style="flex-shrink: 0; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-right: 6px;">
-                    <img src="{{ asset('assets/images/logo-kominfo.png') }}" alt="Logo Kominfo" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));">
+                <div class="brand-icon" style="flex-shrink: 0; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-right: 8px; background: #fff; border-radius: var(--r-md); padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <img src="{{ asset('assets/images/logo-kominfo.png') }}" alt="Logo Kominfo" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
                 <div>
                     <div class="brand-name">SIKANDIS</div>
@@ -32,7 +32,7 @@
 
             <nav class="sidebar-nav">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="Dashboard">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" fill="currentColor"/>
                         </svg>
@@ -45,7 +45,7 @@
                         $isKendaraanActive = request()->is('kendaraan*') || request()->is('pemegang*') || request()->routeIs('kategori.*') || request()->routeIs('qr-kendaraan.*'); 
                     @endphp
                     <div class="nav-group {{ $isKendaraanActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header">
+                        <button class="nav-group-header" title="Kendaraan">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="1" y="3" width="15" height="13"></rect>
                                 <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
@@ -77,7 +77,7 @@
                         $isMasterDataActive = request()->routeIs('units.*', 'pegawai.*', 'kelola-operator.*');
                     @endphp
                     <div class="nav-group {{ $isMasterDataActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header">
+                        <button class="nav-group-header" title="Manajemen Eksternal">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -109,7 +109,7 @@
                         $isLogActive = request()->routeIs('log.aktivitas', 'log.login');
                     @endphp
                     <div class="nav-group {{ $isLogActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header">
+                        <button class="nav-group-header" title="Monitoring & Log">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                             </svg>
@@ -233,6 +233,15 @@
                 @endif
                 @yield('content')
             </main>
+
+            {{-- Unified Footer --}}
+            <footer class="main-footer">
+                <div class="footer-content">
+                    <span>&copy; {{ date('Y') }} Dinas Komunikasi dan Informatika Kota Bengkulu</span>
+                    <span class="footer-divider"></span>
+                    <span class="footer-credit">Dikembangkan oleh Tim Magang Project SIKANDIS</span>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -308,7 +317,6 @@
             });
         });
 
-        // ===========================
         // User Dropdown
         // ===========================
         function toggleUserDropdown() {
@@ -326,6 +334,7 @@
             }
         });
     </script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     @stack('scripts')
 </body>

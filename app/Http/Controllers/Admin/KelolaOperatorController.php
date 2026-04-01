@@ -14,7 +14,8 @@ class KelolaOperatorController extends Controller
 
     public function index(Request $request)
     {
-        $operators = $this->operatorService->paginatedList($request->only(['q', 'sort', 'dir']));
+        $filters = $request->only(['q', 'sort', 'dir', 'login_status']);
+        $operators = $this->operatorService->paginatedList($filters);
 
         return view('kelola-operator.index', compact('operators'));
     }

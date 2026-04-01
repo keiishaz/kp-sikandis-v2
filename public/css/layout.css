@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   z-index: 200;
-  transition: width 0.25s ease, transform 0.25s ease;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
@@ -106,11 +106,12 @@
   min-width: 0;
   margin-left: 240px;
   min-height: 100vh;
-  transition: margin-left 0.25s ease;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .app-layout.sidebar-collapsed .main-wrapper {
   margin-left: 60px;
+  width: calc(100% - 60px);
 }
 
 .page-content {

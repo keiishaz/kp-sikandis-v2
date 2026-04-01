@@ -18,10 +18,13 @@ class PegawaiController extends Controller
 
     public function index(Request $request)
     {
-        $pegawais = $this->pegawaiService->paginatedList($request->input('q', ''));
+        $pegawais = $this->pegawaiService->paginatedList($request->all());
         $units    = $this->pegawaiService->units();
+        
+        $selectedUnitId = $request->input('unit_id');
+        $subUnits = $selectedUnitId ? $this->pegawaiService->subUnits($selectedUnitId) : collect();
 
-        return view('pegawai.index', compact('pegawais', 'units'));
+        return view('pegawai.index', compact('pegawais', 'units', 'subUnits'));
     }
 
     public function create()

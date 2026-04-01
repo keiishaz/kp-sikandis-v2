@@ -13,9 +13,14 @@ class PegawaiService
         private readonly PegawaiRepositoryInterface $pegawaiRepo,
     ) {}
 
-    public function paginatedList(string $search = ''): LengthAwarePaginator
+    public function paginatedList(array $filters = []): LengthAwarePaginator
     {
-        return $this->pegawaiRepo->paginate($search);
+        return $this->pegawaiRepo->paginate($filters);
+    }
+
+    public function subUnits(int $unitId): Collection
+    {
+        return \App\Models\SubUnit::where('unit_id', $unitId)->orderBy('nama_sub_unit')->get();
     }
 
     public function units(): Collection

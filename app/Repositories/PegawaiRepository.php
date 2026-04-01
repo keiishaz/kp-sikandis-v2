@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PegawaiRepository implements PegawaiRepositoryInterface
 {
-    public function paginate(string $search = '', int $perPage = 15): LengthAwarePaginator
+    public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
         $query = Pegawai::with(['unit', 'subUnit']);
+        $search = $filters['q'] ?? '';
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -20,6 +21,14 @@ class PegawaiRepository implements PegawaiRepositoryInterface
                   ->orWhere('nik', 'like', "%{$search}%")
                   ->orWhere('nip', 'like', "%{$search}%");
             });
+        }
+
+        if (!empty($filters['unit_id'])) {
+            $query->where('unit_id', $filters['unit_id']);
+        }
+
+        if (!empty($filters['sub_unit_id'])) {
+            $query->where('sub_unit_id', $filters['sub_unit_id']);
         }
 
         return $query->orderBy('nama')->paginate($perPage)->withQueryString();

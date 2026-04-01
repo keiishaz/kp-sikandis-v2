@@ -133,8 +133,9 @@
                             </div>
 
                             <div class="form-group" style="grid-column: 1">
-                                <label for="pajak" class="form-label">Tanggal Aktif Pajak <span class="text-danger">*</span></label>
+                                <label for="pajak" class="form-label">Tanggal Jatuh Tempo Pajak <span class="text-danger">*</span></label>
                                 <input type="date" id="pajak" name="pajak" class="form-input {{ $errors->has('pajak') ? 'is-invalid' : '' }}" value="{{ old('pajak', $kendaraan->pajak) }}">
+                                <div class="form-hint" style="font-size: 11.5px; color: var(--n-400); margin-top: 6px;">Sesuai dengan masa berlaku STNK/Pajak tahunan kendaraan.</div>
                                 @error('pajak')<div class="form-error">{{ $message }}</div>@enderror
                             </div>
                         </div>

@@ -14,21 +14,21 @@ class KendaraanController extends Controller
 
     public function index(Request $request)
     {
-        $data = $this->kendaraanService->list($request->only(['status', 'q']));
+        $data = $this->kendaraanService->list($request->all());
 
         return view('kendaraan.index', $data);
     }
 
     public function print(Request $request)
     {
-        $data = $this->kendaraanService->printData($request->only(['status', 'q', 'kategori_id', 'jenis_penggunaan', 'status_pajak']));
+        $data = $this->kendaraanService->printData($request->all());
 
         return view('kendaraan.print', $data);
     }
 
     public function printCount(Request $request)
     {
-        $count = $this->kendaraanService->countForPrint($request->only(['status', 'q', 'kategori_id', 'jenis_penggunaan', 'status_pajak']));
+        $count = $this->kendaraanService->countForPrint($request->all());
 
         return response()->json(['count' => $count]);
     }

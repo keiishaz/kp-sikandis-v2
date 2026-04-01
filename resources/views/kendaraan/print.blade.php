@@ -42,72 +42,37 @@
         /* Print Container */
         .print-container {
             background: #fff;
-            width: 210mm; /* A4 width */
-            min-height: 297mm; /* A4 height */
-            margin: 70px auto 20px auto;
-            padding: 15mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 297mm; /* Standard A4 Landscape width */
+            min-height: 210mm; 
+            margin: 80px auto 40px auto;
+            padding: 20mm;
+            box-shadow: 0 0 20px rgba(0,0,0,0.15);
             position: relative;
         }
 
-        /* KOP SURAT */
-        .kop-surat {
-            display: flex;
-            align-items: center;
-            border-bottom: 3px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 2px;
-            position: relative;
+        /* Ensure group header and table stay together */
+        .group-wrapper {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 20px;
         }
-        .kop-surat::after {
-            content: '';
-            position: absolute;
-            left: 0; right: 0; bottom: -4px;
-            border-bottom: 1px solid #000;
-        }
-        .kop-logo-left {
-            width: 80px;
-            flex-shrink: 0;
-        }
-        .kop-logo-right {
-            width: 80px;
-            flex-shrink: 0;
-            object-fit: contain;
-        }
-        .kop-text {
-            flex-grow: 1;
-            text-align: center;
-            padding: 0 16px;
-        }
-        .kop-text h1 { font-size: 18px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-        .kop-text h2 { font-size: 20px; margin: 4px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .kop-text p { font-size: 12px; margin: 2px 0; }
 
-        /* Report Metadata */
-        .report-title {
-            text-align: center;
-            margin: 25px 0 15px;
-        }
-        .report-title h3 {
-            font-size: 16px;
+        .opd-header {
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border: 1px solid #000;
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 13px;
             text-transform: uppercase;
-            text-decoration: underline;
-            margin-bottom: 4px;
         }
-        .meta-table {
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 12px;
-        }
-        .meta-table td { padding: 2px; vertical-align: top; }
-        .meta-label { width: 130px; }
 
         /* Data Table */
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            margin-bottom: 30px;
+            font-size: 11px;
+            margin-bottom: 0; /* Managed by wrapper */
         }
         table.data-table th, table.data-table td {
             border: 1px solid #000;
@@ -118,13 +83,15 @@
             background: #f8fafc;
             text-align: center;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         /* Signatures */
         .signature-section {
             display: flex;
             justify-content: flex-end;
-            margin-top: 40px;
+            margin-top: 30px;
+            break-inside: avoid;
         }
         .signature-box {
             width: 250px;
@@ -132,21 +99,26 @@
             font-size: 12px;
         }
         .signature-space {
-            height: 70px;
+            height: 60px;
         }
 
         /* Print Override */
         @media print {
-            body { background: #fff; }
-            #control-bar { display: none; }
+            body { background: #fff !important; }
+            #control-bar { display: none !important; }
             .print-container {
-                margin: 0; box-shadow: none;
-                width: auto; height: auto;
-                padding: 0;
+                margin: 0 !important; 
+                box-shadow: none !important;
+                width: 100% !important; 
+                height: auto !important;
+                padding: 0 !important;
             }
             @page {
-                size: A4 portrait;
-                margin: 15mm;
+                size: A4 landscape;
+                margin: 15mm 10mm;
+            }
+            .group-wrapper {
+                margin-bottom: 30px;
             }
             table { page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
@@ -159,7 +131,7 @@
 
     <!-- Control Bar (Visible Only on Screen) -->
     <div id="control-bar">
-        <div style="font-weight: bold;">Preview Laporan Data Kendaraan</div>
+        <div style="font-weight: bold;">Preview Laporan Klasifikasi Kendaraan (Landscape)</div>
         <div class="btn-group">
             <button class="btn" onclick="window.print()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -172,7 +144,7 @@
     <!-- Printable Area -->
     <div class="print-container">
         
-        <!-- KOP SURAT: Pemerintah Kota Bengkulu (Dapat disesuaikan) -->
+        <!-- KOP SURAT -->
         <div class="kop-surat">
             <img src="{{ asset('assets/images/logobkl.png') }}" alt="Logo Kiri" class="kop-logo-left">
             <div class="kop-text">
@@ -185,11 +157,7 @@
         </div>
 
         <div class="report-title">
-            <h3>Daftar Inventaris Kendaraan Dinas</h3>
-        </div>
-
-        <div style="font-size: 13px; margin-bottom: 14px; line-height: 1.6;">
-            Berikut merupakan data inventaris kendaraan dinas di lingkungan Pemerintah Kota Bengkulu berdasarkan parameter filter yang ditetapkan:
+            <h3>Daftar Inventaris Kendaraan Dinas (Berdasarkan Unit Kerja)</h3>
         </div>
 
         <table class="meta-table">
@@ -202,103 +170,82 @@
             <tr>
                 <td class="meta-label">Status Kendaraan</td>
                 <td>: <span style="text-transform: capitalize">{{ $status }}</span></td>
-                <td class="meta-label">Pencarian Teks</td>
-                <td>: {{ request('q') ? request('q') : 'Semua Data' }}</td>
-            </tr>
-            <tr>
-                <td class="meta-label">Kategori Kendaraan</td>
-                <td>: {{ $filterLabels['Kategori'] ?? 'Semua Kategori' }}</td>
-                <td class="meta-label">Jenis Penggunaan</td>
-                <td>: {{ $filterLabels['Jenis Penggunaan'] ?? 'Semua' }}</td>
-            </tr>
-            <tr>
                 <td class="meta-label">Status Pajak</td>
                 <td>: {{ $filterLabels['Status Pajak'] ?? 'Semua' }}</td>
-                <td class="meta-label">Total Hasil</td>
-                <td>: {{ $kendaraans->count() }} Data</td>
+            </tr>
+            <tr>
+                <td class="meta-label">Kategori</td>
+                <td>: {{ $filterLabels['Kategori'] ?? 'Semua' }}</td>
+                <td class="meta-label">Total Kendaraan</td>
+                <td>: {{ $totalCount }} Unit</td>
             </tr>
         </table>
 
-        <!-- Tabel Data Kendaraan -->
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 14%;">No. Polisi</th>
-                    <th style="width: 20%;">Nama Kendaraan</th>
-                    <th style="width: 15%;">Kategori & Penggunaan</th>
-                    <th style="width: 15%;">Status Pajak</th>
-                    <th style="width: 31%;">Data Pemegang Saat Ini</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($kendaraans as $index => $k)
-                <tr>
-                    <td style="text-align: center;">{{ $index + 1 }}</td>
-                    <td style="text-align: center; font-weight: bold;">{{ $k->no_polisi }}</td>
-                    <td>
-                        {{ $k->nama_kendaraan }}<br>
-                        <span style="font-size: 10px; color: #555;">Tahun: {{ $k->tahun }}</span>
-                    </td>
-                    <td style="text-align: center;">
-                        {{ $k->kategori->nama_kategori ?? '-' }}<br>
-                        <span style="text-transform: capitalize; font-size: 10px;">({{ $k->jenis_penggunaan }})</span>
-                    </td>
-                    <td style="text-align: center;">
-                        @if($k->status_pajak == 'Aktif')
-                            Aktif
-                        @elseif($k->status_pajak == 'Hampir Jatuh Tempo')
-                            Hampir Jatuh Tempo
-                        @elseif($k->status_pajak == 'Telah Jatuh Tempo')
-                            Jatuh Tempo
-                        @else
-                            Belum Diatur
-                        @endif
-                        @if($k->pajak)
-                        <br><span style="font-size: 10px;">{{ \Carbon\Carbon::parse($k->pajak)->format('d/m/Y') }}</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($k->pemegangAktif)
-                            @php
-                                $hp = $k->pemegangAktif;
-                                $nama = $hp->nama_pegawai ?? ($hp->pegawai->nama ?? 'Pegawai Internal');
-                                $nip = $hp->nip ?? ($hp->pegawai->nip ?? '-');
-                                $jabatan = $hp->jabatan_pegawai ?? ($hp->pegawai->jabatan ?? '');
-                                $unit = $hp->unit_pegawai ?? ($hp->pegawai->unit->nama_unit ?? '');
-                            @endphp
-                            <strong>{{ $nama }}</strong><br>
-                            <span style="font-size: 10px;">
-                                NIP: {{ $nip }}<br>
-                                {{ $jabatan }}
-                                @if($unit)
-                                    - {{ $unit }}
-                                @endif
-                                @if($hp->source_system === 'API')
-                                    <br><i>(Pegawai Internal)</i>
-                                @endif
-                            </span>
-                        @else
-                            <i style="color: #666; font-size: 11px;">Tidak ada pemegang (Standby/Pool)</i>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 20px;">Tidak ada data kendaraan yang cocok dengan filter.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        @php $globalIndex = 1; @endphp
 
-        <!-- Bagian Tanda Tangan -->
+        @foreach($groupedKendaraans as $opdName => $vehicles)
+            <div class="group-wrapper">
+                <div class="opd-header">UNIT KERJA: {{ $opdName }}</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">No</th>
+                            <th style="width: 100px;">No. Polisi</th>
+                            <th style="width: 180px;">Nama Kendaraan</th>
+                            <th style="width: 100px;">Kategori</th>
+                            <th style="width: 100px;">Penggunaan</th>
+                            <th style="width: 110px;">Status Pajak</th>
+                            <th>Personel Pemegang Saat Ini (Nama / NIP / Jabatan)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($vehicles as $k)
+                        <tr>
+                            <td style="text-align: center;">{{ $globalIndex++ }}</td>
+                            <td style="text-align: center; font-weight: bold;">{{ $k->no_polisi }}</td>
+                            <td>
+                                {{ $k->nama_kendaraan }}
+                                <div style="font-size: 9px; color: #666;">Tahun Produksi: {{ $k->tahun }}</div>
+                            </td>
+                            <td style="text-align: center;">{{ $k->kategori->nama_kategori ?? '-' }}</td>
+                            <td style="text-align: center; text-transform: capitalize;">{{ $k->jenis_penggunaan }}</td>
+                            <td style="text-align: center;">
+                                {{ $k->status_pajak }}
+                                @if($k->pajak)
+                                    <div style="font-size: 9px;">{{ \Carbon\Carbon::parse($k->pajak)->format('d/m/Y') }}</div>
+                                @endif
+                            </td>
+                            <td>
+                                @if($k->pemegangAktif)
+                                    <strong>{{ $k->pemegangAktif->display_name }}</strong><br>
+                                    <span style="font-size: 10px;">
+                                        NIP: {{ $k->pemegangAktif->nip ?? ($k->pemegangAktif->pegawai->nip ?? '-') }}<br>
+                                        {{ $k->pemegangAktif->display_jabatan }}
+                                    </span>
+                                @else
+                                    <i style="color: #888;">(Standby / Belum Ada Pemegang)</i>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endforeach
+
+        @if($groupedKendaraans->isEmpty())
+            <div style="text-align: center; padding: 40px; border: 1px solid #000; font-style: italic;">
+                Tidak ada data kendaraan yang ditemukan untuk kriteria ini.
+            </div>
+        @endif
+
         <div class="signature-section">
             <div class="signature-box">
                 <p>Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p>Petugas Inventaris / Admin,</p>
                 <div class="signature-space"></div>
                 <p style="text-decoration: underline; font-weight: bold;">{{ auth()->user()->name }}</p>
-                <p>NIP. {{ auth()->user()->nip }}</p>
+                <p>NIP. {{ auth()->user()->nip ?? '-' }}</p>
             </div>
         </div>
 
