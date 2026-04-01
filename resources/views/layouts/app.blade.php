@@ -45,7 +45,7 @@
                         $isKendaraanActive = request()->is('kendaraan*') || request()->is('pemegang*') || request()->routeIs('kategori.*') || request()->routeIs('qr-kendaraan.*'); 
                     @endphp
                     <div class="nav-group {{ $isKendaraanActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header" title="Kendaraan">
+                        <button class="nav-group-header {{ $isKendaraanActive ? 'active' : '' }}" title="Kendaraan">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="1" y="3" width="15" height="13"></rect>
                                 <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
@@ -77,7 +77,7 @@
                         $isMasterDataActive = request()->routeIs('units.*', 'pegawai.*', 'kelola-operator.*');
                     @endphp
                     <div class="nav-group {{ $isMasterDataActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header" title="Manajemen Eksternal">
+                        <button class="nav-group-header {{ $isMasterDataActive ? 'active' : '' }}" title="Manajemen Eksternal">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -109,7 +109,7 @@
                         $isLogActive = request()->routeIs('log.aktivitas', 'log.login');
                     @endphp
                     <div class="nav-group {{ $isLogActive ? 'expanded' : '' }}">
-                        <button class="nav-group-header" title="Monitoring & Log">
+                        <button class="nav-group-header {{ $isLogActive ? 'active' : '' }}" title="Monitoring & Log">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                             </svg>

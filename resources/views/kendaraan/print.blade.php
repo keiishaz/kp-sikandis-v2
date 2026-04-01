@@ -102,6 +102,73 @@
             height: 60px;
         }
 
+        /* Letterhead (Kop Surat) */
+        .kop-surat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3.5px double #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .kop-logo-left {
+            width: 80px;
+            height: auto;
+            flex-shrink: 0;
+        }
+        .kop-logo-right {
+            width: 100px;
+            height: auto;
+            flex-shrink: 0;
+        }
+        .kop-text {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 20px;
+        }
+        .kop-text h1 {
+            font-size: 19px;
+            margin-bottom: 2px;
+            font-weight: bold;
+            color: #000;
+        }
+        .kop-text h2 {
+            font-size: 17px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        .kop-text p {
+            font-size: 11px;
+            line-height: 1.3;
+            margin-bottom: 0;
+        }
+
+        /* Report Title & Metadata */
+        .report-title {
+            text-align: center;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .report-title h3 {
+            font-size: 16px;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .meta-table {
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+        .meta-table td {
+            padding: 3px 6px;
+            border: none !important;
+        }
+        .meta-label {
+            width: 140px;
+            font-weight: bold;
+        }
+
         /* Print Override */
         @media print {
             body { background: #fff !important; }
@@ -157,7 +224,7 @@
         </div>
 
         <div class="report-title">
-            <h3>Daftar Inventaris Kendaraan Dinas (Berdasarkan Unit Kerja)</h3>
+            <h3>Daftar Inventaris Kendaraan Dinas</h3>
         </div>
 
         <table class="meta-table">

@@ -25,9 +25,10 @@
   overflow: hidden;
 }
 
-/* Sidebar Collapsed State (Desktop) */
+/* Sidebar Collapsed State (Desktop) - NORMAL SYMMETRIC CENTERING */
 .app-layout.sidebar-collapsed .sidebar {
   width: 60px;
+  overflow: visible !important; /* Allow tooltips to pop out */
 }
 
 .app-layout.sidebar-collapsed .sidebar .brand-sub,
@@ -36,42 +37,81 @@
 .app-layout.sidebar-collapsed .sidebar .nav-item span,
 .app-layout.sidebar-collapsed .sidebar .nav-group-header span,
 .app-layout.sidebar-collapsed .sidebar .nav-chevron,
+.app-layout.sidebar-collapsed .sidebar .nav-group-body,
+.app-layout.sidebar-collapsed .sidebar .nav-sub-item,
 .app-layout.sidebar-collapsed .sidebar .user-name,
 .app-layout.sidebar-collapsed .sidebar .user-role,
+.app-layout.sidebar-collapsed .sidebar .user-avatar-sm + div, /* Hide the container wrap */
 .app-layout.sidebar-collapsed .sidebar .logout-btn {
-  display: none;
+  display: none !important;
+}
+
+/* CRITICAL: Unified 10px Horizontal Axis for Perfect Alignment */
+.app-layout.sidebar-collapsed .sidebar .sidebar-brand,
+.app-layout.sidebar-collapsed .sidebar .sidebar-footer {
+  padding: 0 10px !important; /* Remove top/bottom padding for centered axis */
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.app-layout.sidebar-collapsed .sidebar .sidebar-nav {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important; /* Start from top */
+  overflow: visible !important; /* Allow tooltips to pop out */
+}
+
+.app-layout.sidebar-collapsed .sidebar .sidebar-brand { 
+  height: 58px; 
+  padding: 0 10px !important; 
+  border-bottom: 1px solid rgba(255,255,255,0.07); /* Subtle separator aligned with topbar */
+}
+.app-layout.sidebar-collapsed .sidebar .sidebar-nav { padding-top: 10px !important; }
+.app-layout.sidebar-collapsed .sidebar .sidebar-footer { height: 60px; border-top: 1px solid rgba(255,255,255,0.07); }
+
+.app-layout.sidebar-collapsed .sidebar .brand-icon {
+  margin: 0 !important; /* Killer of the 4px offset bug */
+  width: 32px; height: 32px;
 }
 
 .app-layout.sidebar-collapsed .sidebar .nav-item,
 .app-layout.sidebar-collapsed .sidebar .nav-group-header {
-  justify-content: center;
-  padding: 10px;
-}
-
-.app-layout.sidebar-collapsed .sidebar .nav-item.active::before {
-  left: 0; width: 3px;
+  width: 40px !important; /* Centered in 60px (10px pad + 40px item + 10px pad) */
+  height: 40px !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 0 4px 0 !important;
+  border-radius: var(--r-md);
+  position: relative;
 }
 
 .app-layout.sidebar-collapsed .sidebar .nav-icon {
-  width: 20px; height: 20px;
+  width: 18px; height: 18px;
+  margin: 0 !important;
 }
 
-.app-layout.sidebar-collapsed .sidebar .nav-group-body {
-  max-height: 0 !important;
-}
-
-.app-layout.sidebar-collapsed .sidebar .sidebar-brand {
-  justify-content: center;
-  padding: 16px 10px;
-}
-
-.app-layout.sidebar-collapsed .sidebar .sidebar-footer {
-  justify-content: center;
-  padding: 12px 6px;
+/* Position Indicator Bar at the absolute edge of the sidebar */
+.app-layout.sidebar-collapsed .sidebar .nav-item.active::before,
+.app-layout.sidebar-collapsed .sidebar .nav-group-header.active::before {
+  content: '';
+  position: absolute;
+  left: -10px; /* Offset the 10px container padding to touch sidebar edge */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: #93C5FD;
+  border-radius: 0 3px 3px 0;
+  display: block;
 }
 
 .app-layout.sidebar-collapsed .sidebar .user-avatar-sm {
-  margin: 0;
+  margin: 0 !important;
 }
 
 /* Tooltip on icon when collapsed */

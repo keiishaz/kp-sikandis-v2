@@ -427,7 +427,8 @@
 
     <div class="footer">
         Data ini dikelola secara resmi oleh <strong>Dinas Kominfo Kota Bengkulu</strong>.<br>
-        &copy; {{ date('Y') }} SIKANDIS — Sistem Informasi Data Kendaraan Dinas
+        &copy; {{ date('Y') }} SIKANDIS — Sistem Informasi Data Kendaraan Dinas<br>
+        Dikembangkan oleh Tim Magang Project SIKANDIS
     </div>
 
 </div>

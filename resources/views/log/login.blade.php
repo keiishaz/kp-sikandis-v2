@@ -17,10 +17,10 @@
             <form method="GET" action="{{ route('log.login') }}" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
                 
                 <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 250px;">
-                    <label class="form-label">Pencarian NIP Pengguna</label>
+                    <label class="form-label">Pencarian NIK Pengguna</label>
                     <div class="search-input-wrapper" style="max-width: 100%;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="search" name="q" class="search-input" placeholder="Cari NIP pengguna atau keterangan..." value="{{ request('q') }}" autocomplete="off">
+                        <input type="search" name="q" class="search-input" placeholder="Cari NIK pengguna atau keterangan..." value="{{ request('q') }}" autocomplete="off">
                     </div>
                 </div>
 

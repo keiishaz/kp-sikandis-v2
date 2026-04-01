@@ -260,8 +260,88 @@
                 </div>
             </div>
 
-            {{-- Pajak Segera Habis --}}
-            <div class="card card-accent-warning" style="flex: 1; overflow: hidden; min-height: 0;">
+            {{-- Pajak Segera Habis (MUNCUL DI SINI JIKA ADMIN) --}}
+            @if($roleTitle === 'Admin')
+                <div class="card card-accent-warning" style="flex: 1; overflow: hidden; min-height: 0;">
+                    <div class="card-header">
+                        <h3 class="card-title">Pajak Segera Habis (≤ 30 Hari)</h3>
+                        @if($daftarPajakSegera->count() > 0)
+                            <span class="badge badge-warning">{{ $daftarPajakSegera->count() }} Unit</span>
+                        @endif
+                    </div>
+                    <div class="card-body card-body-scrollable" style="padding: 0;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--n-100);">
+                            @forelse($daftarPajakSegera->take(4) as $k)
+                                @php $sisa = \Carbon\Carbon::today()->diffInDays($k->pajak, false); @endphp
+                                <div class="pajak-item" style="background: #fff; padding: 12px 16px;">
+                                    <div class="pajak-item-info">
+                                        <div class="pajak-name" style="font-size: 12.5px;">{{ $k->nama_kendaraan }}</div>
+                                        <div class="pajak-plat" style="font-size: 11px; margin-top: 2px;">{{ $k->no_polisi }} &bull; {{ \Carbon\Carbon::parse($k->pajak)->isoFormat('D MMM Y') }}</div>
+                                    </div>
+                                    <div class="days-tag" style="padding: 4px 8px; font-size: 11px; background: {{ $sisa <= 7 ? 'var(--danger-bg)' : 'var(--warning-bg)' }}; color: {{ $sisa <= 7 ? 'var(--danger-text)' : 'var(--warning-text)' }};">
+                                        {{ $sisa }}h
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center" style="background: #fff; padding: 30px; grid-column: 1 / -1;">
+                                    <div style="color: var(--success-icon); margin-bottom: 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                                    <div style="font-size: 13px; color: var(--n-500);">Data pajak aman semua</div>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Right Column (Tall) --}}
+        @if($roleTitle === 'Admin')
+            {{-- AKTIVITAS TERBARU UNTUK ADMIN --}}
+            <div class="card card-h-activity" style="align-self: stretch; height: 100%;">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Aktivitas Terbaru</h3>
+                        <p style="font-size: 11px; color: var(--n-500); margin-top: 2px;">Khusus Hari Ini</p>
+                    </div>
+                    <a href="{{ route('log.aktivitas') }}" class="btn btn-sm btn-ghost">Semua</a>
+                </div>
+                <div class="card-body card-body-scrollable" style="flex: 1; overflow-y: auto;">
+                    <div class="activity-feed" style="padding: 0;">
+                        @forelse($recentLogs as $log)
+                            @php
+                                $aksi = strtoupper($log['aksi'] ?? '');
+                                $isCreate = str_contains($aksi, 'TAMBAH');
+                                $isEdit   = str_contains($aksi, 'EDIT') || str_contains($aksi, 'UPDATE') || str_contains($aksi, 'UBAH');
+                                $isDelete = str_contains($aksi, 'HAPUS') || str_contains($aksi, 'DELETE');
+                                $dotColor = $isCreate ? 'activity-dot--create' : ($isEdit ? 'activity-dot--edit' : ($isDelete ? 'activity-dot--delete' : 'activity-dot--default'));
+                            @endphp
+                            <div class="activity-item">
+                                <div class="activity-dot {{ $dotColor }}">
+                                    @if($isCreate) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    @elseif($isEdit) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    @elseif($isDelete) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                                    @else <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                    @endif
+                                </div>
+                                <div class="activity-body">
+                                    <div class="activity-text" style="font-size: 12px;">
+                                        <strong>{{ $log['user'] ?? 'Sistem' }}</strong> {{ strtolower($log['aksi'] ?? '') }} @if(!empty($log['modul'])) <strong>{{ $log['modul'] }}</strong> @endif
+                                    </div>
+                                    <div class="activity-time" style="font-size: 10.5px;">{{ $log['waktu'] ?? '-' }}</div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="empty-state" style="padding: 40px 10px;">
+                                <div style="color: var(--n-300); margin-bottom: 8px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                                <div class="empty-state-text" style="font-size: 13px;">Belum ada aktivitas hari ini.</div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        @else
+            {{-- PAJAK SEGERA HABIS PINDAH KE KANAN UNTUK OPERATOR (DENGAN STYLE ASLI DAN TINGGI SELARAS) --}}
+            <div class="card card-accent-warning card-h-row2">
                 <div class="card-header">
                     <h3 class="card-title">Pajak Segera Habis (≤ 30 Hari)</h3>
                     @if($daftarPajakSegera->count() > 0)
@@ -269,20 +349,20 @@
                     @endif
                 </div>
                 <div class="card-body card-body-scrollable" style="padding: 0;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--n-100);">
-                        @forelse($daftarPajakSegera->take(2) as $k)
+                    <div style="display: flex; flex-direction: column; gap: 1px; background: var(--n-100);">
+                        @forelse($daftarPajakSegera as $k)
                             @php $sisa = \Carbon\Carbon::today()->diffInDays($k->pajak, false); @endphp
-                            <div class="pajak-item" style="background: #fff; padding: 12px 16px;">
+                            <div class="pajak-item" style="background: #fff; padding: 12px 16px; border-bottom: 1px solid var(--n-100);">
                                 <div class="pajak-item-info">
-                                    <div class="pajak-name" style="font-size: 12.5px;">{{ $k->nama_kendaraan }}</div>
-                                    <div class="pajak-plat" style="font-size: 11px; margin-top: 2px;">{{ $k->no_polisi }} &bull; {{ \Carbon\Carbon::parse($k->pajak)->isoFormat('D MMM Y') }}</div>
+                                    <div class="pajak-name" style="font-size: 12.5px; font-weight: 600;">{{ $k->nama_kendaraan }}</div>
+                                    <div class="pajak-plat" style="font-size: 11px; margin-top: 2px;"><span class="plat-badge" style="font-size: 10px; padding: 1px 4px;">{{ $k->no_polisi }}</span> &bull; {{ \Carbon\Carbon::parse($k->pajak)->isoFormat('D MMM Y') }}</div>
                                 </div>
-                                <div class="days-tag" style="padding: 4px 8px; font-size: 11px; background: {{ $sisa <= 7 ? 'var(--danger-bg)' : 'var(--warning-bg)' }}; color: {{ $sisa <= 7 ? 'var(--danger-text)' : 'var(--warning-text)' }};">
-                                    {{ $sisa }}h
+                                <div class="days-tag" style="padding: 4px 8px; font-size: 11px; font-weight: 700; background: {{ $sisa <= 7 ? 'var(--danger-bg)' : 'var(--warning-bg)' }}; color: {{ $sisa <= 7 ? 'var(--danger-text)' : 'var(--warning-text)' }};">
+                                    {{ $sisa }} hari
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center" style="background: #fff; padding: 30px; grid-column: 1 / -1;">
+                            <div class="text-center" style="background: #fff; padding: 30px;">
                                 <div style="color: var(--success-icon); margin-bottom: 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                                 <div style="font-size: 13px; color: var(--n-500);">Data pajak aman semua</div>
                             </div>
@@ -290,55 +370,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- Aktivitas Terbaru (Tall) --}}
-        <div class="card card-h-activity" style="align-self: stretch; height: 100%;">
-            <div class="card-header">
-                <div>
-                    <h3 class="card-title">Aktivitas Terbaru</h3>
-                    <p style="font-size: 11px; color: var(--n-500); margin-top: 2px;">Khusus Hari Ini</p>
-                </div>
-                <a href="{{ route('log.aktivitas') }}" class="btn btn-sm btn-ghost">Semua</a>
-            </div>
-            <div class="card-body card-body-scrollable" style="flex: 1; overflow-y: auto;">
-                <div class="activity-feed" style="padding: 0;">
-                    @forelse($recentLogs as $log)
-                        @php
-                            $aksi = strtoupper($log['aksi'] ?? '');
-                            $isCreate = str_contains($aksi, 'TAMBAH');
-                            $isEdit   = str_contains($aksi, 'EDIT') || str_contains($aksi, 'UPDATE') || str_contains($aksi, 'UBAH');
-                            $isDelete = str_contains($aksi, 'HAPUS') || str_contains($aksi, 'DELETE');
-                            $dotColor = $isCreate ? 'activity-dot--create' : ($isEdit ? 'activity-dot--edit' : ($isDelete ? 'activity-dot--delete' : 'activity-dot--default'));
-                        @endphp
-                        <div class="activity-item">
-                            <div class="activity-dot {{ $dotColor }}">
-                                @if($isCreate) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                @elseif($isEdit) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                @elseif($isDelete) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-                                @else <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                                @endif
-                            </div>
-                            <div class="activity-body">
-                                <div class="activity-text" style="font-size: 12px;">
-                                    <strong>{{ $log['user'] ?? 'Sistem' }}</strong> {{ strtolower($log['aksi'] ?? '') }} @if(!empty($log['modul'])) <strong>{{ $log['modul'] }}</strong> @endif
-                                </div>
-                                <div class="activity-time" style="font-size: 10.5px;">{{ $log['waktu'] ?? '-' }}</div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="empty-state" style="padding: 40px 10px;">
-                            <div style="color: var(--n-300); margin-bottom: 8px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                            <div class="empty-state-text" style="font-size: 13px;">Belum ada aktivitas hari ini.</div>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
+        @endif
     </div>
 </div>
 @endsection
-
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>

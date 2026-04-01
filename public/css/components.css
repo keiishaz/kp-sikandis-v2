@@ -219,7 +219,8 @@
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.9);
 }
-.nav-item.active {
+.nav-item.active,
+.nav-group-header.active {
   background: rgba(255,255,255,0.12);
   color: #fff; font-weight: 500;
 }
