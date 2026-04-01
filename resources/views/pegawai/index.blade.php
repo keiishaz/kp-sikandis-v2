@@ -71,36 +71,31 @@
         </div>
 
         <div class="card-body-flush table-wrapper">
-            {{-- Filter Chips & Summary --}}
+            @if($activeFilterCount > 0 || request('q'))
             <div class="filter-summary">
                 <div class="filter-chip-container">
-                    @if($activeFilterCount > 0 || request('q'))
-                        @if(request('q'))
-                            <div class="filter-chip">
-                                Cari: "{{ request('q') }}"
-                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('unit_id'))
-                            <div class="filter-chip">
-                                Unit: {{ $units->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit' }}
-                                <span class="filter-chip-remove" onclick="removeFilter('unit_id')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('sub_unit_id'))
-                            <div class="filter-chip">
-                                Sub Unit: {{ $subUnits->firstWhere('id', request('sub_unit_id'))->nama_sub_unit ?? 'Sub Unit' }}
-                                <span class="filter-chip-remove" onclick="removeFilter('sub_unit_id')">&times;</span>
-                            </div>
-                        @endif
-                        <a href="{{ route('pegawai.index') }}" class="filter-reset">Reset Semua</a>
+                    @if(request('q'))
+                        <div class="filter-chip">
+                            Cari: "{{ request('q') }}"
+                            <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                        </div>
                     @endif
-                </div>
-                <div class="summary-text">
-                    Menampilkan <strong>{{ $pegawais->firstItem() ?? 0 }} - {{ $pegawais->lastItem() ?? 0 }}</strong> dari <strong>{{ $pegawais->total() }}</strong> pegawai
+                    @if(request('unit_id'))
+                        <div class="filter-chip">
+                            Unit: {{ $units->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('unit_id')">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('sub_unit_id'))
+                        <div class="filter-chip">
+                            Sub Unit: {{ $subUnits->firstWhere('id', request('sub_unit_id'))->nama_sub_unit ?? 'Sub Unit' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('sub_unit_id')">&times;</span>
+                        </div>
+                    @endif
+                    <a href="{{ route('pegawai.index') }}" class="filter-reset">Reset Semua</a>
                 </div>
             </div>
-
+            @endif
             <div style="padding: 0 20px 20px;">
                 <table class="data-table">
                 <thead>
@@ -156,7 +151,7 @@
             </table>
         </div>
 
-        @if($pegawais->hasPages())
+        @if($pegawais->total() > 0)
         <div class="card-footer" style="padding: 16px 20px; border-top: 1px solid var(--n-200);">
             {{ $pegawais->links() }}
         </div>

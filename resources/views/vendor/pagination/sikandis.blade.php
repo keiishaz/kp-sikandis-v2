@@ -1,12 +1,13 @@
-@if ($paginator->hasPages())
+@if ($paginator->total() > 0)
 <div class="pagination-wrapper">
     {{-- Info --}}
     <span class="pagination-info">
-        Menampilkan <strong>{{ $paginator->firstItem() }}</strong>&ndash;<strong>{{ $paginator->lastItem() }}</strong>
+        Menampilkan <strong>{{ $paginator->firstItem() ?? 0 }}</strong>&ndash;<strong>{{ $paginator->lastItem() ?? 0 }}</strong>
         dari <strong>{{ $paginator->total() }}</strong> data
     </span>
 
-    {{-- Controls --}}
+    {{-- Controls (Only if count > 1 page) --}}
+    @if ($paginator->hasPages())
     <div class="pagination-controls">
 
         {{-- Previous --}}
@@ -49,5 +50,6 @@
         @endif
 
     </div>
+    @endif
 </div>
 @endif

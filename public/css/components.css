@@ -576,10 +576,10 @@
   flex-wrap: wrap;
 }
 .pagination-info {
-  font-size: 13px;
-  color: var(--n-500);
+  font-size: 11.5px;
+  color: var(--n-400);
 }
-.pagination-info strong { color: var(--n-800); font-weight: 600; }
+.pagination-info strong { color: var(--n-700); font-weight: 600; }
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -764,7 +764,6 @@
   align-items: center;
   padding: 12px 20px;
   background: #fff;
-  min-height: 52px;
 }
 
 .filter-chip-container {
@@ -808,18 +807,18 @@
 .filter-reset:hover { text-decoration: underline; }
 
 .summary-text {
-  font-size: 12.5px;
-  color: var(--n-500);
+  font-size: 11.5px;
+  color: var(--n-400);
 }
 
 /* ==========================================================================
    FOOTER
    ========================================================================== */
 .main-footer {
-    padding: 24px 32px;
+    padding: 16px 24px;
     border-top: 1px solid var(--n-200);
     margin-top: auto;
-    background: #fff;
+    background: transparent;
     text-align: center;
 }
 
@@ -828,9 +827,9 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
-    color: var(--n-500);
-    font-size: 13.5px;
-    font-weight: 500;
+    color: var(--n-400);
+    font-size: 11.5px;
+    font-weight: 400;
 }
 
 .footer-divider {
@@ -841,8 +840,8 @@
 }
 
 .footer-credit {
-    color: var(--brand-600);
-    font-weight: 600;
+    color: var(--n-400);
+    font-weight: 500;
 }
 
 @media (max-width: 768px) {

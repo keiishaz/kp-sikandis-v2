@@ -32,22 +32,17 @@
         </div>
 
         <div class="card-body-flush table-wrapper">
-            {{-- Search Summary --}}
+            @if(request('q'))
             <div class="filter-summary">
                 <div class="filter-chip-container">
-                    @if(request('q'))
-                        <div class="filter-chip">
-                            Cari: "{{ request('q') }}"
-                            <a href="{{ route('units.index') }}" class="filter-chip-remove" style="text-decoration: none;">&times;</a>
-                        </div>
-                        <a href="{{ route('units.index') }}" class="filter-reset">Reset Semua</a>
-                    @endif
-                </div>
-                <div class="summary-text">
-                    Menampilkan <strong>{{ $units->firstItem() ?? 0 }} - {{ $units->lastItem() ?? 0 }}</strong> dari <strong>{{ $units->total() }}</strong> unit kerja
+                    <div class="filter-chip">
+                        Cari: "{{ request('q') }}"
+                        <a href="{{ route('units.index') }}" class="filter-chip-remove" style="text-decoration: none;">&times;</a>
+                    </div>
+                    <a href="{{ route('units.index') }}" class="filter-reset">Reset Semua</a>
                 </div>
             </div>
-
+            @endif
             <div style="padding: 0 20px 20px;">
                 <table class="data-table">
                 <thead>
@@ -100,7 +95,7 @@
             </table>
         </div>
 
-        @if($units->hasPages())
+        @if($units->total() > 0)
         <div class="card-footer" style="padding: 16px 20px; border-top: 1px solid var(--n-200);">
             {{ $units->links() }}
         </div>

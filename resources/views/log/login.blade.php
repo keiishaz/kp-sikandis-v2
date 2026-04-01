@@ -99,7 +99,7 @@
             </table>
         </div>
 
-        @if($logs->hasPages())
+        @if($logs->total() > 0)
         <div class="card-footer" style="padding: 16px 20px; border-top: 1px solid var(--n-200);">
             {{ $logs->appends(request()->query())->links() }}
         </div>

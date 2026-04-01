@@ -62,30 +62,25 @@
         </div>
 
         <div class="card-body-flush table-wrapper">
-             {{-- Filter Chips & Summary --}}
+             @if($activeFilterCount > 0 || request('q'))
              <div class="filter-summary">
                 <div class="filter-chip-container">
-                    @if($activeFilterCount > 0 || request('q'))
-                        @if(request('q'))
-                            <div class="filter-chip">
-                                Cari: "{{ request('q') }}"
-                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('login_status'))
-                            <div class="filter-chip">
-                                Status: {{ request('login_status') === 'never' ? 'Belum Login' : 'Sudah Login' }}
-                                <span class="filter-chip-remove" onclick="removeFilter('login_status')">&times;</span>
-                            </div>
-                        @endif
-                        <a href="{{ route('kelola-operator.index') }}" class="filter-reset">Reset Semua</a>
+                    @if(request('q'))
+                        <div class="filter-chip">
+                            Cari: "{{ request('q') }}"
+                            <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                        </div>
                     @endif
-                </div>
-                <div class="summary-text">
-                    Menampilkan <strong>{{ $operators->firstItem() ?? 0 }} - {{ $operators->lastItem() ?? 0 }}</strong> dari <strong>{{ $operators->total() }}</strong> operator
+                    @if(request('login_status'))
+                        <div class="filter-chip">
+                            Status: {{ request('login_status') === 'never' ? 'Belum Login' : 'Sudah Login' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('login_status')">&times;</span>
+                        </div>
+                    @endif
+                    <a href="{{ route('kelola-operator.index') }}" class="filter-reset">Reset Semua</a>
                 </div>
             </div>
-
+            @endif
             <div style="padding: 0 20px 20px;">
                 <table class="data-table">
                 <thead>
@@ -144,7 +139,7 @@
             </table>
         </div>
 
-        @if($operators->hasPages())
+        @if($operators->total() > 0)
         <div class="card-footer" style="padding: 16px 20px; border-top: 1px solid var(--n-200);">
             {{ $operators->links() }}
         </div>

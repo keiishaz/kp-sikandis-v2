@@ -70,36 +70,31 @@
         </div>
 
         <div class="card-body-flush table-wrapper">
-             {{-- Filter Chips & Summary --}}
-             <div class="filter-summary">
+            @if($activeFilterCount > 0 || request('q'))
+            <div class="filter-summary">
                 <div class="filter-chip-container">
-                    @if($activeFilterCount > 0 || request('q'))
-                        @if(request('q'))
-                            <div class="filter-chip">
-                                Cari: "{{ request('q') }}"
-                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('kategori_id'))
-                            <div class="filter-chip">
-                                Kategori: {{ $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori' }}
-                                <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('scan_status'))
-                            <div class="filter-chip">
-                                Status: {{ request('scan_status') === 'never' ? 'Belum Discan' : 'Sudah Discan' }}
-                                <span class="filter-chip-remove" onclick="removeFilter('scan_status')">&times;</span>
-                            </div>
-                        @endif
-                        <a href="{{ route('qr-kendaraan.index') }}" class="filter-reset">Reset Semua</a>
+                    @if(request('q'))
+                        <div class="filter-chip">
+                            Cari: "{{ request('q') }}"
+                            <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                        </div>
                     @endif
-                </div>
-                <div class="summary-text">
-                    Menampilkan <strong>{{ $qrs->firstItem() ?? 0 }} - {{ $qrs->lastItem() ?? 0 }}</strong> dari <strong>{{ $qrs->total() }}</strong> QR Kendaraan
+                    @if(request('kategori_id'))
+                        <div class="filter-chip">
+                            Kategori: {{ $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('scan_status'))
+                        <div class="filter-chip">
+                            Status: {{ request('scan_status') === 'never' ? 'Belum Discan' : 'Sudah Discan' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('scan_status')">&times;</span>
+                        </div>
+                    @endif
+                    <a href="{{ route('qr-kendaraan.index') }}" class="filter-reset">Reset Semua</a>
                 </div>
             </div>
-
+            @endif
             <div style="padding: 0 20px 20px;">
                 <table class="data-table">
                 <thead>
@@ -169,7 +164,7 @@
             </table>
         </div>
         
-        @if($qrs->hasPages())
+        @if($qrs->total() > 0)
         <div class="card-footer" style="padding: 16px 20px; border-top: 1px solid var(--n-200);">
             {{ $qrs->appends(request()->query())->links() }}
         </div>

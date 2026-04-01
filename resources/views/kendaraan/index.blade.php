@@ -196,56 +196,50 @@
         </div>
 
         <div class="card-body-flush table-wrapper">
-            
-            {{-- Filter Chips & Summary --}}
+            @if($activeFilterCount > 0 || request('q'))
             <div class="filter-summary">
                 <div class="filter-chip-container">
-                    @if($activeFilterCount > 0 || request('q'))
-                        @if(request('q'))
-                            <div class="filter-chip">
-                                Cari: "{{ request('q') }}"
-                                <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('kategori_id'))
-                            <div class="filter-chip">
-                                @php $katName = $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori'; @endphp
-                                Kategori: {{ $katName }}
-                                <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('jenis_penggunaan'))
-                            <div class="filter-chip">
-                                Jenis: {{ ucfirst(request('jenis_penggunaan')) }}
-                                <span class="filter-chip-remove" onclick="removeFilter('jenis_penggunaan')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('status_pajak'))
-                            <div class="filter-chip">
-                                Pajak: {{ str_replace('_', ' ', ucfirst(request('status_pajak'))) }}
-                                <span class="filter-chip-remove" onclick="removeFilter('status_pajak')">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('unit_id'))
-                            <div class="filter-chip">
-                                Dinas: {{ $manualUnits->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit Kerja' }}
-                                <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
-                            </div>
-                        @endif
-                        @if(request('opd_name'))
-                            <div class="filter-chip">
-                                Dinas (API): {{ request('opd_name') }}
-                                <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
-                            </div>
-                        @endif
-                        <a href="{{ route('kendaraan.index', ['status' => $status]) }}" class="filter-reset">Reset Semua</a>
+                    @if(request('q'))
+                        <div class="filter-chip">
+                            Cari: "{{ request('q') }}"
+                            <span class="filter-chip-remove" onclick="removeFilter('q')">&times;</span>
+                        </div>
                     @endif
-                </div>
-                <div class="summary-text">
-                    Menampilkan <strong>{{ $kendaraans->firstItem() ?? 0 }} - {{ $kendaraans->lastItem() ?? 0 }}</strong> dari <strong>{{ $kendaraans->total() }}</strong> kendaraan
+                    @if(request('kategori_id'))
+                        <div class="filter-chip">
+                            @php $katName = $kategoris->firstWhere('id', request('kategori_id'))->nama_kategori ?? 'Kategori'; @endphp
+                            Kategori: {{ $katName }}
+                            <span class="filter-chip-remove" onclick="removeFilter('kategori_id')">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('jenis_penggunaan'))
+                        <div class="filter-chip">
+                            Jenis: {{ ucfirst(request('jenis_penggunaan')) }}
+                            <span class="filter-chip-remove" onclick="removeFilter('jenis_penggunaan')">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('status_pajak'))
+                        <div class="filter-chip">
+                            Pajak: {{ str_replace('_', ' ', ucfirst(request('status_pajak'))) }}
+                            <span class="filter-chip-remove" onclick="removeFilter('status_pajak')">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('unit_id'))
+                        <div class="filter-chip">
+                            Dinas: {{ $manualUnits->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit Kerja' }}
+                            <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
+                        </div>
+                    @endif
+                    @if(request('opd_name'))
+                        <div class="filter-chip">
+                            Dinas (API): {{ request('opd_name') }}
+                            <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
+                        </div>
+                    @endif
+                    <a href="{{ route('kendaraan.index', ['status' => $status]) }}" class="filter-reset">Reset Semua</a>
                 </div>
             </div>
-
+            @endif
             <div style="padding: 0 20px 20px;">
                 <table class="data-table">
                 <thead>
@@ -339,9 +333,9 @@
             </table>
         </div>
         
-        @if($kendaraans->hasPages())
+        @if($kendaraans->total() > 0)
         <div class="card-footer" style="background: white; border-top: 1px solid var(--n-200);">
-            {{ $kendaraans->links('pagination::bootstrap-5') }}
+            {{ $kendaraans->links() }}
         </div>
         @endif
     </div>
