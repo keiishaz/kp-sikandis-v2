@@ -100,7 +100,7 @@ class DashboardService
     private function getRecentLogs(): \Illuminate\Support\Collection
     {
         return collect(
-            $this->logReader->readAktivitasLog(null, now()->format('Y-m-d'), 8, 1)->items()
+            $this->logReader->readAktivitasLog(null, now()->format('Y-m-d'), 20, 1)->items()
         );
     }
 }

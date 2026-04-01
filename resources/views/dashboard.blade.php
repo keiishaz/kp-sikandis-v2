@@ -98,7 +98,7 @@
     </div>
 
     {{-- BAGIAN 3 — QUICK ACTIONS --}}
-    <div class="card card-body-flush">
+    <div class="card card-body-flush quick-actions-card">
         <div class="quick-actions">
             <div class="quick-actions-inner">
                 <a href="{{ route('kendaraan.create') }}" class="quick-action-item">
@@ -141,229 +141,199 @@
         </div>
     </div>
 
-    {{-- BAGIAN 4 — DASHBOARD GRID --}}
-    <div class="dashboard-grid">
-        <div class="dashboard-col-main">
-            {{-- Kendaraan Terbaru --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Kendaraan Terbaru</h3>
-                    <a href="{{ route('kendaraan.index') }}" class="btn btn-sm btn-ghost">Lihat semua &rarr;</a>
-                </div>
-                <div class="card-body-flush table-wrapper">
-                    <table class="data-table">
-                        <thead>
+    {{-- ROW 1: KENDARAAN TERBARU & DONUT --}}
+    <div class="dashboard-row">
+        {{-- Kendaraan Terbaru --}}
+        <div class="card card-h-main">
+            <div class="card-header">
+                <h3 class="card-title">Kendaraan Terbaru</h3>
+                <a href="{{ route('kendaraan.index') }}" class="btn btn-sm btn-ghost">Lihat semua &rarr;</a>
+            </div>
+            <div class="card-body-flush table-wrapper card-body-scrollable">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Plat Nomor</th>
+                            <th>Nama Kendaraan</th>
+                            <th>Kategori</th>
+                            <th>Status</th>
+                            <th>Pemegang</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($kendaraanTerbaru as $k)
                             <tr>
-                                <th>Plat Nomor</th>
-                                <th>Nama Kendaraan</th>
-                                <th>Kategori</th>
-                                <th>Status</th>
-                                <th>Pemegang</th>
+                                <td><span class="plat-badge">{{ $k->no_polisi }}</span></td>
+                                <td><div class="cell-primary">{{ $k->nama_kendaraan }}</div></td>
+                                <td><span class="badge badge-neutral">{{ $k->kategori?->nama_kategori ?? '-' }}</span></td>
+                                <td><span class="badge {{ $k->status === 'aktif' ? 'badge-success' : 'badge-danger' }}">{{ strtoupper($k->status) }}</span></td>
+                                <td>{{ $k->pemegangAktif?->pegawai?->nama ?? '—' }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($kendaraanTerbaru as $k)
-                                <tr>
-                                    <td><span class="plat-badge">{{ $k->no_polisi }}</span></td>
-                                    <td>
-                                        <div class="cell-primary">{{ $k->nama_kendaraan }}</div>
-                                    </td>
-                                    <td><span class="badge badge-neutral">{{ $k->kategori?->nama_kategori ?? '-' }}</span></td>
-                                    <td>
-                                        <span class="badge {{ $k->status === 'aktif' ? 'badge-success' : 'badge-danger' }}">
-                                            {{ strtoupper($k->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if($k->pemegangAktif?->pegawai)
-                                            <div class="cell-primary">{{ $k->pemegangAktif->pegawai->nama }}</div>
-                                        @else
-                                            <span class="text-muted">—</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5">
-                                        <div class="empty-state">
-                                            <div class="empty-state-icon">
-                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                            </div>
-                                            <div class="empty-state-title">Belum ada kendaraan</div>
-                                            <div class="empty-state-text">Data kendaraan terbaru akan muncul di sini.</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                        @empty
+                            <tr><td colspan="5" class="text-center" style="padding: 40px;">Belum ada data kendaraan.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Distribusi Kategori --}}
+        <div class="card card-h-main">
+            <div class="card-header">
+                <h3 class="card-title">Distribusi Kategori</h3>
+            </div>
+            <div class="card-body card-body-scrollable">
+                <div class="donut-layout" style="flex-direction: column; gap: 20px;">
+                    @php
+                        $colors = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
+                        $total = $distribusiKategori->sum('kendaraans_count');
+                        $offset = 25;
+                    @endphp
+                    <div class="donut-chart" style="margin: 0 auto;">
+                        <svg viewBox="0 0 36 36" width="130" height="130" style="transform:rotate(-90deg);">
+                            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--n-100)" stroke-width="4"/>
+                            @foreach($distribusiKategori as $i => $kat)
+                                @php
+                                    $pct = $total > 0 ? ($kat->kendaraans_count / $total * 100) : 0;
+                                    $dash = round($pct, 2);
+                                    $gap = 100 - $dash;
+                                    $color = $colors[$i % count($colors)];
+                                @endphp
+                                @if($pct > 0)
+                                    <circle cx="18" cy="18" r="15.9155" fill="none" stroke="{{ $color }}" stroke-width="4" stroke-dasharray="{{ $dash }} {{ $gap }}" stroke-dashoffset="{{ -$offset + 100 }}" />
+                                @endif
+                                @php $offset += $pct; @endphp
+                            @endforeach
+                        </svg>
+                    </div>
+                    <div class="donut-legend" style="width: 100%;">
+                        @foreach($distribusiKategori as $i => $kat)
+                            <div class="donut-legend-item">
+                                <div style="display:flex; align-items:center;">
+                                    <div class="legend-color-dot" style="background: {{ $colors[$i % count($colors)] }};"></div>
+                                    <div class="legend-item-name" style="font-size: 12px;">{{ $kat->nama_kategori }}</div>
+                                </div>
+                                <div class="legend-item-count" style="font-weight: 700; font-size: 12px;">{{ $kat->kendaraans_count }}</div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            {{-- Distribusi per Kategori --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Distribusi Kategori</h3>
+    {{-- ROW 2: COMPLEX MONITORING BLOCK --}}
+    <div class="dashboard-row" style="align-items: stretch;">
+        {{-- Left Cluster (Tren + Top QR, then Pajak) --}}
+        <div style="display: flex; flex-direction: column; gap: 20px; flex: 1; align-self: stretch; height: 100%;">
+            <div class="dashboard-row--nested" style="margin-bottom: 0;">
+                {{-- Tren --}}
+                <div class="card card-h-row2" style="overflow: hidden; min-width: 0;">
+                    <div class="card-header">
+                        <h3 class="card-title">Tren Scan (Tahun Ini)</h3>
+                    </div>
+                    <div class="card-body--chart" style="min-width: 0;">
+                        <div class="chart-container" style="min-width: 0;">
+                            <div id="qrScanChart" style="height: 100%; width: 100%;"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="donut-layout">
-                        @php
-                            $colors  = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
-                            $total   = $distribusiKategori->sum('kendaraans_count');
-                            $offset  = 25;
-                        @endphp
-                        <div class="donut-chart">
-                            <svg viewBox="0 0 36 36" width="160" height="160" style="transform:rotate(-90deg);">
-                                <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--n-100)" stroke-width="4"/>
-                                @foreach($distribusiKategori as $i => $kat)
-                                    @php
-                                        $pct    = $total > 0 ? ($kat->kendaraans_count / $total * 100) : 0;
-                                        $dash   = round($pct, 2);
-                                        $gap    = 100 - $dash;
-                                        $color  = $colors[$i % count($colors)];
-                                    @endphp
-                                    @if($pct > 0)
-                                        <circle cx="18" cy="18" r="15.9155" fill="none"
-                                            stroke="{{ $color }}" stroke-width="4"
-                                            stroke-dasharray="{{ $dash }} {{ $gap }}"
-                                            stroke-dashoffset="{{ -$offset + 100 }}" />
-                                    @endif
-                                    @php $offset += $pct; @endphp
-                                @endforeach
-                            </svg>
-                        </div>
-                        <div class="donut-legend">
-                            @foreach($distribusiKategori as $i => $kat)
-                                <div class="donut-legend-item">
-                                    <div style="display:flex; align-items:center;">
-                                        <div class="legend-color-dot" style="background: {{ $colors[$i % count($colors)] }};"></div>
-                                        <div class="legend-item-name">{{ $kat->nama_kategori }}</div>
-                                    </div>
-                                    <div class="legend-item-count">{{ $kat->kendaraans_count }}</div>
+                {{-- Top QR --}}
+                <div class="card card-h-row2">
+                    <div class="card-header">
+                        <h3 class="card-title">Top QR Dipindai</h3>
+                    </div>
+                    <div class="card-body card-body-scrollable">
+                        @forelse($topQr as $idx => $qr)
+                            <div class="qr-rank-item" style="padding: 10px 16px;">
+                                <div class="rank-badge rank-{{ $idx < 3 ? $idx + 1 : 'other' }}">{{ $idx + 1 }}</div>
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-size:12px;font-weight:600;color:var(--n-900);">{{ $qr->kendaraan?->no_polisi ?? $qr->token }}</div>
+                                    <div style="font-size:11px;color:var(--n-500); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $qr->kendaraan?->nama_kendaraan ?? '-' }}</div>
                                 </div>
-                            @endforeach
-                        </div>
+                                <div class="qr-scan-count" style="font-size: 11.5px;">{{ number_format($qr->scan_count) }}x</div>
+                            </div>
+                        @empty
+                            <div class="text-center" style="padding: 20px; font-size: 13px; color: var(--n-400);">Belum ada data.</div>
+                        @endforelse
                     </div>
                 </div>
             </div>
 
-            {{-- Tren Scan QR --}}
-            <div class="card">
+            {{-- Pajak Segera Habis --}}
+            <div class="card card-accent-warning" style="flex: 1; overflow: hidden; min-height: 0;">
                 <div class="card-header">
-                    <h3 class="card-title">Tren Scan QR (Tahun Ini)</h3>
+                    <h3 class="card-title">Pajak Segera Habis (≤ 30 Hari)</h3>
+                    @if($daftarPajakSegera->count() > 0)
+                        <span class="badge badge-warning">{{ $daftarPajakSegera->count() }} Unit</span>
+                    @endif
                 </div>
-                <div class="card-body">
-                    <div id="qrScanChart" style="min-height: 300px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard-col-side">
-            @can('view-log')
-            {{-- Aktivitas Terbaru --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Aktivitas Terbaru</h3>
-                    <a href="{{ route('log.aktivitas') }}" class="btn btn-sm btn-ghost">Semua</a>
-                </div>
-                <div class="card-body" style="padding: 12px 0;">
-                    <div class="activity-feed" style="max-height: 420px; overflow-y: auto; padding: 0 12px;">
-                        @forelse($recentLogs as $log)
-                            @php
-                                $aksi = strtoupper($log['aksi'] ?? '');
-                                $isCreate = str_contains($aksi, 'TAMBAH');
-                                $isEdit   = str_contains($aksi, 'EDIT') || str_contains($aksi, 'UPDATE');
-                                $isDelete = str_contains($aksi, 'HAPUS') || str_contains($aksi, 'DELETE');
-                                $dotColor = $isCreate ? 'activity-dot--create' : ($isEdit ? 'activity-dot--edit' : ($isDelete ? 'activity-dot--delete' : 'activity-dot--default'));
-                            @endphp
-                            <div class="activity-item">
-                                <div class="activity-dot {{ $dotColor }}">
-                                    @if($isCreate) 
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    @elseif($isEdit) 
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    @elseif($isDelete) 
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-                                    @else 
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                                    @endif
+                <div class="card-body card-body-scrollable" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--n-100);">
+                        @forelse($daftarPajakSegera->take(2) as $k)
+                            @php $sisa = \Carbon\Carbon::today()->diffInDays($k->pajak, false); @endphp
+                            <div class="pajak-item" style="background: #fff; padding: 12px 16px;">
+                                <div class="pajak-item-info">
+                                    <div class="pajak-name" style="font-size: 12.5px;">{{ $k->nama_kendaraan }}</div>
+                                    <div class="pajak-plat" style="font-size: 11px; margin-top: 2px;">{{ $k->no_polisi }} &bull; {{ \Carbon\Carbon::parse($k->pajak)->isoFormat('D MMM Y') }}</div>
                                 </div>
-                                <div class="activity-body">
-                                    <div class="activity-text">
-                                        <strong>{{ $log['user'] ?? 'Sistem' }}</strong> {{ strtolower($log['aksi'] ?? '') }} @if(!empty($log['modul'])) <strong>{{ $log['modul'] }}</strong> @endif
-                                    </div>
-                                    <div class="activity-time">{{ $log['waktu'] ?? '-' }}</div>
+                                <div class="days-tag" style="padding: 4px 8px; font-size: 11px; background: {{ $sisa <= 7 ? 'var(--danger-bg)' : 'var(--warning-bg)' }}; color: {{ $sisa <= 7 ? 'var(--danger-text)' : 'var(--warning-text)' }};">
+                                    {{ $sisa }}h
                                 </div>
                             </div>
                         @empty
-                            <div class="empty-state" style="padding: 24px;">
-                                <div class="empty-state-text">Belum ada aktivitas</div>
+                            <div class="text-center" style="background: #fff; padding: 30px; grid-column: 1 / -1;">
+                                <div style="color: var(--success-icon); margin-bottom: 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                                <div style="font-size: 13px; color: var(--n-500);">Data pajak aman semua</div>
                             </div>
                         @endforelse
                     </div>
                 </div>
             </div>
-            @endcan
+        </div>
 
-            {{-- Pajak Segera Habis --}}
-            <div class="card card-accent-warning">
-                <div class="card-header">
-                    <h3 class="card-title">Pajak Segera Habis</h3>
-                    @if($daftarPajakSegera->count() > 0)
-                        <span class="badge badge-warning">{{ $daftarPajakSegera->count() }} unit</span>
-                    @endif
+        {{-- Aktivitas Terbaru (Tall) --}}
+        <div class="card card-h-activity" style="align-self: stretch; height: 100%;">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Aktivitas Terbaru</h3>
+                    <p style="font-size: 11px; color: var(--n-500); margin-top: 2px;">Khusus Hari Ini</p>
                 </div>
-                <div class="card-body-flush">
-                    @forelse($daftarPajakSegera as $k)
-                        @php $sisa = \Carbon\Carbon::today()->diffInDays($k->pajak, false); @endphp
-                        <div class="pajak-item">
-                            <div class="pajak-item-info">
-                                <div class="pajak-name">{{ $k->nama_kendaraan }}</div>
-                                <div class="pajak-plat">
-                                    <span class="plat-badge" style="background: transparent; border: none; padding: 0; font-size: 10.5px; color: var(--n-500);">{{ $k->no_polisi }}</span>
-                                    &bull; {{ \Carbon\Carbon::parse($k->pajak)->isoFormat('D MMM Y') }}
+                <a href="{{ route('log.aktivitas') }}" class="btn btn-sm btn-ghost">Semua</a>
+            </div>
+            <div class="card-body card-body-scrollable" style="flex: 1; overflow-y: auto;">
+                <div class="activity-feed" style="padding: 0;">
+                    @forelse($recentLogs as $log)
+                        @php
+                            $aksi = strtoupper($log['aksi'] ?? '');
+                            $isCreate = str_contains($aksi, 'TAMBAH');
+                            $isEdit   = str_contains($aksi, 'EDIT') || str_contains($aksi, 'UPDATE') || str_contains($aksi, 'UBAH');
+                            $isDelete = str_contains($aksi, 'HAPUS') || str_contains($aksi, 'DELETE');
+                            $dotColor = $isCreate ? 'activity-dot--create' : ($isEdit ? 'activity-dot--edit' : ($isDelete ? 'activity-dot--delete' : 'activity-dot--default'));
+                        @endphp
+                        <div class="activity-item">
+                            <div class="activity-dot {{ $dotColor }}">
+                                @if($isCreate) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                @elseif($isEdit) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                @elseif($isDelete) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                                @else <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                @endif
+                            </div>
+                            <div class="activity-body">
+                                <div class="activity-text" style="font-size: 12px;">
+                                    <strong>{{ $log['user'] ?? 'Sistem' }}</strong> {{ strtolower($log['aksi'] ?? '') }} @if(!empty($log['modul'])) <strong>{{ $log['modul'] }}</strong> @endif
                                 </div>
-                            </div>
-                            <div class="days-tag" style="background: {{ $sisa <= 7 ? 'var(--danger-bg)' : 'var(--warning-bg)' }}; color: {{ $sisa <= 7 ? 'var(--danger-text)' : 'var(--warning-text)' }};">
-                                {{ $sisa }}h
+                                <div class="activity-time" style="font-size: 10.5px;">{{ $log['waktu'] ?? '-' }}</div>
                             </div>
                         </div>
                     @empty
-                        <div class="empty-state" style="padding: 32px 16px;">
-                            <div class="empty-state-icon" style="color: var(--success-icon);">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            </div>
-                            <div class="empty-state-text" style="color: var(--n-500);">Semua pajak kendaraan aman</div>
+                        <div class="empty-state" style="padding: 40px 10px;">
+                            <div style="color: var(--n-300); margin-bottom: 8px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                            <div class="empty-state-text" style="font-size: 13px;">Belum ada aktivitas hari ini.</div>
                         </div>
                     @endforelse
                 </div>
             </div>
-
-            {{-- Top QR --}}
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Top QR Dipindai</h3>
-                </div>
-                <div class="card-body-flush" style="padding: 10px 0;">
-                    @forelse($topQr as $idx => $qr)
-                        <div class="qr-rank-item">
-                            <div class="rank-badge rank-{{ $idx < 3 ? $idx + 1 : 'other' }}">
-                                {{ $idx + 1 }}
-                            </div>
-                            <div style="flex:1; min-width:0;">
-                                <div style="font-size:13px;font-weight:600;color:var(--n-900);">{{ $qr->kendaraan?->no_polisi ?? $qr->token }}</div>
-                                <div style="font-size:11.5px;color:var(--n-500); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $qr->kendaraan?->nama_kendaraan ?? '-' }}</div>
-                            </div>
-                            <div class="qr-scan-count">{{ number_format($qr->scan_count) }}x</div>
-                        </div>
-                    @empty
-                        <div class="empty-state" style="padding: 24px;">
-                            <div class="empty-state-text">Belum ada pemindaian QR</div>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
@@ -380,7 +350,8 @@
                     data: {!! json_encode($qrChartData ?? []) !!}
                 }],
                 chart: {
-                    height: 300,
+                    height: '100%',
+                    width: '100%',
                     type: 'area',
                     toolbar: { show: false },
                     fontFamily: 'Inter, sans-serif'
@@ -400,7 +371,11 @@
                 xaxis: {
                     categories: {!! json_encode($qrChartBulan ?? []) !!},
                     axisBorder: { show: false },
-                    axisTicks: { show: false }
+                    axisTicks: { show: false },
+                    labels: {
+                        hideOverlappingLabels: true,
+                        style: { fontSize: '10px' }
+                    }
                 },
                 yaxis: {
                     labels: { formatter: function (val) { return Math.floor(val); } }
@@ -408,6 +383,11 @@
                 grid: {
                     borderColor: '#f1f5f9',
                     strokeDashArray: 4,
+                    padding: {
+                        left: 10,
+                        right: 15,
+                        bottom: 0
+                    }
                 }
             };
             var chart = new ApexCharts(document.querySelector("#qrScanChart"), options);

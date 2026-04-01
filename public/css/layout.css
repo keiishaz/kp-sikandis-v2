@@ -278,5 +278,95 @@
   .topbar { padding: 0 14px; }
   .page-heading { font-size: 18px; }
   .page-subheading { font-size: 12.5px; }
-  .page-intro { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-intro { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .metrics-grid { margin-bottom: 20px; }
+}
+
+.page-intro { margin-bottom: 20px; }
+.metrics-grid { margin-bottom: 20px; }
+.quick-actions-card { margin-bottom: 20px; }
+
+/* === DASHBOARD CUSTOM GRID REFINED (NO WRAPPERS) === */
+
+.dashboard-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: flex-start; /* CRITICAL: Prevents containers from stretching to match row height */
+}
+
+.dashboard-row--nested {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Fixed Height Utilities for Perfect Alignment */
+.card-h-main { height: 380px !important; } /* Row 1: Kendaraan & Donut */
+.card-h-row2 { height: 320px !important; } /* Row 2: Tren & Top QR */
+.card-h-pajak { height: 160px !important; } /* Row 3: Pajak (Shrunk for alignment) */
+.card-h-activity { height: 500px !important; } /* Activity spans Row 2 + Gap + Row 3 (320 + 20 + 160) */
+
+.card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0; /* Managed by grid gap/row margins */
+}
+
+/* Internal Scrolling for fixed heights */
+.card-body-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+}
+
+/* Zero padding for charts to prevent overflow */
+.card-body--chart {
+    padding: 0 !important;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 220px;
+}
+
+/* Chart Container constraints */
+.chart-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    height: 220px;
+}
+
+/* Custom Scrollbar for feeds */
+.card-body-scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+.card-body-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+.card-body-scrollable::-webkit-scrollbar-thumb {
+    background: var(--n-200);
+    border-radius: 10px;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-row {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-row--nested {
+        grid-template-columns: 1fr;
+    }
+    .card-h-main, .card-h-row2, .card-h-pajak, .card-h-activity {
+        height: auto !important;
+        max-height: 500px;
+    }
+    .card-body-scrollable {
+        max-height: 400px;
+    }
 }
