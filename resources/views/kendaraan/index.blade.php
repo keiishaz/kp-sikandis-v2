@@ -301,10 +301,10 @@
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     </a>
                                     @can('delete-kendaraan')
-                                    <form action="{{ route('kendaraan.destroy', $k->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status kendaraan ini?')">
+                                    <form action="{{ route('kendaraan.destroy', $k->id) }}" method="POST" style="display:inline;" data-confirm="Apakah Anda yakin ingin mengubah status kendaraan ini?">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-icon btn-secondary" title="{{ $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}" style="{{ $k->status === 'aktif' ? 'color: var(--danger-600); border-color: var(--danger-200); background: var(--danger-50);' : 'color: var(--success-600); border-color: var(--success-200); background: var(--success-50);' }}">
+                                        <button type="submit" class="btn btn-icon btn-secondary" title="{{ $k->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}" style="{{ $k->status === 'aktif' ? 'color: var(--danger-text); background: var(--danger-bg); border: 1px solid var(--danger-border);' : 'color: var(--success-text); background: var(--success-bg); border: 1px solid var(--success-border);' }}">
                                             @if($k->status === 'aktif')
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                                             @else

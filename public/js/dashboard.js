@@ -352,39 +352,42 @@ function showConfirm(options = {}) {
  * Intercept forms/links that use onclick="return confirm(...)"
  */
 function initBetterConfirms() {
-    // Intercept forms using specific action buttons
+    // Intercept forms using specific action buttons or data-confirm attribute
     document.addEventListener('submit', async function (e) {
         const form = e.target;
         const submitter = e.submitter;
 
-        if (!submitter) return;
+        // 1. Check for data-confirm attribute on the form itself (Highest priority)
+        const formConfirmMsg = form.getAttribute('data-confirm');
+        
+        // 2. Fallback to submitter button markers
+        const isDelete = submitter && (submitter.classList.contains('btn-delete') || submitter.closest('.btn-delete') || submitter.title?.toLowerCase().includes('hapus') || (submitter.style.color && submitter.style.color.includes('danger')));
+        const isWarning = submitter && (submitter.classList.contains('btn-warning') || submitter.closest('.btn-warning'));
 
-        // Pattern for Delete actions
-        const isDelete = submitter.classList.contains('btn-delete') || submitter.closest('.btn-delete');
-
-        // Pattern for Warning actions (like Regenerate QR)
-        const isWarning = submitter.classList.contains('btn-warning') || submitter.closest('.btn-warning');
-
-        if (isDelete || isWarning) {
+        if (formConfirmMsg || isDelete || isWarning) {
             if (form.dataset.confirmed) return; // Allow submit if already confirmed
 
             e.preventDefault();
 
             let options = {
                 type: isDelete ? 'danger' : 'warning',
-                title: isDelete ? 'Hapus Data?' : 'Konfirmasi Tindakan',
-                message: 'Apakah Anda yakin ingin melanjutkan?',
-                confirmText: isDelete ? 'Ya, Hapus' : 'Ya, Lanjutkan'
+                title: isDelete ? 'Konfirmasi Tindakan' : 'Konfirmasi',
+                message: formConfirmMsg || 'Apakah Anda yakin ingin melanjutkan?',
+                confirmText: isDelete ? 'Ya, Lanjutkan' : 'Ya, Setuju'
             };
 
-            // Custom messages based on context
-            if (isDelete) {
-                options.message = 'Data ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.';
-            } else if (submitter.innerText.toLowerCase().includes('regenerate')) {
-                options.title = 'Buat Ulang QR Code?';
-                options.message = 'QR Code lama tidak akan berfungsi lagi setelah Anda membuat yang baru.';
-                options.confirmText = 'Ya, Buat Ulang';
-                options.type = 'warning';
+            // Context-specific defaults if no message provided
+            if (!formConfirmMsg) {
+                if (isDelete) {
+                    options.title = 'Hapus Data?';
+                    options.message = 'Data ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.';
+                    options.confirmText = 'Ya, Hapus';
+                } else if (submitter && submitter.innerText.toLowerCase().includes('regenerate')) {
+                    options.title = 'Buat Ulang QR Code?';
+                    options.message = 'QR Code lama tidak akan berfungsi lagi setelah Anda membuat yang baru.';
+                    options.confirmText = 'Ya, Buat Ulang';
+                    options.type = 'warning';
+                }
             }
 
             const confirmed = await showConfirm(options);

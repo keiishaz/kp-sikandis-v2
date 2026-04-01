@@ -42,5 +42,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('is-operator', fn($user) => $user->role?->nama_role === 'operator');
         Gate::define('manage-master', fn($user) => $user->role?->nama_role === 'admin');
         Gate::define('view-log', fn($user) => $user->role?->nama_role === 'admin');
+        Gate::define('delete-kendaraan', fn($user) => in_array($user->role?->nama_role, ['admin', 'operator']));
     }
 }

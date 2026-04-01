@@ -12,8 +12,16 @@
         <input type="hidden" name="items" id="input-print-items">
     </form>
 
-    {{-- PAGE HEADER & TOOLBAR --}}
-    <div class="card" style="margin-top: 24px;">
+    {{-- PAGE HEADER --}}
+    <div class="page-intro">
+        <div>
+            <h2 class="page-heading">QR Kendaraan</h2>
+            <p class="page-subheading">Kelola dan cetak kode QR untuk akses informasi publik kendaraan</p>
+        </div>
+    </div>
+
+    {{-- PAGE TOOLBAR & TABLE CARD --}}
+    <div class="card">
         <div class="table-toolbar">
             <form id="searchForm" method="GET" action="{{ route('qr-kendaraan.index') }}" class="toolbar-left">
                 {{-- Search Input --}}
