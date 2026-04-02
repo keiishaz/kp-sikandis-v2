@@ -4,6 +4,28 @@
 @section('topbar_title', 'Data Kendaraan ' . (auth()->user()->role->nama_role === 'admin' ? 'Admin' : 'Operator'))
 
 @section('content')
+<style>
+    .tab-btn {
+        background: none; border: none; padding: 0 0 12px 0;
+        font-size: 14.5px; font-weight: 500; color: var(--n-500);
+        border-bottom: 2px solid transparent; cursor: pointer;
+        margin-bottom: -2px; transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--n-700); }
+    .tab-btn.active {
+        font-weight: 600; color: var(--brand-600);
+        border-bottom: 2px solid var(--brand-600);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .info-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 768px) {
+        .info-grid { grid-template-columns: 1fr; }
+    }
+</style>
 <div class="dashboard">
 
     {{-- PAGE HEADER --}}
@@ -49,14 +71,15 @@
     </div>
 
     {{-- CUSTOM TAB NAVIGATION --}}
+    @php $activeTab = request('tab', 'info'); @endphp
     <div style="display: flex; gap: 32px; border-bottom: 2px solid var(--n-100); margin-bottom: 24px;">
-        <button class="tab-btn active" data-target="tab-info" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 600; color: var(--brand-600); border-bottom: 2px solid var(--brand-600); cursor:pointer; margin-bottom: -2px;">
+        <button class="tab-btn {{ $activeTab === 'info' ? 'active' : '' }}" data-target="tab-info">
             Informasi Kendaraan
         </button>
-        <button class="tab-btn" data-target="tab-pemegang" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 500; color: var(--n-500); border-bottom: 2px solid transparent; cursor:pointer; margin-bottom: -2px;">
+        <button class="tab-btn {{ $activeTab === 'pemegang' ? 'active' : '' }}" data-target="tab-pemegang">
             Riwayat Pemegang
         </button>
-        <button class="tab-btn" data-target="tab-aktivitas" style="background:none; border:none; padding: 0 0 12px 0; font-size: 14.5px; font-weight: 500; color: var(--n-500); border-bottom: 2px solid transparent; cursor:pointer; margin-bottom: -2px;">
+        <button class="tab-btn {{ $activeTab === 'aktivitas' ? 'active' : '' }}" data-target="tab-aktivitas">
             Riwayat Aktivitas
         </button>
     </div>
@@ -65,8 +88,8 @@
     <div class="tab-contents">
         
         {{-- TAB 1: INFORMASI KENDARAAN --}}
-        <div id="tab-info" class="tab-content" style="display: block;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div id="tab-info" class="tab-content {{ $activeTab === 'info' ? 'active' : '' }}">
+            <div class="info-grid">
                 
                 {{-- Spesifikasi & Pajak --}}
                 <div class="card">
@@ -132,7 +155,7 @@
         </div>
 
         {{-- TAB 2: RIWAYAT PEMEGANG --}}
-        <div id="tab-pemegang" class="tab-content" style="display: none;">
+        <div id="tab-pemegang" class="tab-content {{ $activeTab === 'pemegang' ? 'active' : '' }}">
 
 
             <div class="card">
@@ -203,7 +226,7 @@
         </div>
 
         {{-- TAB 3: RIWAYAT AKTIVITAS --}}
-        <div id="tab-aktivitas" class="tab-content" style="display: none;">
+        <div id="tab-aktivitas" class="tab-content {{ $activeTab === 'aktivitas' ? 'active' : '' }}">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Histori Servis & Aktivitas</h3>
@@ -438,20 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            tabBtns.forEach(b => {
-                b.classList.remove('active');
-                b.style.color = 'var(--n-500)';
-                b.style.borderBottomColor = 'transparent';
-                b.style.fontWeight = '500';
-            });
-            tabContents.forEach(c => { c.style.display = 'none'; });
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
 
             btn.classList.add('active');
-            btn.style.color = 'var(--brand-600)';
-            btn.style.borderBottomColor = 'var(--brand-600)';
-            btn.style.fontWeight = '600';
-
-            document.getElementById(btn.getAttribute('data-target')).style.display = 'block';
+            document.getElementById(btn.getAttribute('data-target')).classList.add('active');
         });
     });
 
@@ -703,9 +717,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) btn.click();
     }
 
-    // Flash message auto-hide
-    const flash = document.getElementById('pemegang-flash');
-    if (flash) setTimeout(() => { flash.style.opacity = '0'; flash.style.transition = 'opacity 0.5s'; setTimeout(() => flash.remove(), 500); }, 4000);
+    // Flash message auto-hide if using generic alerts
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s';
+            setTimeout(() => alert.remove(), 500);
+        }, 4000);
+    });
 
 });
 </script>

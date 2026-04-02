@@ -20,7 +20,7 @@
 <body>
     <div class="app-layout">
         <aside class="sidebar">
-            <div class="sidebar-brand">
+            <a href="{{ route('dashboard') }}" class="sidebar-brand" style="text-decoration: none;">
                 <div class="brand-icon" style="flex-shrink: 0; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-right: 8px; background: #fff; border-radius: var(--r-md); padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <img src="{{ asset('assets/images/logo-kominfo.png') }}" alt="Logo Kominfo" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
@@ -28,7 +28,7 @@
                     <div class="brand-name">SIKANDIS</div>
                     <div class="brand-sub">Kominfo Kota Bengkulu</div>
                 </div>
-            </div>
+            </a>
 
             <nav class="sidebar-nav">
                 @auth

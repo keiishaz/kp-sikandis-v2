@@ -283,9 +283,11 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-center" style="background: #fff; padding: 30px; grid-column: 1 / -1;">
-                                    <div style="color: var(--success-icon); margin-bottom: 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                                    <div style="font-size: 13px; color: var(--n-500);">Data pajak aman semua</div>
+                                <div class="empty-state" style="padding: 40px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; grid-column: 1 / -1;">
+                                    <div class="empty-state-icon" style="color: var(--success-icon); margin-bottom: 12px;">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    </div>
+                                    <div class="empty-state-text" style="font-size: 13px; color: var(--n-500); font-weight: 500;">Data pajak aman semua</div>
                                 </div>
                             @endforelse
                         </div>
@@ -331,9 +333,11 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="empty-state" style="padding: 40px 10px;">
-                                <div style="color: var(--n-300); margin-bottom: 8px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                                <div class="empty-state-text" style="font-size: 13px;">Belum ada aktivitas hari ini.</div>
+                            <div class="empty-state" style="padding: 64px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <div class="empty-state-icon" style="color: var(--n-200); margin-bottom: 16px;">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                </div>
+                                <div class="empty-state-text" style="font-size: 13.5px; color: var(--n-400); font-weight: 500;">Belum ada aktivitas hari ini.</div>
                             </div>
                         @endforelse
                     </div>
@@ -362,9 +366,11 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center" style="background: #fff; padding: 30px;">
-                                <div style="color: var(--success-icon); margin-bottom: 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                                <div style="font-size: 13px; color: var(--n-500);">Data pajak aman semua</div>
+                            <div class="empty-state" style="padding: 40px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                                <div class="empty-state-icon" style="color: var(--success-icon); margin-bottom: 12px;">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                </div>
+                                <div class="empty-state-text" style="font-size: 13px; color: var(--n-500); font-weight: 500;">Data pajak aman semua</div>
                             </div>
                         @endforelse
                     </div>

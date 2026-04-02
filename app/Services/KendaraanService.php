@@ -82,6 +82,9 @@ class KendaraanService
     public function detail(Kendaraan $kendaraan): array
     {
         $kendaraan = $this->kendaraanRepo->findWithRelations($kendaraan);
+        
+        // Inject tax status decoration (label + color)
+        $this->decoratePajakStatus([$kendaraan]);
 
         return [
             'kendaraan' => $kendaraan,
