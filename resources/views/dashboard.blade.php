@@ -78,7 +78,7 @@
             </div>
             <div class="metric-value text-warning" style="color: var(--warning-text);">{{ $pajakSegera ?? 0 }}</div>
             <div class="metric-footer">
-                <span class="metric-trend metric-trend--neutral" style="background: var(--warning-bg); color: var(--warning-text);">≤ 30 hari</span>
+                <span class="metric-trend metric-trend--neutral" style="background: var(--warning-bg); color: var(--warning-text);">≤ 60 hari</span>
                 <span class="metric-trend-label">Perlu dicek</span>
             </div>
         </div>
@@ -264,7 +264,7 @@
             @if($roleTitle === 'Admin')
                 <div class="card card-accent-warning" style="flex: 1; overflow: hidden; min-height: 0;">
                     <div class="card-header">
-                        <h3 class="card-title">Pajak Segera Habis (≤ 30 Hari)</h3>
+                        <h3 class="card-title">Pajak Segera Habis (≤ 60 Hari)</h3>
                         @if($daftarPajakSegera->count() > 0)
                             <span class="badge badge-warning">{{ $daftarPajakSegera->count() }} Unit</span>
                         @endif
@@ -347,7 +347,7 @@
             {{-- PAJAK SEGERA HABIS PINDAH KE KANAN UNTUK OPERATOR (DENGAN STYLE ASLI DAN TINGGI SELARAS) --}}
             <div class="card card-accent-warning card-h-row2">
                 <div class="card-header">
-                    <h3 class="card-title">Pajak Segera Habis (≤ 30 Hari)</h3>
+                    <h3 class="card-title">Pajak Segera Habis (≤ 60 Hari)</h3>
                     @if($daftarPajakSegera->count() > 0)
                         <span class="badge badge-warning">{{ $daftarPajakSegera->count() }} Unit</span>
                     @endif

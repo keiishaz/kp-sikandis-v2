@@ -50,7 +50,7 @@ class DashboardRepository implements DashboardRepositoryInterface
     public function pajakStats(): array
     {
         $today           = Carbon::today();
-        $thirtyDaysLater = Carbon::today()->addDays(30);
+        $sixtyDaysLater  = Carbon::today()->addDays(60);
         $base            = $this->kendaraanBase();
 
         return [
@@ -59,7 +59,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             'tidak_ada' => (clone $base)->whereNull('pajak')->count(),
             'segera'    => (clone $base)->whereNotNull('pajak')
                                ->where('pajak', '>=', $today->format('Y-m-d'))
-                               ->where('pajak', '<=', $thirtyDaysLater->format('Y-m-d'))
+                               ->where('pajak', '<=', $sixtyDaysLater->format('Y-m-d'))
                                ->count(),
         ];
     }
@@ -149,13 +149,13 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function daftarPajakSegera(int $limit = 5): Collection
     {
-        $today           = Carbon::today();
-        $thirtyDaysLater = Carbon::today()->addDays(30);
+        $today          = Carbon::today();
+        $sixtyDaysLater = Carbon::today()->addDays(60);
 
         return $this->kendaraanBase()
             ->whereNotNull('pajak')
             ->where('pajak', '>=', $today->format('Y-m-d'))
-            ->where('pajak', '<=', $thirtyDaysLater->format('Y-m-d'))
+            ->where('pajak', '<=', $sixtyDaysLater->format('Y-m-d'))
             ->with('pemegangAktif.pegawai')
             ->orderBy('pajak', 'asc')
             ->limit($limit)

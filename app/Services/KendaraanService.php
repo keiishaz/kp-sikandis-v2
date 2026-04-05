@@ -198,11 +198,14 @@ class KendaraanService
             }
 
             $pajakDate = Carbon::parse($k->pajak);
+            // reset time to 00:00:00 to accurately count full days
+            $pajakDateStr = $pajakDate->copy()->startOfDay();
+            $nowStr = $now->copy()->startOfDay();
 
-            if ($pajakDate->isPast()) {
+            if ($pajakDateStr->isPast()) {
                 $k->status_pajak = 'Telah Jatuh Tempo';
                 $k->color_pajak  = 'red';
-            } elseif ($now->diffInMonths($pajakDate, false) <= 6) {
+            } elseif ($nowStr->diffInDays($pajakDateStr, false) <= 60) {
                 $k->status_pajak = 'Hampir Jatuh Tempo';
                 $k->color_pajak  = 'yellow';
             } else {
