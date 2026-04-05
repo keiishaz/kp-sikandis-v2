@@ -382,13 +382,18 @@
 @endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script id="qrDataJson" type="application/json">{!! json_encode($qrChartData ?? []) !!}</script>
+<script id="qrBulanJson" type="application/json">{!! json_encode($qrChartBulan ?? []) !!}</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if (document.querySelector("#qrScanChart")) {
+            var chartData = JSON.parse(document.getElementById('qrDataJson').textContent);
+            var chartBulan = JSON.parse(document.getElementById('qrBulanJson').textContent);
+            
             var options = {
                 series: [{
                     name: 'Pemindaian QR',
-                    data: {!! json_encode($qrChartData ?? []) !!}
+                    data: chartData
                 }],
                 chart: {
                     height: '100%',
@@ -410,7 +415,7 @@
                 dataLabels: { enabled: false },
                 stroke: { curve: 'smooth', width: 3 },
                 xaxis: {
-                    categories: {!! json_encode($qrChartBulan ?? []) !!},
+                    categories: chartBulan,
                     axisBorder: { show: false },
                     axisTicks: { show: false },
                     labels: {

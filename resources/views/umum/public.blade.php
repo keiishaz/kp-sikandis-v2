@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --brand-50: #eff6ff;
@@ -160,7 +159,7 @@
             z-index: 2;
         }
 
-        /* ===== QR FLOAT CARD ===== */
+        /* ===== FLOAT CARD & CHECKMARK ===== */
         .qr-float-card {
             background: #fff;
             border-radius: 16px;
@@ -172,31 +171,63 @@
             margin-bottom: 20px;
         }
 
-        .qr-box {
-            background: #fff;
-            border-radius: 12px;
-            padding: 10px;
-            border: 1px solid var(--n-200);
-            flex-shrink: 0;
-            display: flex;
-        }
-
         .qr-info { flex: 1; min-width: 0; }
         .qr-info h3 { font-size: 16px; font-weight: 700; color: var(--n-900); margin-bottom: 6px; }
-        .qr-info p { font-size: 13px; color: var(--n-500); line-height: 1.5; margin-bottom: 12px; }
+        .qr-info p { font-size: 13px; color: var(--n-500); line-height: 1.5; margin-bottom: 0px; }
 
-        .qr-token {
-            display: inline-block;
-            background: var(--brand-50);
-            border: 1px solid var(--brand-100);
-            color: var(--brand-700);
-            font-family: monospace;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            padding: 6px 14px;
-            border-radius: 8px;
+        /* Animated Checkmark */
+        .check-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #dcfce7;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
         }
+
+        .checkmark-anim {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 4;
+            stroke: #16a34a;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #16a34a;
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 4;
+            stroke-miterlimit: 10;
+            stroke: #16a34a;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+        }
+
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes scale {
+            0%, 100% { transform: none; }
+            50% { transform: scale3d(1.1, 1.1, 1); }
+        }
+        @keyframes fill {
+            100% { box-shadow: inset 0px 0px 0px 30px transparent; }
+        }
+
 
         /* ===== INFO CARDS ===== */
         .info-card {
@@ -336,14 +367,15 @@
 <div class="main-wrap">
 
     <div class="qr-float-card">
-        <div class="qr-box" style="position: relative;">
-            <div id="qr-code"></div>
-            <img src="{{ asset('assets/images/logobkl.png') }}" alt="logo" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; padding: 2px; background: #fff; border-radius: 4px; object-fit: contain;">
+        <div class="check-box">
+            <svg class="checkmark-anim" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
         </div>
         <div class="qr-info">
             <h3>Kendaraan Resmi Terverifikasi</h3>
-            <p>QR Code ini merupakan identitas digital resmi kendaraan dinas yang terdaftar dalam sistem SIKANDIS.</p>
-            <span class="qr-token">{{ $qr->token ?? '-' }}</span>
+            <p>Kendaraan dinas ini terdaftar secara resmi dan terverifikasi secara sah dalam database SIKANDIS.</p>
         </div>
     </div>
 
@@ -433,15 +465,5 @@
 
 </div>
 
-<script>
-new QRCode(document.getElementById('qr-code'), {
-    text: window.location.href,
-    width: 90,
-    height: 90,
-    colorDark: '#1e3a8a',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.M
-});
-</script>
 </body>
 </html>

@@ -19,8 +19,8 @@ class PublicKendaraanController extends Controller
             'kendaraan.pemegangAktif.pegawai.subUnit',
         ])->where('token', $kode)->first();
 
-        // Tampilkan halaman not-found jika token tidak ada di database
-        if (! $qr || ! $qr->kendaraan) {
+        // Tampilkan halaman not-found jika token tidak ada di database, atau kendaraan sedang nonaktif
+        if (! $qr || ! $qr->kendaraan || $qr->kendaraan->status !== 'aktif') {
             return response(view('umum.not-found'), 404);
         }
 
