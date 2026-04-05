@@ -22,7 +22,8 @@ class KelolaOperatorController extends Controller
 
     public function create()
     {
-        return view('kelola-operator.create');
+        $units = \App\Models\Unit::orderBy('type')->orderBy('nama_unit')->get();
+        return view('kelola-operator.create', compact('units'));
     }
 
     public function store(Request $request)
@@ -31,6 +32,7 @@ class KelolaOperatorController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'nik'      => ['required', 'numeric', 'digits:16', 'unique:users,nik'],
             'nip'      => ['nullable', 'string', 'max:30'],
+            'unit_id'  => ['required', 'exists:units,id'],
             'password' => ['required', 'string', 'min:6'],
         ]);
 
@@ -47,7 +49,8 @@ class KelolaOperatorController extends Controller
 
     public function edit(User $kelola_operator)
     {
-        return view('kelola-operator.edit', ['operator' => $kelola_operator]);
+        $units = \App\Models\Unit::orderBy('type')->orderBy('nama_unit')->get();
+        return view('kelola-operator.edit', ['operator' => $kelola_operator, 'units' => $units]);
     }
 
     public function update(Request $request, User $kelola_operator)
@@ -56,6 +59,7 @@ class KelolaOperatorController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'nik'      => ['required', 'numeric', 'digits:16', Rule::unique('users', 'nik')->ignore($kelola_operator->id)],
             'nip'      => ['nullable', 'string', 'max:30'],
+            'unit_id'  => ['required', 'exists:units,id'],
             'password' => ['nullable', 'string', 'min:6'],
         ]);
 

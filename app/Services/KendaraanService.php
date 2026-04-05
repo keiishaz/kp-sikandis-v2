@@ -96,7 +96,10 @@ class KendaraanService
 
     public function formData(): array
     {
-        return ['kategoris' => $this->kategoriRepo->all()];
+        return [
+            'kategoris' => $this->kategoriRepo->all(),
+            'units'     => \App\Models\Unit::orderBy('type')->orderBy('nama_unit')->get(),
+        ];
     }
 
     // ─── Store ───────────────────────────────────────────────────────────────
@@ -105,6 +108,12 @@ class KendaraanService
     {
         if ($data['jenis_penggunaan'] === 'jabatan') {
             $data['lokasi_operasional'] = null;
+        }
+
+        // Auto-inject unit for operators (cannot differ from their own unit)
+        $user = Auth::user();
+        if ($user->isOperator() && $user->unit_id) {
+            $data['unit_id'] = $user->unit_id;
         }
 
         $kendaraan = $this->kendaraanRepo->create($data);

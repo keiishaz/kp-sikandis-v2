@@ -24,6 +24,7 @@ class User extends Authenticatable
         'nip',
         'password',
         'role_id',
+        'unit_id',
     ];
 
     /**
@@ -53,5 +54,22 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    // ─── Role Helpers ───────────────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role?->nama_role === 'admin';
+    }
+
+    public function isOperator(): bool
+    {
+        return $this->role?->nama_role === 'operator';
     }
 }

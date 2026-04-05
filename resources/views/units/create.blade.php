@@ -28,10 +28,18 @@
             @csrf
 
             <div class="card-body">
-                <div class="form-group" style="margin-bottom: 0;">
+                <div class="form-group">
                     <label for="nama_unit" class="form-label">Nama Unit <span class="text-danger">*</span></label>
                     <input type="text" id="nama_unit" name="nama_unit" value="{{ old('nama_unit') }}" class="form-input" placeholder="Contoh: Dinas Kominfo" autofocus>
                     @error('nama_unit')<div class="form-error">{{ $message }}</div>@enderror
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="type" class="form-label">Kategori <span class="text-danger">*</span></label>
+                    <select id="type" name="type" class="form-select {{ $errors->has('type') ? 'is-invalid' : '' }}">
+                        <option value="internal" {{ old('type') == 'internal' ? 'selected' : '' }}>Internal (Pemerintah)</option>
+                        <option value="external" {{ old('type', 'external') == 'external' ? 'selected' : '' }}>Eksternal</option>
+                    </select>
+                    @error('type')<div class="form-error">{{ $message }}</div>@enderror
                 </div>
             </div>
 

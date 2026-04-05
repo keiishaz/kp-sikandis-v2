@@ -4,14 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\QrKendaraan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QrKendaraanController extends Controller
 {
     public function index(Request $request)
     {
         $kategoris = \App\Models\Kategori::all();
+        
         $query = QrKendaraan::with(['kendaraan.kategori'])
-            ->whereHas('kendaraan', fn($q) => $q->where('status', 'aktif'));
+            ->whereHas('kendaraan', function ($q) {
+                $q->where('status', 'aktif');
+                
+                $user = Auth::user();
+                if ($user && $user->isOperator() && $user->unit_id) {
+                    $q->where('unit_id', $user->unit_id);
+                }
+            });
 
         if ($request->filled('q')) {
             $search = $request->q;

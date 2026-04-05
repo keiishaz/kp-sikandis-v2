@@ -89,6 +89,37 @@
                                 </select>
                                 @error('kategori_id')<div class="form-error">{{ $message }}</div>@enderror
                             </div>
+
+                            {{-- UNIT / OPD FIELD --}}
+                            @php $authUser = auth()->user(); @endphp
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label class="form-label">Unit / OPD Pemilik <span class="text-danger">*</span></label>
+                                @if($authUser->isOperator())
+                                    {{-- Operator: locked to their own unit --}}
+                                    <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--n-50); border: 1px solid var(--n-200); border-radius: var(--r-md); font-size: 13.5px; color: var(--n-700);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-500)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                        <span>{{ $authUser->unit?->nama_unit ?? 'Unit tidak dikonfigurasi' }}</span>
+                                        <span class="badge badge-info" style="font-size: 11px;">{{ ucfirst($authUser->unit?->type ?? '') }}</span>
+                                    </div>
+                                    <div class="form-hint" style="font-size: 11.5px; color: var(--n-400); margin-top: 6px;">Kendaraan otomatis terdaftar di unit Anda.</div>
+                                @else
+                                    {{-- Admin: free to choose any unit --}}
+                                    <select id="unit_id" name="unit_id" class="form-select {{ $errors->has('unit_id') ? 'is-invalid' : '' }}">
+                                        <option value="">-- Pilih Unit / OPD --</option>
+                                        <optgroup label="Unit Internal (Pemerintah)">
+                                            @foreach($units->where('type', 'internal') as $unit)
+                                                <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Unit">
+                                            @foreach($units->where('type', 'external') as $unit)
+                                                <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
+                                    @error('unit_id')<div class="form-error">{{ $message }}</div>@enderror
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

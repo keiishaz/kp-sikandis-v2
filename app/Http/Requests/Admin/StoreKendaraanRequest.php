@@ -47,6 +47,7 @@ class StoreKendaraanRequest extends FormRequest
             'jenis_penggunaan'   => 'required|in:jabatan,operasional',
             'lokasi_operasional' => 'nullable|string|max:100|required_if:jenis_penggunaan,operasional',
             'kategori_id'        => 'required|exists:kategoris,id',
+            'unit_id'            => 'nullable|exists:units,id',
             'status'             => 'required|in:aktif,nonaktif',
         ];
     }

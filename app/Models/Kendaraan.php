@@ -22,12 +22,18 @@ class Kendaraan extends Model
         'jenis_penggunaan',
         'lokasi_operasional',
         'kategori_id',
+        'unit_id',
         'status',
     ];
 
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(Kategori::class);
+    }
+
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class);
     }
 
     public function qrKendaraan(): HasOne

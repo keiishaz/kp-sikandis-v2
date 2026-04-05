@@ -47,6 +47,25 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="unit_id" class="form-label">Unit / OPD <span class="text-danger">*</span></label>
+                    <select id="unit_id" name="unit_id" class="form-select {{ $errors->has('unit_id') ? 'is-invalid' : '' }}">
+                        <option value="">-- Pilih Unit / OPD --</option>
+                        <optgroup label="Unit Internal (Pemerintah)">
+                            @foreach($units->where('type', 'internal') as $unit)
+                                <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Unit">
+                            @foreach($units->where('type', 'external') as $unit)
+                                <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
+                            @endforeach
+                        </optgroup>
+                    </select>
+                    @error('unit_id')<div class="form-error">{{ $message }}</div>@enderror
+                    <div style="font-size: 11.5px; color: var(--n-400); margin-top: 6px;">Tentukan unit/OPD tempat operator ini bertanggung jawab. Operator hanya bisa melihat kendaraan milik unit ini.</div>
+                </div>
+
+                <div class="form-group">
                     <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                     <input type="password" id="password" name="password" class="form-input">
                     @error('password')<div class="form-error">{{ $message }}</div>@enderror

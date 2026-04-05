@@ -36,9 +36,12 @@ class KendaraanRepository implements KendaraanRepositoryInterface
 
     public function countByStatus(): array
     {
+        $base = Kendaraan::query();
+        $this->applyUnitScope($base);
+
         return [
-            'aktif'    => Kendaraan::where('status', 'aktif')->count(),
-            'nonaktif' => Kendaraan::where('status', 'nonaktif')->count(),
+            'aktif'    => (clone $base)->where('status', 'aktif')->count(),
+            'nonaktif' => (clone $base)->where('status', 'nonaktif')->count(),
         ];
     }
 
@@ -79,10 +82,26 @@ class KendaraanRepository implements KendaraanRepositoryInterface
 
     // ─── Private Helpers ────────────────────────────────────────────────────
 
+    /**
+     * Inject unit_id scope for operators.
+     * Admin users see all data; Operators only see their assigned unit.
+     */
+    private function applyUnitScope(Builder $query): void
+    {
+        $user = auth()->user();
+
+        if ($user && $user->isOperator() && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        }
+    }
+
     private function buildBaseQuery(array $filters): Builder
     {
         $status = $filters['status'] ?? 'aktif';
         $query  = Kendaraan::query()->where('status', $status);
+
+        // ── Apply unit scope for operators ──
+        $this->applyUnitScope($query);
 
         if (! empty($filters['q'])) {
             $search = $filters['q'];
@@ -105,11 +124,9 @@ class KendaraanRepository implements KendaraanRepositoryInterface
             $this->applyPajakFilter($query, $filters['status_pajak']);
         }
 
-        // Filter by Unit/OPD (Manual or API)
+        // Filter by unit (direct ownership, not via pemegang)
         if (! empty($filters['unit_id'])) {
-            $query->whereHas('pemegangAktif.pegawai', function ($q) use ($filters) {
-                $q->where('unit_id', $filters['unit_id']);
-            });
+            $query->where('unit_id', $filters['unit_id']);
         }
 
         if (! empty($filters['opd_name'])) {

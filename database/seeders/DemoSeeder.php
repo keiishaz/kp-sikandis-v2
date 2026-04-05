@@ -33,18 +33,46 @@ class DemoSeeder extends Seeder
         $kat6 = Kategori::updateOrCreate(['nama_kategori' => 'Roda 6 (Truck/Bus)']);
 
         // 2. Create Units & SubUnits
-        $units = [
+        $internalUnits = [
+            'Dinas Pemadam Kebakaran dan Penyelamatan' => ['Sekretariat', 'Bidang Damkar'],
+            'Dinas Komunikasi dan Informatika' => ['Bidang E-Government', 'Bidang IKP'],
+            'Dinas Pendidikan' => ['Bidang Dikdas', 'Bidang PAUD'],
+        ];
+
+        $externalUnits = [
             'Polda Bengkulu' => ['Ditlantas', 'Ditreskrim', 'Satbrimob', 'Yanduan'],
             'Universitas Bengkulu (UNIB)' => ['Fakultas Teknik', 'Fakultas Kedokteran', 'Rektorat', 'Fakultas Pertanian']
         ];
 
-        foreach ($units as $unitName => $subUnits) {
-            $unit = Unit::updateOrCreate(['nama_unit' => $unitName]);
+        $allUnitNames = [];
+
+        // Internal
+        foreach ($internalUnits as $unitName => $subUnits) {
+            $unit = Unit::updateOrCreate(
+                ['nama_unit' => $unitName],
+                [
+                    'type' => 'internal', 
+                    'api_mapping_key' => strtoupper($unitName)
+                ]
+            );
+            $allUnitNames[] = $unitName;
             foreach ($subUnits as $subUnitName) {
-                SubUnit::updateOrCreate([
-                    'unit_id' => $unit->id,
-                    'nama_sub_unit' => $subUnitName
-                ]);
+                SubUnit::updateOrCreate(['unit_id' => $unit->id, 'nama_sub_unit' => $subUnitName]);
+            }
+        }
+
+        // External
+        foreach ($externalUnits as $unitName => $subUnits) {
+            $unit = Unit::updateOrCreate(
+                ['nama_unit' => $unitName],
+                [
+                    'type' => 'external', 
+                    'api_mapping_key' => null
+                ]
+            );
+            $allUnitNames[] = $unitName;
+            foreach ($subUnits as $subUnitName) {
+                SubUnit::updateOrCreate(['unit_id' => $unit->id, 'nama_sub_unit' => $subUnitName]);
             }
         }
 
@@ -83,21 +111,23 @@ class DemoSeeder extends Seeder
             ]);
 
             // 5. Create Holder (Pemegang)
-            $selectedUnitKey = array_rand($units);
-            $ranks = $selectedUnitKey === 'Universitas Bengkulu (UNIB)' 
+            $selectedUnitKey = $allUnitNames[array_rand($allUnitNames)];
+            $ranks = array_key_exists($selectedUnitKey, $externalUnits) && $selectedUnitKey === 'Universitas Bengkulu (UNIB)' 
                 ? ['Prof.', 'Dr.', 'Dekan', 'Dosen'] 
-                : ['AKBP', 'Kompol', 'AKP', 'Iptu', 'Ipda'];
+                : (array_key_exists($selectedUnitKey, $externalUnits) 
+                    ? ['AKBP', 'Kompol', 'AKP', 'Iptu', 'Ipda'] 
+                    : ['Kadis', 'Kabid', 'Kasi', 'Staf']);
             
             $names = ['Budi', 'Siti', 'Agus', 'Lestari', 'Adi', 'Dewi', 'Iwan', 'Ani'];
             $tanggalSk = now()->subMonths(rand(1, 12));
             
             KendaraanPemegang::create([
                 'kendaraan_id' => $kendaraan->id,
-                'source_system' => 'Manual',
+                'source_system' => array_key_exists($selectedUnitKey, $internalUnits) ? 'API' : 'Manual',
                 'nip' => rand(1980, 2000) . rand(10, 12) . rand(10, 28) . rand(2005, 2024) . rand(0, 1) . rand(100, 999),
                 'nama_pegawai' => $ranks[array_rand($ranks)] . ' ' . $names[array_rand($names)],
                 'jabatan_pegawai' => $ranks[array_rand($ranks)] . ' ' . Str::random(5),
-                'unit_pegawai' => $selectedUnitKey,
+                'unit_pegawai' => array_key_exists($selectedUnitKey, $internalUnits) ? strtoupper($selectedUnitKey) : $selectedUnitKey,
                 'nomor_sk' => '800/' . rand(100, 999) . '/SK/' . now()->year,
                 'tanggal_sk' => $tanggalSk,
                 'tanggal_mulai' => $tanggalSk, // Added missing column

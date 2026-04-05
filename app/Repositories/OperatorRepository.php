@@ -43,7 +43,8 @@ class OperatorRepository implements OperatorRepositoryInterface
         return User::create([
             'name'     => $data['name'],
             'nik'      => $data['nik'],
-            'nip'      => $data['nip'],
+            'nip'      => $data['nip'] ?? null,
+            'unit_id'  => $data['unit_id'],
             'password' => Hash::make($data['password']),
             'role_id'  => $operatorRole->id,
         ]);
@@ -51,9 +52,10 @@ class OperatorRepository implements OperatorRepositoryInterface
 
     public function update(User $operator, array $data): User
     {
-        $operator->name = $data['name'];
-        $operator->nik  = $data['nik'];
-        $operator->nip  = $data['nip'];
+        $operator->name    = $data['name'];
+        $operator->nik     = $data['nik'];
+        $operator->nip     = $data['nip'] ?? null;
+        $operator->unit_id = $data['unit_id'];
 
         if (! empty($data['password'])) {
             $operator->password = Hash::make($data['password']);

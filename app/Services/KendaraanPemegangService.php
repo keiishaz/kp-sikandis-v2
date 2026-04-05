@@ -8,6 +8,7 @@ use App\Models\KendaraanPemegang;
 use App\Models\Pegawai;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class KendaraanPemegangService
 {
@@ -29,11 +30,18 @@ class KendaraanPemegangService
     /**
      * Proses assign pemegang baru. Jika ada pemegang lama, lakukan serah terima.
      * Semua operasi dibungkus dalam DB::transaction.
+     *
+     * @throws ValidationException  Jika Operator mencoba assign pemegang lintas OPD.
      */
     public function assign(array $data, Kendaraan $kendaraan, ?KendaraanPemegang $pemegangLama): void
     {
         DB::transaction(function () use ($data, $kendaraan, $pemegangLama) {
             $holderData = $this->resolveHolderData($data);
+
+            // ── OPD Consistency Check (only for API source) ──
+            if ($data['source_system'] === 'API' && $kendaraan->unit) {
+                $this->validateOpdConsistency($holderData['opd'], $kendaraan, $data);
+            }
 
             if ($pemegangLama) {
                 $this->deactivatePemegang($pemegangLama, $kendaraan);
@@ -41,10 +49,60 @@ class KendaraanPemegangService
 
             $this->createPemegang($data, $kendaraan, $holderData);
             $this->logAssignment($data, $kendaraan, $holderData, $pemegangLama);
+
+            // ── Discovery: auto-populate api_mapping_key on first API assignment ──
+            if ($data['source_system'] === 'API' && $kendaraan->unit && $holderData['opd']) {
+                $this->updateApiMappingKey($kendaraan, $holderData['opd']);
+            }
         });
     }
 
-    // ─── Private Helpers ─────────────────────────────────────────────────────
+    // ─── Private Helpers ───────────────────────────────────────────────────────────
+
+    /**
+     * Validate that the employee's OPD (from API) matches the kendaraan's unit.
+     *
+     * - Operator: hard block with ValidationException.
+     * - Admin: allowed, but the controller layer intercepts cross_opd_warning first.
+     */
+    private function validateOpdConsistency(string $opdFromApi, Kendaraan $kendaraan, array $data): void
+    {
+        $unit = $kendaraan->unit;
+
+        // No mapping key yet — nothing to validate against (Discovery phase will set it after success)
+        if (! $unit->api_mapping_key) {
+            return;
+        }
+
+        $isMismatch = strtolower(trim($opdFromApi)) !== strtolower(trim($unit->api_mapping_key));
+
+        if (! $isMismatch) {
+            return;
+        }
+
+        $user = Auth::user();
+
+        // Operator → hard block
+        if ($user->isOperator()) {
+            throw ValidationException::withMessages([
+                'nip' => "Pegawai ini berasal dari OPD berbeda ({$opdFromApi}). Kendaraan ini terdaftar di unit '{$unit->nama_unit}'. Anda tidak diizinkan melakukan penugasan lintas OPD.",
+            ]);
+        }
+
+        // Admin → only block if force_replace_opd flag is not set
+        // The controller will have already shown the warning and returned early before calling assign()
+    }
+
+    /**
+     * Auto-discovery: populate api_mapping_key the first time an API assignment is made.
+     * Does NOT overwrite an existing key (only Admin can change it via the Units CRUD).
+     */
+    private function updateApiMappingKey(Kendaraan $kendaraan, string $opdFromApi): void
+    {
+        if (! $kendaraan->unit->api_mapping_key) {
+            $kendaraan->unit->update(['api_mapping_key' => trim($opdFromApi)]);
+        }
+    }
 
     /**
      * Resolve nama, nip, jabatan, dan OPD dari sumber Manual atau API.

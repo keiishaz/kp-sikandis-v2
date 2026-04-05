@@ -11,18 +11,39 @@ use App\Models\QrKendaraan;
 use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class DashboardRepository implements DashboardRepositoryInterface
 {
+    // ─── Unit Scope ───────────────────────────────────────────────────────────
+
+    /**
+     * Returns a base Kendaraan query scoped to the operator's unit if applicable.
+     */
+    private function kendaraanBase(): Builder
+    {
+
+        $query = Kendaraan::query();
+        $user  = auth()->user();
+
+        if ($user && $user->isOperator() && $user->unit_id) {
+            $query->where('unit_id', $user->unit_id);
+        }
+
+        return $query;
+    }
+
     public function kendaraanStats(): array
     {
+        $base = $this->kendaraanBase();
+
         return [
-            'total'        => Kendaraan::count(),
-            'aktif'        => Kendaraan::where('status', 'aktif')->count(),
-            'tidak_aktif'  => Kendaraan::where('status', '!=', 'aktif')->count(),
-            'jabatan'      => Kendaraan::where('jenis_penggunaan', 'jabatan')->count(),
-            'operasional'  => Kendaraan::where('jenis_penggunaan', 'operasional')->count(),
+            'total'        => (clone $base)->count(),
+            'aktif'        => (clone $base)->where('status', 'aktif')->count(),
+            'tidak_aktif'  => (clone $base)->where('status', '!=', 'aktif')->count(),
+            'jabatan'      => (clone $base)->where('jenis_penggunaan', 'jabatan')->count(),
+            'operasional'  => (clone $base)->where('jenis_penggunaan', 'operasional')->count(),
         ];
     }
 
@@ -30,25 +51,28 @@ class DashboardRepository implements DashboardRepositoryInterface
     {
         $today           = Carbon::today();
         $thirtyDaysLater = Carbon::today()->addDays(30);
+        $base            = $this->kendaraanBase();
 
         return [
-            'aktif'        => Kendaraan::whereNotNull('pajak')->where('pajak', '>=', $today->format('Y-m-d'))->count(),
-            'mati'         => Kendaraan::whereNotNull('pajak')->where('pajak', '<', $today->format('Y-m-d'))->count(),
-            'tidak_ada'    => Kendaraan::whereNull('pajak')->count(),
-            'segera'       => Kendaraan::whereNotNull('pajak')
-                                ->where('pajak', '>=', $today->format('Y-m-d'))
-                                ->where('pajak', '<=', $thirtyDaysLater->format('Y-m-d'))
-                                ->count(),
+            'aktif'     => (clone $base)->whereNotNull('pajak')->where('pajak', '>=', $today->format('Y-m-d'))->count(),
+            'mati'      => (clone $base)->whereNotNull('pajak')->where('pajak', '<', $today->format('Y-m-d'))->count(),
+            'tidak_ada' => (clone $base)->whereNull('pajak')->count(),
+            'segera'    => (clone $base)->whereNotNull('pajak')
+                               ->where('pajak', '>=', $today->format('Y-m-d'))
+                               ->where('pajak', '<=', $thirtyDaysLater->format('Y-m-d'))
+                               ->count(),
         ];
     }
 
     public function pemegangStats(int $totalKendaraan): array
     {
-        $denganPemegang = KendaraanPemegang::where('is_active', true)->count();
+        $base           = $this->kendaraanBase();
+        // Count vehicles in scope that have an active holder
+        $denganPemegang = (clone $base)->whereHas('pemegangAktif')->count();
 
         return [
-            'dengan_pemegang'  => $denganPemegang,
-            'tanpa_pemegang'   => $totalKendaraan - $denganPemegang,
+            'dengan_pemegang' => $denganPemegang,
+            'tanpa_pemegang'  => $totalKendaraan - $denganPemegang,
         ];
     }
 
@@ -95,7 +119,11 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function kendaraanTerbaru(int $limit = 6): Collection
     {
-        return Kendaraan::with(['kategori', 'pemegangAktif.pegawai'])->latest()->limit($limit)->get();
+        return $this->kendaraanBase()
+            ->with(['kategori', 'pemegangAktif.pegawai'])
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 
     public function daftarPajakSegera(int $limit = 5): Collection
@@ -103,7 +131,8 @@ class DashboardRepository implements DashboardRepositoryInterface
         $today           = Carbon::today();
         $thirtyDaysLater = Carbon::today()->addDays(30);
 
-        return Kendaraan::whereNotNull('pajak')
+        return $this->kendaraanBase()
+            ->whereNotNull('pajak')
             ->where('pajak', '>=', $today->format('Y-m-d'))
             ->where('pajak', '<=', $thirtyDaysLater->format('Y-m-d'))
             ->with('pemegangAktif.pegawai')

@@ -21,6 +21,7 @@ class UpdateUnitRequest extends FormRequest
                 'max:255',
                 Rule::unique('units', 'nama_unit')->ignore($this->route('unit')),
             ],
+            'type' => ['required', 'in:internal,external'],
         ];
     }
 

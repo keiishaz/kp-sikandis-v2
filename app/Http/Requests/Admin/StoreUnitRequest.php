@@ -15,6 +15,7 @@ class StoreUnitRequest extends FormRequest
     {
         return [
             'nama_unit' => ['required', 'string', 'max:255', 'unique:units,nama_unit'],
+            'type'      => ['required', 'in:internal,external'],
         ];
     }
 
