@@ -78,16 +78,31 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function qrStats(): array
     {
+        $user = auth()->user();
+        
+        $qrQuery = QrKendaraan::whereHas('kendaraan', function ($q) use ($user) {
+            if ($user && $user->isOperator() && $user->unit_id) {
+                $q->where('unit_id', $user->unit_id);
+            }
+        });
+
         return [
-            'total' => QrKendaraan::count(),
-            'scan'  => QrKendaraan::sum('scan_count'),
-            'top'   => QrKendaraan::with('kendaraan')->orderByDesc('scan_count')->limit(5)->get(),
+            'total' => (clone $qrQuery)->count(),
+            'scan'  => (clone $qrQuery)->sum('scan_count'),
+            'top'   => (clone $qrQuery)->with('kendaraan')->orderByDesc('scan_count')->limit(5)->get(),
         ];
     }
 
     public function qrChartData(): array
     {
-        $records = QrKendaraan::whereYear('updated_at', date('Y'))
+        $user = auth()->user();
+
+        $records = QrKendaraan::whereHas('kendaraan', function ($q) use ($user) {
+                if ($user && $user->isOperator() && $user->unit_id) {
+                    $q->where('unit_id', $user->unit_id);
+                }
+            })
+            ->whereYear('updated_at', date('Y'))
             ->get()
             ->groupBy(fn ($val) => Carbon::parse($val->updated_at)->format('n'));
 
@@ -114,7 +129,13 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function distribusiKategori(): Collection
     {
-        return Kategori::withCount('kendaraans')->get();
+        $user = auth()->user();
+        
+        return Kategori::withCount(['kendaraans' => function ($query) use ($user) {
+            if ($user && $user->isOperator() && $user->unit_id) {
+                $query->where('unit_id', $user->unit_id);
+            }
+        }])->get();
     }
 
     public function kendaraanTerbaru(int $limit = 6): Collection
