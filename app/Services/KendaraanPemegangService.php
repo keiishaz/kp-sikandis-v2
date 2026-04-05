@@ -14,6 +14,7 @@ class KendaraanPemegangService
 {
     public function __construct(
         private readonly PegawaiInternalService $pegawaiInternalService,
+        private readonly FileUploadService $fileUploadService,
     ) {}
 
     /**
@@ -37,6 +38,10 @@ class KendaraanPemegangService
     {
         DB::transaction(function () use ($data, $kendaraan, $pemegangLama) {
             $holderData = $this->resolveHolderData($data);
+
+            // Upload the Dokumen SK file
+            $filePath = $this->fileUploadService->upload($data['dokumen_sk']);
+            $data['dokumen_sk'] = $filePath; // replace the UploadedFile with the path string
 
             // ── OPD Consistency Check (only for API source) ──
             if ($data['source_system'] === 'API' && $kendaraan->unit) {
@@ -165,7 +170,7 @@ class KendaraanPemegangService
             'nama_pegawai'    => $holderData['nama'],
             'jabatan_pegawai' => $holderData['jabatan'],
             'unit_pegawai'    => $holderData['opd'],
-            'nomor_sk'        => $data['nomor_sk'],
+            'dokumen_sk'      => $data['dokumen_sk'],
             'tanggal_sk'      => $data['tanggal_sk'],
             'tanggal_mulai'   => $data['tanggal_mulai'],
             'tanggal_selesai' => null,
@@ -188,7 +193,7 @@ class KendaraanPemegangService
             'TAMBAH PEMEGANG',
             'Kendaraan',
             $kendaraan->id,
-            "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$namaBaru}, NIP: {$nipBaru}, Source: {$data['source_system']}, SK: {$data['nomor_sk']}"
+            "Kendaraan: {$kendaraan->nama_kendaraan}, Pegawai: {$namaBaru}, NIP: {$nipBaru}, Source: {$data['source_system']}, SK Uploaded"
         );
 
         if ($pemegangLama) {
@@ -198,14 +203,14 @@ class KendaraanPemegangService
                 'SERAH TERIMA PEMEGANG',
                 'Kendaraan',
                 $kendaraan->id,
-                "Kendaraan: {$kendaraan->nama_kendaraan}, Dari: {$namaLama} → {$namaBaru}, SK: {$data['nomor_sk']}"
+                "Kendaraan: {$kendaraan->nama_kendaraan}, Dari: {$namaLama} → {$namaBaru}, SK Uploaded"
             );
 
             $judul      = 'Serah Terima Pemegang Kendaraan';
-            $deskripsi  = "Serah terima kendaraan dari {$namaLama} kepada {$namaBaru}. SK: {$data['nomor_sk']}.";
+            $deskripsi  = "Serah terima kendaraan dari {$namaLama} kepada {$namaBaru}. [Dokumen SK Terlampir]";
         } else {
             $judul      = 'Penugasan Pemegang Kendaraan';
-            $deskripsi  = "Pegawai {$namaBaru} (NIP: {$nipBaru}) ditugaskan sebagai pemegang kendaraan. SK: {$data['nomor_sk']}.";
+            $deskripsi  = "Pegawai {$namaBaru} (NIP: {$nipBaru}) ditugaskan sebagai pemegang kendaraan. [Dokumen SK Terlampir]";
         }
 
         if (! $isManual && $opdBaru) {

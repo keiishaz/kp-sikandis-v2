@@ -143,7 +143,7 @@
                         </td>
                         <td style="text-align: center; vertical-align: middle;">
                             <span class="badge {{ $qr->scan_count > 0 ? 'badge-info' : 'badge-neutral' }}" style="padding: 6px 12px; font-size: 13px;">
-                                {{ number_format($qr->scan_count) }}
+                                {{ number_format($qr->scan_count, 0, ',', '.') }}
                             </span>
                         </td>
                         <td style="text-align: center; vertical-align: middle;" class="action-cell">

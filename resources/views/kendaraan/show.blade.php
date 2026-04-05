@@ -141,6 +141,14 @@
                                 <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->lokasi_operasional ?? '-' }}</span>
                             </div>
                             @endif
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">Terdaftar di Unit</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->unit->nama_unit ?? '-' }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--n-200); padding-bottom: 12px;">
+                                <span class="text-muted">Warna Kendaraan</span>
+                                <span style="font-weight: 500; color: var(--n-900);">{{ $kendaraan->warna ?? '-' }}</span>
+                            </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px;">
                                 <span class="text-muted">Token QR Sistem</span>
                                 <span class="badge" style="background: var(--brand-100); color: var(--brand-700); font-family: monospace; letter-spacing: 1px;">
@@ -196,7 +204,13 @@
                                         @endif
                                     </td>
                                     <td><span style="font-family: monospace; font-size: 13px; color: var(--n-600);">{{ $p->nip ?? ($p->pegawai->nip ?? '-') }}</span></td>
-                                    <td>{{ $p->nomor_sk }}</td>
+                                    <td>
+                                        @if($p->dokumen_sk)
+                                            <a href="{{ Storage::url($p->dokumen_sk) }}" target="_blank" class="btn btn-sm btn-secondary" style="padding: 4px 8px; font-size: 11px;">Lihat File</a>
+                                        @else
+                                            <span style="color:var(--n-400); font-style:italic; font-size:12px;">-</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $p->tanggal_mulai ? $p->tanggal_mulai->translatedFormat('d M Y') : '-' }}</td>
                                     <td>{{ $p->tanggal_selesai ? $p->tanggal_selesai->translatedFormat('d M Y') : '—' }}</td>
                                     <td>
@@ -307,7 +321,7 @@
             </button>
         </div>
 
-        <form id="form-ganti-pemegang" action="{{ route('kendaraan.pemegang.store', $kendaraan->id) }}" method="POST">
+        <form id="form-ganti-pemegang" action="{{ route('kendaraan.pemegang.store', $kendaraan->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="force_replace" id="input-force-replace" value="0">
 
@@ -377,9 +391,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Nomor Surat Keputusan (SK) <span class="text-danger">*</span></label>
-                    <input type="text" name="nomor_sk" id="input-nomor-sk" class="form-input" required placeholder="Contoh: SK/001/2026">
-                    <div id="error-nomor-sk" class="form-error" style="display:none; color:var(--danger-text); font-size:12px; margin-top:4px;"></div>
+                    <label class="form-label">Unggah Dokumen SK (Wajib, Maks 1MB) <span class="text-danger">*</span></label>
+                    <input type="file" name="dokumen_sk" id="input-dokumen-sk" class="form-input" required accept=".pdf,.png,.jpg,.jpeg">
+                    <div id="error-dokumen-sk" class="form-error" style="display:none; color:var(--danger-text); font-size:12px; margin-top:4px;"></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -618,16 +632,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Reset error states
-            document.getElementById('error-nomor-sk').style.display = 'none';
-            document.getElementById('input-nomor-sk').classList.remove('is-invalid');
+            document.getElementById('error-dokumen-sk').style.display = 'none';
+            document.getElementById('input-dokumen-sk').classList.remove('is-invalid');
 
             if (res.status === 422) {
                 const errorData = await res.json();
-                if (errorData.errors && errorData.errors.nomor_sk) {
-                    const errorEl = document.getElementById('error-nomor-sk');
-                    errorEl.textContent = errorData.errors.nomor_sk[0];
+                if (errorData.errors && errorData.errors.dokumen_sk) {
+                    const errorEl = document.getElementById('error-dokumen-sk');
+                    errorEl.textContent = errorData.errors.dokumen_sk[0];
                     errorEl.style.display = 'block';
-                    document.getElementById('input-nomor-sk').classList.add('is-invalid');
+                    document.getElementById('input-dokumen-sk').classList.add('is-invalid');
                 }
                 return; // Stop processing if validation fails
             }

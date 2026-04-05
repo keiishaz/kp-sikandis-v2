@@ -82,7 +82,7 @@ class KendaraanPemegangController extends Controller
     {
         $request->validate([
             'source_system' => 'required|in:API,Manual',
-            'nomor_sk'      => 'required|string|max:100|unique:kendaraan_pemegangs,nomor_sk',
+            'dokumen_sk'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:1024',
             'tanggal_sk'    => 'required|date',
             'tanggal_mulai' => 'required|date',
         ]);

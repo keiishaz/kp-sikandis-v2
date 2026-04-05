@@ -43,7 +43,10 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::where('nik', $nik)->first();
 
             if (!$user) {
-                \App\Services\LoginLogger::log('LOGIN FAIL', "NIK tidak ditemukan: {$nik}");
+                \App\Services\LoginLogger::log('LOGIN FAIL', "NIK tidak ditemukan: {$nik}", [
+                    'ip' => $ip,
+                    'user_agent' => $userAgent
+                ]);
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'password' => "NIK tidak ditemukan"
                 ]);
@@ -52,7 +55,10 @@ class FortifyServiceProvider extends ServiceProvider
             // Check if user is blocked
             if ($user->locked_until && now()->lt($user->locked_until)) {
                 $sec = now()->diffInSeconds($user->locked_until);
-                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nik . " (Sisa {$sec} detik)");
+                \App\Services\LoginLogger::log('LOGIN BLOCKED', $user->nik . " (Sisa {$sec} detik)", [
+                    'ip' => $ip,
+                    'user_agent' => $userAgent
+                ]);
                 session()->flash('locked_until', $user->locked_until);
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'password' => "Akun dikunci. Tunggu {$sec} detik sebelum mencoba lagi."
@@ -80,14 +86,20 @@ class FortifyServiceProvider extends ServiceProvider
             // Password wrong
             $user->increment('failed_login_attempts');
             
-            if ($user->failed_login_attempts >= 3) {
-                $user->forceFill(['locked_until' => now()->addMinute()])->save();
-                \App\Services\LoginLogger::log('LOGIN LOCKED 1 MIN', $user->nik);
+            if ($user->failed_login_attempts >= 5) {
+                $user->forceFill(['locked_until' => now()->addMinutes(15)])->save();
+                \App\Services\LoginLogger::log('LOGIN LOCKED 15 MIN', $user->nik, [
+                    'ip' => $ip,
+                    'user_agent' => $userAgent
+                ]);
             } else {
-                \App\Services\LoginLogger::log('LOGIN FAIL PASSWORD', $user->nik);
+                \App\Services\LoginLogger::log('LOGIN FAIL PASSWORD', $user->nik, [
+                    'ip' => $ip,
+                    'user_agent' => $userAgent
+                ]);
             }
 
-            $remain = max(0, 3 - $user->failed_login_attempts);
+            $remain = max(0, 5 - $user->failed_login_attempts);
             $sec = $user->locked_until ? now()->diffInSeconds($user->locked_until) : 0;
             
             if ($user->locked_until) {

@@ -18,9 +18,10 @@ return new class extends Migration
             $table->year('tahun');
             $table->char('no_rangka', 17)->unique();
             $table->char('no_mesin', 30)->unique();
-            $table->date('pajak');
-            $table->enum('jenis_penggunaan', ['jabatan', 'operasional']);
+            $table->date('pajak')->index();
+            $table->enum('jenis_penggunaan', ['jabatan', 'operasional'])->index();
             $table->string('lokasi_operasional', 100)->nullable();
+            $table->string('warna', 50);
                 
             $table->foreignId('kategori_id')
                 ->constrained('kategoris')
@@ -28,7 +29,8 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->enum('status', ['aktif','nonaktif'])
-                ->default('aktif');
+                ->default('aktif')
+                ->index();
 
             $table->timestamps();
             $table->softDeletes();

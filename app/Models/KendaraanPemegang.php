@@ -15,7 +15,7 @@ class KendaraanPemegang extends Model
         'jabatan_pegawai',
         'unit_pegawai',
         'pegawai_id',
-        'nomor_sk',
+        'dokumen_sk',
         'tanggal_sk',
         'tanggal_mulai',
         'tanggal_selesai',

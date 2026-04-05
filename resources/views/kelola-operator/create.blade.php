@@ -55,7 +55,7 @@
                                 <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
                             @endforeach
                         </optgroup>
-                        <optgroup label="Unit">
+                        <optgroup label="Unit Eksternal">
                             @foreach($units->where('type', 'external') as $unit)
                                 <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
                             @endforeach

@@ -121,12 +121,10 @@
 
                 {{-- HIDDEN INPUTS FOR ALL FILTERS (to ensure they are submitted together) --}}
                 <div id="filterInputsContainer">
-                    @foreach(request()->except(['q', 'status', 'page', 'kategori_id', 'jenis_penggunaan', 'status_pajak', 'unit_id', 'opd_name']) as $key => $value)
+                    @foreach(request()->except(['q', 'status', 'page', 'kategori_id', 'jenis_penggunaan', 'status_pajak', 'unit_id']) as $key => $value)
                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                     @endforeach
-                    {{-- Specific hidden inputs for unit_id and opd_name to map the dinas_opd selection --}}
                     <input type="hidden" name="unit_id" value="{{ request('unit_id') }}">
-                    <input type="hidden" name="opd_name" value="{{ request('opd_name') }}">
                 </div>
             </form>
 
@@ -171,27 +169,18 @@
                         <option value="hampir_jatuh_tempo" {{ request('status_pajak') == 'hampir_jatuh_tempo' ? 'selected' : '' }}>Hampir Jatuh Tempo</option>
                         <option value="telah_jatuh_tempo" {{ request('status_pajak') == 'telah_jatuh_tempo' ? 'selected' : '' }}>Telah Jatuh Tempo</option>
                     </select>
-                </div>
-
-                {{-- Filter Dinas/OPD (Dinamis) --}}
+                </div>                {{-- Filter Dinas/OPD (Khusus Admin) --}}
+                @if(auth()->user()->isAdmin())
                 <div class="filter-group">
                     <label class="filter-label">Tugas Dinas / OPD</label>
-                    <select name="dinas_opd" form="searchForm" class="form-select" id="dinasFilter" onchange="handleDinasChange(this)">
+                    <select name="unit_id" form="searchForm" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Dinas</option>
-                        
-                        <optgroup label="Unit Kerja Internal (Manual)">
-                            @foreach($manualUnits as $un)
-                                <option value="unit:{{ $un->id }}" {{ request('unit_id') == $un->id ? 'selected' : '' }}>{{ $un->nama_unit }}</option>
-                            @endforeach
-                        </optgroup>
-
-                        <optgroup label="OPD Penanggung Jawab (API)">
-                            @foreach($apiOpds as $opd)
-                                <option value="opd:{{ $opd }}" {{ request('opd_name') == $opd ? 'selected' : '' }}>{{ $opd }}</option>
-                            @endforeach
-                        </optgroup>
+                        @foreach($units as $un)
+                            <option value="{{ $un->id }}" {{ request('unit_id') == $un->id ? 'selected' : '' }}>{{ $un->nama_unit }}</option>
+                        @endforeach
                     </select>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -226,14 +215,8 @@
                     @endif
                     @if(request('unit_id'))
                         <div class="filter-chip">
-                            Dinas: {{ $manualUnits->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit Kerja' }}
-                            <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
-                        </div>
-                    @endif
-                    @if(request('opd_name'))
-                        <div class="filter-chip">
-                            Dinas (API): {{ request('opd_name') }}
-                            <span class="filter-chip-remove" onclick="removeDinasFilters()">&times;</span>
+                            Dinas: {{ $units->firstWhere('id', request('unit_id'))->nama_unit ?? 'Unit Kerja' }}
+                            <span class="filter-chip-remove" onclick="removeFilter('unit_id')">&times;</span>
                         </div>
                     @endif
                     <a href="{{ route('kendaraan.index', ['status' => $status]) }}" class="filter-reset">Reset Semua</a>
@@ -381,6 +364,18 @@
                         </select>
                     </div>
 
+                    @if(auth()->user()->isAdmin())
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 13.5px; font-weight: 600; color: var(--n-800); margin-bottom: 8px;">Dinas / OPD</label>
+                        <select name="unit_id" class="form-select">
+                            <option value="">Semua Dinas</option>
+                            @foreach($units as $un)
+                                <option value="{{ $un->id }}">{{ $un->nama_unit }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+
                     {{-- Live Counter --}}
                     <div id="printCountBox" style="background: var(--brand-50); border: 1px solid var(--brand-200); border-radius: var(--r-md); padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -420,43 +415,18 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(document.getElementById('modalPrintFilter'));
 });
 
-function handleDinasChange(select) {
-    const value = select.value;
-    const form = document.getElementById('searchForm');
-    const unitIdInput = form.querySelector('input[name="unit_id"]');
-    const opdNameInput = form.querySelector('input[name="opd_name"]');
-
-    if (value === "") {
-        unitIdInput.value = "";
-        opdNameInput.value = "";
-    } else if (value.startsWith('unit:')) {
-        unitIdInput.value = value.split(':')[1];
-        opdNameInput.value = "";
-    } else if (value.startsWith('opd:')) {
-        unitIdInput.value = "";
-        opdNameInput.value = value.split(':')[1];
-    }
-    
-    form.submit();
-}
-
 function removeFilter(key) {
     const form = document.getElementById('searchForm');
-    // Using form.elements is robust for elements linked via form attribute
     const input = form.elements[key];
     if (input) {
         if (input.tagName === 'SELECT') input.selectedIndex = 0;
         else input.value = '';
     }
-    form.submit();
-}
+    
+    // Support removing hidden inputs too
+    const hidden = form.querySelector(`input[type="hidden"][name="${key}"]`);
+    if (hidden) hidden.value = '';
 
-function removeDinasFilters() {
-    const form = document.getElementById('searchForm');
-    form.elements['unit_id'].value = '';
-    form.elements['opd_name'].value = '';
-    const select = document.getElementById('dinasFilter');
-    if (select) select.selectedIndex = 0;
     form.submit();
 }
 

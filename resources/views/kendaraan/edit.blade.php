@@ -102,6 +102,12 @@
                                 </select>
                                 @error('kategori_id')<div class="form-error">{{ $message }}</div>@enderror
                             </div>
+
+                            <div class="form-group">
+                                <label for="warna" class="form-label">Warna Kendaraan <span class="text-danger">*</span></label>
+                                <input type="text" id="warna" name="warna" class="form-input {{ $errors->has('warna') ? 'is-invalid' : '' }}" value="{{ old('warna', $kendaraan->warna) }}" placeholder="Contoh: Hitam, Putih, Merah...">
+                                @error('warna')<div class="form-error">{{ $message }}</div>@enderror
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -279,12 +279,12 @@
                 <p class="form-subtitle">Langkah terakhir: Masukkan kata sandi sandi Anda.</p>
             </div>
 
-            @error('password')
+            @if($errors->has('password') && !session('locked_until'))
             <div class="alert-box alert-error">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <p>{{ $message }}</p>
+                <p>{{ $errors->first('password') }}</p>
             </div>
-            @enderror
+            @endif
 
             {{-- Alert Timer --}}
             <div id="timer-container" class="alert-box alert-warning" style="display: none;">
@@ -360,9 +360,15 @@
 
             function updateTimer() {
                 const now = new Date().getTime();
-                const sec = Math.floor((lockedUntil - now) / 1000); 
-                if(sec > 0){
-                    timerDiv.textContent = "Akun dikunci. Tunggu " + sec + " detik.";
+                const totalSec = Math.floor((lockedUntil - now) / 1000); 
+                if(totalSec > 0){
+                    const mins = Math.floor(totalSec / 60);
+                    const secs = totalSec % 60;
+                    let displayTime = '';
+                    if (mins > 0) displayTime += mins + ' menit ';
+                    displayTime += secs + ' detik';
+                    
+                    timerDiv.textContent = "Akun dikunci. Tunggu " + displayTime.trim() + ".";
                     timerContainer.style.display = 'flex';
                     submitBtn.disabled = true;
                     passwordInput.disabled = true;

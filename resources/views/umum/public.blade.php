@@ -404,6 +404,10 @@
                 <span class="row-value">{{ $kendaraan->tahun ?? '-' }}</span>
             </div>
             <div class="row">
+                <span class="row-key">Warna Kendaraan</span>
+                <span class="row-value">{{ $kendaraan->warna ?? '-' }}</span>
+            </div>
+            <div class="row">
                 <span class="row-key">Jenis Penggunaan</span>
                 <span class="row-value capitalize">{{ str_replace('_', ' ', $kendaraan->jenis_penggunaan) ?? '-' }}</span>
             </div>

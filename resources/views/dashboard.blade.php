@@ -90,7 +90,7 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h7v7h-7z"></path></svg>
                 </div>
             </div>
-            <div class="metric-value">{{ number_format($totalScan ?? 0) }}</div>
+            <div class="metric-value">{{ number_format($totalScan ?? 0, 0, ',', '.') }}</div>
             <div class="metric-footer">
                 <span class="metric-trend-label">Dari stiker QR public</span>
             </div>
@@ -251,7 +251,7 @@
                                     <div style="font-size:12px;font-weight:600;color:var(--n-900);">{{ $qr->kendaraan?->no_polisi ?? $qr->token }}</div>
                                     <div style="font-size:11px;color:var(--n-500); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $qr->kendaraan?->nama_kendaraan ?? '-' }}</div>
                                 </div>
-                                <div class="qr-scan-count" style="font-size: 11.5px;">{{ number_format($qr->scan_count) }}x</div>
+                                <div class="qr-scan-count" style="font-size: 11.5px;">{{ number_format($qr->scan_count, 0, ',', '.') }}x</div>
                             </div>
                         @empty
                             <div class="text-center" style="padding: 20px; font-size: 13px; color: var(--n-400);">Belum ada data.</div>

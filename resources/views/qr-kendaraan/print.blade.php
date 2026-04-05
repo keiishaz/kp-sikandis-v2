@@ -250,12 +250,9 @@ function regenerateAll() {
         card.appendChild(wrapper);
 
         // Teks Informasi (Di Luar Kartu Putih)
-        const codeEl = document.createElement('div');
-        codeEl.className = 'vehicle-code';
-        codeEl.textContent = item.token;
-
         const nameEl = document.createElement('div');
         nameEl.className = 'vehicle-name';
+        nameEl.style.marginTop = '8px'; // Add slight margin for spacing
         nameEl.textContent = item.nama;
 
         const platEl = document.createElement('div');
@@ -263,7 +260,6 @@ function regenerateAll() {
         platEl.textContent = item.plat;
 
         printItem.appendChild(card);
-        printItem.appendChild(codeEl);
         printItem.appendChild(nameEl);
         printItem.appendChild(platEl);
 

@@ -129,13 +129,6 @@ class KendaraanRepository implements KendaraanRepositoryInterface
             $query->where('unit_id', $filters['unit_id']);
         }
 
-        if (! empty($filters['opd_name'])) {
-            $query->whereHas('pemegangAktif', function ($q) use ($filters) {
-                $q->where('source_system', '!=', 'manual')
-                  ->where('unit_pegawai', $filters['opd_name']);
-            });
-        }
-
         return $query;
     }
 

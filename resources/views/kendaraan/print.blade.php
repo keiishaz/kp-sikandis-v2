@@ -112,12 +112,12 @@
             margin-bottom: 20px;
         }
         .kop-logo-left {
-            width: 80px;
+            width: 60px;
             height: auto;
             flex-shrink: 0;
         }
         .kop-logo-right {
-            width: 100px;
+            width: 75px;
             height: auto;
             flex-shrink: 0;
         }
@@ -127,18 +127,18 @@
             padding: 0 20px;
         }
         .kop-text h1 {
-            font-size: 19px;
+            font-size: 17px;
             margin-bottom: 2px;
             font-weight: bold;
             color: #000;
         }
         .kop-text h2 {
-            font-size: 17px;
-            margin-bottom: 6px;
+            font-size: 15px;
+            margin-bottom: 4px;
             font-weight: bold;
         }
         .kop-text p {
-            font-size: 11px;
+            font-size: 10.5px;
             line-height: 1.3;
             margin-bottom: 0;
         }

@@ -23,9 +23,9 @@ return new class extends Migration
               ->constrained('pegawais')
               ->cascadeOnDelete();
             
-            $table->string('nomor_sk')->unique();
+            $table->string('dokumen_sk');
             $table->date('tanggal_sk');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(true)->index();
  
             $table->timestamps();
         });

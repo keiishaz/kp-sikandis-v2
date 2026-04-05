@@ -21,6 +21,7 @@ class Kendaraan extends Model
         'pajak',
         'jenis_penggunaan',
         'lokasi_operasional',
+        'warna',
         'kategori_id',
         'unit_id',
         'status',

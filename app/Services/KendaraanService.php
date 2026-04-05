@@ -33,12 +33,7 @@ class KendaraanService
         $kategoris = $this->kategoriRepo->all();
 
         // ─── Filter Support (Advanced) ───
-        $manualUnits = \App\Models\Unit::orderBy('nama_unit')->get();
-        $apiOpds     = \App\Models\KendaraanPemegang::where('source_system', '!=', 'manual')
-                        ->whereNotNull('unit_pegawai')
-                        ->distinct()
-                        ->orderBy('unit_pegawai')
-                        ->pluck('unit_pegawai');
+        $units = \App\Models\Unit::orderBy('nama_unit')->get();
 
         return [
             'kendaraans'    => $paginator,
@@ -46,8 +41,7 @@ class KendaraanService
             'countAktif'    => $counts['aktif'],
             'countNonaktif' => $counts['nonaktif'],
             'kategoris'     => $kategoris,
-            'manualUnits'   => $manualUnits,
-            'apiOpds'       => $apiOpds,
+            'units'         => $units,
             'filters'       => $filters, 
         ];
     }
@@ -238,6 +232,13 @@ class KendaraanService
 
         if (! empty($filters['status_pajak']) && isset($pajakLabels[$filters['status_pajak']])) {
             $labels['Status Pajak'] = $pajakLabels[$filters['status_pajak']];
+        }
+
+        if (! empty($filters['unit_id'])) {
+            $unit = \App\Models\Unit::find($filters['unit_id']);
+            if ($unit) {
+                $labels['Dinas / OPD'] = $unit->nama_unit;
+            }
         }
 
         return $labels;
