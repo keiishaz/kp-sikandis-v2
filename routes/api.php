@@ -15,6 +15,6 @@ use App\Http\Controllers\Api\V1\StatsController;
 |
 */
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('/stats', [StatsController::class, 'index']);
 });
